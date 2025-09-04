@@ -1,37 +1,47 @@
 <?php
 
+use App\Services\ViewService;
+use App\Services\ComponentService;
+
+// ========================================
+// VIEW SERVICE WRAPPER FUNCTIONS
+// ========================================
+
 if (!function_exists('findViewDirectory')) {
     function findViewDirectory()
     {
-        $request = request();
-        $path = '/' . ltrim($request->path(), '/');
-        
-        $routes = config('routes-web');
-        
-        if (isset($routes[$path])) {
-            return $routes[$path];
-        }
-        
-        throw new RuntimeException("Unable to determine view directory for path: {$path}");
+        return app(ViewService::class)->findViewDirectory();
     }
 }
 
 if (!function_exists('getCommonPath')) {
     function getCommonPath()
     {
-        $folder = findViewDirectory();
-        
-        if (preg_match('/^(\d)(\d{2})-([^-]+)/', $folder, $matches)) {
-            return $matches[1] . '00-' . $matches[3] . '-common';
-        }
-        
-        throw new RuntimeException("Unable to parse view directory pattern: {$folder}");
+        return app(ViewService::class)->getCommonPath();
     }
 }
 
 if (!function_exists('getCurrentViewPath')) {
     function getCurrentViewPath()
     {
-        return findViewDirectory() . '.body';
+        return app(ViewService::class)->getCurrentViewPath();
+    }
+}
+
+// ========================================
+// COMPONENT SERVICE WRAPPER FUNCTIONS
+// ========================================
+
+if (!function_exists('renderComponent')) {
+    function renderComponent($configFile, $componentName, $overrides = [])
+    {
+        return app(ComponentService::class)->render($configFile, $componentName, $overrides);
+    }
+}
+
+if (!function_exists('renderAuthLinks')) {
+    function renderAuthLinks()
+    {
+        return app(ComponentService::class)->renderAuthLinks();
     }
 }
