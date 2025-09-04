@@ -17,7 +17,17 @@ class ViewService
         $routes = config('routes-web');
         
         if (isset($routes[$path])) {
-            return $routes[$path];
+            $config = $routes[$path];
+            
+            // 새로운 배열 구조 지원
+            if (is_array($config)) {
+                return $config['view'];
+            }
+            
+            // 이전 문자열 구조도 지원 (하위 호환성)
+            if (is_string($config)) {
+                return $config;
+            }
         }
         
         throw new RuntimeException("Unable to determine view directory for path: {$path}");
