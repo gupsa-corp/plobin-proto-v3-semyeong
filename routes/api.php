@@ -18,7 +18,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/check-email', CheckEmailController::class);
     Route::post('/signup', SignupController::class);
     Route::post('/login', LoginController::class);
-    
+
     // 인증 필요한 라우트
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', LogoutController::class);

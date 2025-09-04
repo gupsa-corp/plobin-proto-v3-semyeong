@@ -1,9 +1,36 @@
 <main class="service-main flex-1 p-6">
-    <!-- 헤더 -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">대시보드</h1>
-        <p class="text-gray-600">프로젝트 현황을 한눈에 확인하세요</p>
+    <!-- 인증 체크 로딩 -->
+    <div id="authLoading" class="flex items-center justify-center min-h-96">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <span class="ml-3 text-gray-600">인증 확인 중...</span>
     </div>
+
+    <!-- 인증되지 않은 사용자 -->
+    <div id="authRequired" class="hidden text-center py-20">
+        <div class="mb-6">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">로그인이 필요합니다</h2>
+        <p class="text-gray-600 mb-6">대시보드를 사용하려면 로그인해주세요.</p>
+        <div class="space-x-4">
+            <a href="/login" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition duration-200">
+                로그인
+            </a>
+            <a href="/signup" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-200 transition duration-200">
+                회원가입
+            </a>
+        </div>
+    </div>
+
+    <!-- 메인 대시보드 콘텐츠 -->
+    <div id="dashboardContent" class="hidden">
+        <!-- 헤더 -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">대시보드</h1>
+            <p class="text-gray-600">환영합니다! <span id="userName">사용자</span>님</p>
+        </div>
 
     <!-- 통계 카드 -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -172,5 +199,12 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
+
+    {{-- AJAX 로직 포함 --}}
+    @include('301-service-dashboard.ajax')
+    
+    {{-- JavaScript 로직 포함 --}}
+    @include('301-service-dashboard.javascript')
 </main>
