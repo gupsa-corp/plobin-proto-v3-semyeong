@@ -2,12 +2,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Plobin</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ $title ?? 'Plobin' }} - 서비스</title>
     
-    <!-- 랜딩페이지 전용 Vite 번들 -->
-    @vite(['resources/css/landing.css', 'resources/js/landing.js'])
+    <!-- 서비스용 Vite 번들 -->
+    @vite(['resources/css/service.css', 'resources/js/service.js'])
+    @stack('styles')
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -24,4 +28,6 @@
             }
         }
     </script>
+    
+    @stack('scripts')
 </head>
