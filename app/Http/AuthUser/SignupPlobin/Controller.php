@@ -3,25 +3,20 @@
 namespace App\Http\AuthUser\SignupPlobin;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Traits\{HasRateLimit, HasCache, HasSecurity};
 use App\Models\User;
 
 class Controller extends ApiController
 {
-    use HasRateLimit, HasCache, HasSecurity;
-
     public function __invoke(Request $request)
     {
-        $this->checkRateLimit($request, null, 3, 5);
-
-        $normalizedEmail = $this->normalizeEmail($request->email);
-
+        // 이메일은 SecurityMiddleware에서 이미 정규화됨
         $user = User::create([
             'name' => $request->name,
-            'email' => $normalizedEmail,
+            'email' => $request->email,
             'password' => $request->password,
         ]);
 
+        // 회원가입과 동시에 로그인 토큰 발급
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return $this->created([

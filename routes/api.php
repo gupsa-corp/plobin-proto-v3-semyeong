@@ -8,11 +8,15 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes - 단순하게 정리됨
 |--------------------------------------------------------------------------
+|
+| 두 가지 인증만 지원:
+| 1. 웹 세션 인증 (브라우저)
+| 2. API 토큰 인증 (Bearer token)
+|
 */
 
-// 200Auth 도메인 - 인증 관련 API
 Route::prefix('auth')->group(function () {
     // 001RegisterPlobin: 플로빈 회원가입
     Route::post('/check-email', CheckEmailController::class);
