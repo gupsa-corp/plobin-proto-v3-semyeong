@@ -56,6 +56,9 @@ class SimpleAuth
             return $user;
         });
 
+        // Laravel의 auth 시스템에도 사용자를 설정
+        auth()->setUser($user);
+
         return $next($request);
     }
 }

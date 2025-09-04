@@ -1,9 +1,6 @@
 <main class="service-main flex-1 p-6">
-    {{-- 인증 체크 컴포넌트 --}}
-    @include('501-service-block-auth-check.auth-check')
-
     {{-- 대시보드 메인 콘텐츠 --}}
-    <div id="dashboardContent" class="hidden">
+    <div id="dashboardContent">
         {{-- 조직선택 헤더 --}}
         <div class="flex justify-between items-center mb-8">
             <div class="flex-1">

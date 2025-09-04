@@ -10,7 +10,7 @@ async function fetchUserInfo(token) {
     });
 
     if (!response.ok) {
-        throw new Error('인증 실패');
+        throw new Error(`API 오류: ${response.status}`);
     }
 
     const result = await response.json();

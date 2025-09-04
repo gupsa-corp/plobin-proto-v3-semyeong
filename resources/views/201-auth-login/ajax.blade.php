@@ -53,22 +53,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const data = await response.json();
                 
-                if (response.ok && (data.success || data.token)) {
+                if (response.ok && (data.success || data.token || (data.data && data.data.token))) {
                     // 로그인 성공
                     showSuccess('로그인 성공! 잠시 후 대시보드로 이동합니다...');
                     
-                    // 토큰이 있으면 저장
-                    if (data.token) {
-                        localStorage.setItem('auth_token', data.token);
+                    // 토큰이 있으면 저장 (data.token 또는 data.data.token 확인)
+                    const token = data.token || (data.data && data.data.token);
+                    if (token) {
+                        localStorage.setItem('auth_token', token);
                         // AuthHelper에도 설정
                         if (window.AuthHelper) {
-                            window.AuthHelper.setToken(data.token);
+                            window.AuthHelper.setToken(token);
                         }
                     }
                     
                     // 쿠키 기반 인증의 경우 토큰 없이도 성공
-                    if (data.user) {
-                        console.log('로그인한 사용자:', data.user);
+                    const user = data.user || (data.data && data.data.user);
+                    if (user) {
+                        console.log('로그인한 사용자:', user);
                     }
                     
                     // 대시보드로 리다이렉트 (2초 후)

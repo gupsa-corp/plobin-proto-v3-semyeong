@@ -6,9 +6,13 @@ use App\Http\Controllers\ApiController;
 
 class Controller extends ApiController
 {
-    public function __invoke()
+    public function __invoke(\Illuminate\Http\Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user() ?: auth()->user();
+
+        if (!$user) {
+            throw \App\Exceptions\ApiException::unauthorized('인증된 사용자를 찾을 수 없습니다.');
+        }
 
         return $this->success([
             'id' => $user->id,
