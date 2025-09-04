@@ -14,11 +14,11 @@ foreach ($routes as $path => $config) {
         $viewName = $config['view'];
         $routeName = $config['name'] ?? null;
     }
-    
+
     $route = Route::get($path, function () use ($viewName) {
         return view($viewName . '.index');
     });
-    
+
     // 라우트명이 있으면 추가
     if ($routeName) {
         $route->name($routeName);

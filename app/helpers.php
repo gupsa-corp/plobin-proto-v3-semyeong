@@ -27,21 +27,3 @@ if (!function_exists('getCurrentViewPath')) {
         return app(ViewService::class)->getCurrentViewPath();
     }
 }
-
-// ========================================
-// COMPONENT SERVICE WRAPPER FUNCTIONS
-// ========================================
-
-if (!function_exists('renderComponent')) {
-    function renderComponent($configFile, $componentName, $overrides = [])
-    {
-        return app(ComponentService::class)->render($configFile, $componentName, $overrides);
-    }
-}
-
-if (!function_exists('renderAuthLinks')) {
-    function renderAuthLinks()
-    {
-        return app(ComponentService::class)->renderAuthLinks();
-    }
-}

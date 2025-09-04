@@ -5,7 +5,6 @@
                 <h1 class="text-2xl font-bold text-primary-600">Plobin</h1>
             </div>
             <nav class="flex space-x-4">
-                {!! renderAuthLinks() !!}
             </nav>
         </div>
     </div>

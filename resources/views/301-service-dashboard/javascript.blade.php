@@ -1,4 +1,3 @@
-{{-- 대시보드 JavaScript 로직 --}}
 <script>
 // 인증 상태 확인
 async function checkAuth() {

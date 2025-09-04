@@ -1,4 +1,3 @@
-{{-- 대시보드 인증 AJAX --}}
 <script>
 // 사용자 정보 조회 AJAX
 async function fetchUserInfo(token) {
@@ -21,7 +20,7 @@ async function fetchUserInfo(token) {
 // 로그아웃 AJAX
 async function performLogout() {
     const token = localStorage.getItem('auth_token');
-    
+
     if (token) {
         try {
             await fetch('/api/auth/logout', {
@@ -35,7 +34,7 @@ async function performLogout() {
             console.log('로그아웃 API 오류:', error);
         }
     }
-    
+
     // 로컬 토큰 제거
     localStorage.removeItem('auth_token');
 }
