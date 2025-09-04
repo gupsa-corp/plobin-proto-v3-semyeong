@@ -120,7 +120,12 @@ class OrganizationModalManager {
             }
 
             const data = await response.json();
-            const organizations = data.data || data.organizations || data || [];
+            let organizations = data.data || data.organizations || data || [];
+            
+            // organizations가 배열이 아닌 경우 빈 배열로 설정
+            if (!Array.isArray(organizations)) {
+                organizations = [];
+            }
             
             // 현재 조직 목록에서 같은 subdomain이 있는지 확인
             const isDuplicate = organizations.some(org => 
