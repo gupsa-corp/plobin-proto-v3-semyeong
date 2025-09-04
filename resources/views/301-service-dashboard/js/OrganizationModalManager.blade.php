@@ -21,11 +21,11 @@ class OrganizationModalManager {
         if (this.createModal) {
             this.createModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            
+
             // 입력 필드 초기화
             this.orgNameInput = document.getElementById('orgName');
             this.subdomainInput = document.getElementById('subdomain');
-            
+
             if (this.orgNameInput) this.orgNameInput.value = '';
             if (this.subdomainInput) this.subdomainInput.value = '';
         }
@@ -44,7 +44,7 @@ class OrganizationModalManager {
     /**
      * 성공 모달을 표시합니다
      * @param {string} orgName - 조직명
-     * @param {string} subdomain - 하위 도메인
+     * @param {string} subdomain - URL 명
      */
     showSuccessModal(orgName, subdomain) {
         this.successModal = document.getElementById('createOrganizationSuccessModal');
@@ -82,16 +82,16 @@ class OrganizationModalManager {
     async checkDuplicate() {
         const subdomain = this.subdomainInput?.value.trim();
         this.checkDuplicateBtn = document.getElementById('checkDuplicateBtn');
-        
+
         if (!subdomain) {
-            alert('하위 도메인을 입력해주세요.');
+            alert('URL 명을 입력해주세요.');
             return;
         }
 
         // 영문 소문자 3~12자 유효성 검사
         const subdomainPattern = /^[a-z]{3,12}$/;
         if (!subdomainPattern.test(subdomain)) {
-            alert('하위 도메인은 영문 소문자 3~12자로 입력해주세요.');
+            alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
             return;
         }
 
@@ -121,16 +121,16 @@ class OrganizationModalManager {
 
             const data = await response.json();
             let organizations = data.data || data.organizations || data || [];
-            
+
             // organizations가 배열이 아닌 경우 빈 배열로 설정
             if (!Array.isArray(organizations)) {
                 organizations = [];
             }
-            
+
             // 현재 조직 목록에서 같은 subdomain이 있는지 확인
-            const isDuplicate = organizations.some(org => 
-                (org.code === subdomain) || 
-                (org.subdomain === subdomain) || 
+            const isDuplicate = organizations.some(org =>
+                (org.code === subdomain) ||
+                (org.subdomain === subdomain) ||
                 (org.slug === subdomain)
             );
 
@@ -139,10 +139,16 @@ class OrganizationModalManager {
             } else {
                 alert('사용 가능한 도메인입니다.');
             }
-            
+
+            // 성공적인 중복 확인 후 버튼 복원
+            if (this.checkDuplicateBtn) {
+                this.checkDuplicateBtn.disabled = false;
+                this.checkDuplicateBtn.textContent = '중복확인';
+            }
+
         } catch (error) {
             ApiErrorHandler.handle(error, '중복 확인');
-            
+
             // 401이 아닌 경우에만 사용자 알림 및 버튼 복원
             if (!ApiErrorHandler.is401Error(error)) {
                 alert('중복 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -161,7 +167,7 @@ class OrganizationModalManager {
         const orgName = this.orgNameInput?.value.trim();
         const subdomain = this.subdomainInput?.value.trim();
         this.createSubmitBtn = document.getElementById('createOrgSubmitBtn');
-        
+
         // 유효성 검사
         if (!orgName) {
             alert('조직 이름을 입력해주세요.');
@@ -174,13 +180,13 @@ class OrganizationModalManager {
         }
 
         if (!subdomain) {
-            alert('하위 도메인을 입력해주세요.');
+            alert('URL 명을 입력해주세요.');
             return;
         }
 
         const subdomainPattern = /^[a-z]{3,12}$/;
         if (!subdomainPattern.test(subdomain)) {
-            alert('하위 도메인은 영문 소문자 3~12자로 입력해주세요.');
+            alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
             return;
         }
 
@@ -218,33 +224,33 @@ class OrganizationModalManager {
 
             const data = await response.json();
             console.log('조직 생성 성공:', data);
-            
+
             // 생성 모달 닫기
             this.hideCreateModal();
-            
+
             // 성공 모달 표시
             this.showSuccessModal(orgName, subdomain);
-            
+
             // 조직 목록 다시 로드
             const organizationManager = new OrganizationManager();
             organizationManager.loadOrganizations();
-            
+
         } catch (error) {
             ApiErrorHandler.handle(error, '조직 생성');
-            
+
             // 401이 아닌 경우에만 사용자 알림 및 버튼 복원
             if (!ApiErrorHandler.is401Error(error)) {
                 // 에러 메시지 표시
                 let errorMessage = '조직 생성 중 오류가 발생했습니다.';
-                
+
                 if (error.message.includes('422')) {
                     errorMessage = '입력한 정보를 다시 확인해주세요.';
                 } else if (error.message.includes('409') || error.message.includes('conflict')) {
                     errorMessage = '이미 존재하는 도메인입니다. 다른 도메인을 사용해주세요.';
                 }
-                
+
                 alert(errorMessage);
-                
+
                 if (this.createSubmitBtn) {
                     this.createSubmitBtn.disabled = false;
                     this.createSubmitBtn.textContent = '생성하기';
@@ -318,7 +324,7 @@ class OrganizationModalManager {
             if (e.key === 'Escape') {
                 const createModal = document.getElementById('createOrganizationModal');
                 const successModal = document.getElementById('createOrganizationSuccessModal');
-                
+
                 if (createModal && !createModal.classList.contains('hidden')) {
                     this.hideCreateModal();
                 } else if (successModal && !successModal.classList.contains('hidden')) {
