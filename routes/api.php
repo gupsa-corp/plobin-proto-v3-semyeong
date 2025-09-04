@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Auth\CheckEmail\Controller as CheckEmailController;
-use Illuminate\Http\Request;
+use App\Http\AuthUser\CheckEmail\Controller as CheckEmailController;
 use Illuminate\Support\Facades\Route;
 
 /*
