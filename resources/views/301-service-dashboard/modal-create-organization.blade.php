@@ -22,10 +22,10 @@
                     {{-- URL 명 입력 --}}
                     <div class="flex flex-col justify-center items-start gap-1 w-full">
                         <div class="flex items-center pl-1 gap-2">
-                            <label for="subdomain" class="text-sm text-gray-900">URL 명</label>
+                            <label for="urlPath" class="text-sm text-gray-900">URL 명</label>
                         </div>
                         <div class="flex items-center gap-2 w-full">
-                            <input type="text" id="subdomain" placeholder="영문 소문자 3~12자"
+                            <input type="text" id="urlPath" placeholder="영문 소문자 3~12자"
                                    class="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
                             <button type="button" id="checkDuplicateBtn"
                                     class="px-6 py-3 border border-teal-500 bg-teal-50 text-teal-500 font-bold text-sm rounded-lg hover:bg-teal-100">

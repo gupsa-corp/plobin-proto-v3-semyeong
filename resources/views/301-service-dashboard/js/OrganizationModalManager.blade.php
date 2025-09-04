@@ -8,7 +8,7 @@ class OrganizationModalManager {
         this.createModal = null;
         this.successModal = null;
         this.orgNameInput = null;
-        this.subdomainInput = null;
+        this.urlPathInput = null;
         this.checkDuplicateBtn = null;
         this.createSubmitBtn = null;
     }
@@ -24,10 +24,10 @@ class OrganizationModalManager {
 
             // 입력 필드 초기화
             this.orgNameInput = document.getElementById('orgName');
-            this.subdomainInput = document.getElementById('subdomain');
+            this.urlPathInput = document.getElementById('urlPath');
 
             if (this.orgNameInput) this.orgNameInput.value = '';
-            if (this.subdomainInput) this.subdomainInput.value = '';
+            if (this.urlPathInput) this.urlPathInput.value = '';
         }
     }
 
@@ -44,9 +44,9 @@ class OrganizationModalManager {
     /**
      * 성공 모달을 표시합니다
      * @param {string} orgName - 조직명
-     * @param {string} subdomain - URL 명
+     * @param {string} urlPath - URL 명
      */
-    showSuccessModal(orgName, subdomain) {
+    showSuccessModal(orgName, urlPath) {
         this.successModal = document.getElementById('createOrganizationSuccessModal');
         if (this.successModal) {
             // 제목 업데이트
@@ -58,7 +58,7 @@ class OrganizationModalManager {
             // URL 업데이트
             const organizationUrl = document.getElementById('organizationUrl');
             if (organizationUrl) {
-                organizationUrl.textContent = `www.plobin.com/orgs/${subdomain}`;
+                organizationUrl.textContent = `www.plobin.com/orgs/${urlPath}`;
             }
 
             this.successModal.classList.remove('hidden');
@@ -80,17 +80,17 @@ class OrganizationModalManager {
      * 도메인 중복을 확인합니다
      */
     async checkDuplicate() {
-        const subdomain = this.subdomainInput?.value.trim();
+        const urlPath = this.urlPathInput?.value.trim();
         this.checkDuplicateBtn = document.getElementById('checkDuplicateBtn');
 
-        if (!subdomain) {
+        if (!urlPath) {
             alert('URL 명을 입력해주세요.');
             return;
         }
 
         // 영문 소문자 3~12자 유효성 검사
-        const subdomainPattern = /^[a-z]{3,12}$/;
-        if (!subdomainPattern.test(subdomain)) {
+        const urlPathPattern = /^[a-z]{3,12}$/;
+        if (!urlPathPattern.test(urlPath)) {
             alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
             return;
         }
@@ -127,11 +127,11 @@ class OrganizationModalManager {
                 organizations = [];
             }
 
-            // 현재 조직 목록에서 같은 subdomain이 있는지 확인
+            // 현재 조직 목록에서 같은 urlPath이 있는지 확인
             const isDuplicate = organizations.some(org =>
-                (org.code === subdomain) ||
-                (org.subdomain === subdomain) ||
-                (org.slug === subdomain)
+                (org.code === urlPath) ||
+                (org.url_path === urlPath) ||
+                (org.slug === urlPath)
             );
 
             if (isDuplicate) {
@@ -164,8 +164,12 @@ class OrganizationModalManager {
      * 조직을 생성합니다
      */
     async createOrganization() {
+        // 입력 필드를 다시 참조 (모달이 열린 후 변경될 수 있으므로)
+        this.orgNameInput = document.getElementById('orgName');
+        this.urlPathInput = document.getElementById('urlPath');
+
         const orgName = this.orgNameInput?.value.trim();
-        const subdomain = this.subdomainInput?.value.trim();
+        const urlPath = this.urlPathInput?.value.trim();
         this.createSubmitBtn = document.getElementById('createOrgSubmitBtn');
 
         // 유효성 검사
@@ -179,13 +183,13 @@ class OrganizationModalManager {
             return;
         }
 
-        if (!subdomain) {
+        if (!urlPath) {
             alert('URL 명을 입력해주세요.');
             return;
         }
 
-        const subdomainPattern = /^[a-z]{3,12}$/;
-        if (!subdomainPattern.test(subdomain)) {
+        const urlPathPattern = /^[a-z]{3,12}$/;
+        if (!urlPathPattern.test(urlPath)) {
             alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
             return;
         }
@@ -209,7 +213,7 @@ class OrganizationModalManager {
                 },
                 body: JSON.stringify({
                     name: orgName,
-                    subdomain: subdomain,
+                    url_path: urlPath,
                     // 필요한 경우 추가 필드들
                     description: '', // 빈 설명
                     type: 'organization' // 기본 타입
@@ -229,7 +233,7 @@ class OrganizationModalManager {
             this.hideCreateModal();
 
             // 성공 모달 표시
-            this.showSuccessModal(orgName, subdomain);
+            this.showSuccessModal(orgName, urlPath);
 
             // 조직 목록 다시 로드
             const organizationManager = new OrganizationManager();

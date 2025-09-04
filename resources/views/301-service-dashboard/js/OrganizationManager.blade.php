@@ -52,7 +52,7 @@ class OrganizationManager {
 
         } catch (error) {
             ApiErrorHandler.handle(error, '조직 목록 로드');
-            
+
             // 401이 아닌 다른 오류의 경우 빈 상태 표시
             if (!ApiErrorHandler.is401Error(error)) {
                 this.showEmptyOrganizations();
@@ -69,7 +69,7 @@ class OrganizationManager {
 
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col justify-center items-start gap-2 w-[362px] h-[180px]';
-        
+
         emptyDiv.innerHTML = `
             <div class="flex flex-col items-start gap-5 w-full h-full pr-5">
                 <div class="flex flex-col items-start gap-1 w-full">
@@ -79,7 +79,7 @@ class OrganizationManager {
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center justify-center">
                     <button id="emptyCreateOrgBtn" class="flex items-center justify-center gap-1 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white font-bold text-sm rounded-full h-[42px]">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -118,7 +118,7 @@ class OrganizationManager {
         // 조직 아바타 텍스트 (이름의 첫 글자)
         const avatarText = org.avatar || org.name?.charAt(0)?.toUpperCase() || '?';
         // 조직 코드 (서버 응답 구조에 맞게 조정)
-        const orgCode = org.code || org.subdomain || org.slug || 'no-code';
+        const orgCode = org.code || org.urlPath || org.slug || 'no-code';
 
         div.innerHTML = `
             <div class="flex flex-col h-full">
