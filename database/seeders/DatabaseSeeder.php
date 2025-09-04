@@ -13,11 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            UserSeeder::class,
         ]);
+
+        $this->command->info('🎉 데이터베이스 시딩 완료!');
+        $this->command->info('로그인 테스트용 계정:');
+        $this->command->info('👤 admin@gupsa.com / password');
     }
 }
