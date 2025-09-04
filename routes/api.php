@@ -4,6 +4,8 @@ use App\Http\AuthUser\CheckEmail\Controller as CheckEmailController;
 use App\Http\AuthUser\SignupPlobin\Controller as SignupController;
 use App\Http\AuthUser\LoginPlobin\Controller as LoginController;
 use App\Http\AuthUser\LogoutPlobin\Controller as LogoutController;
+use App\Http\AuthUser\ForgotPassword\Controller as ForgotPasswordController;
+use App\Http\AuthUser\ResetPassword\Controller as ResetPasswordController;
 use App\Http\AuthUser\Me\Controller as MeController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +29,12 @@ Route::prefix('auth')->group(function () {
         ->middleware('rate.limit:3,5');
         
     Route::post('/login', LoginController::class)
+        ->middleware('rate.limit:5,1');
+        
+    Route::post('/forgot-password', ForgotPasswordController::class)
+        ->middleware('rate.limit:3,1');
+        
+    Route::post('/reset-password', ResetPasswordController::class)
         ->middleware('rate.limit:5,1');
     
     // 인증 필요한 API (웹 세션 OR API 토큰)
