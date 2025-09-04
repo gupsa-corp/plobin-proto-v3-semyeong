@@ -3,7 +3,7 @@
 // 인증 상태 확인
 async function checkAuth() {
     const token = localStorage.getItem('auth_token');
-    
+
     if (!token) {
         showAuthRequired();
         return;
@@ -33,17 +33,17 @@ function showDashboard(userData) {
     document.getElementById('authLoading').classList.add('hidden');
     document.getElementById('authRequired').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
-    
+
     // 사용자 정보 표시
     if (userData && userData.name) {
         document.getElementById('userName').textContent = userData.name;
-        
+
         // 헤더의 사용자 정보도 업데이트
         const userButton = document.querySelector('.service-header button span');
         if (userButton) {
             userButton.textContent = userData.name;
         }
-        
+
         // 사용자 아바타 업데이트
         const userAvatar = document.querySelector('.service-header .bg-primary-500');
         if (userAvatar && userData.name) {
