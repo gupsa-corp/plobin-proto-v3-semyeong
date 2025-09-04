@@ -16,7 +16,7 @@ class DashboardSidebar {
         // 조직 선택 드롭다운 토글
         const orgSelector = document.getElementById('orgSelector');
         const orgDropdown = document.getElementById('orgDropdown');
-        
+
         if (orgSelector && orgDropdown) {
             orgSelector.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -53,7 +53,7 @@ class DashboardSidebar {
 
     async loadOrganizations() {
         try {
-            const response = await fetch('/api/organizations', {
+            const response = await fetch('/api/organizations/list', {
                 headers: {
                     'Authorization': `Bearer ${this.getAuthToken()}`,
                     'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ class DashboardSidebar {
         }
 
         orgList.innerHTML = this.organizations.map(org => `
-            <div class="org-item" data-org-id="${org.id}" data-org-url="${org.url}" 
+            <div class="org-item" data-org-id="${org.id}" data-org-url="${org.url}"
                  style="display: flex; align-items: center; padding: 10px 12px; cursor: pointer; transition: background-color 0.2s ease;">
                 <div>
                     <div class="org-item-name" style="font-size: 14px; color: #111111;">${this.escapeHtml(org.name)}</div>
@@ -116,7 +116,7 @@ class DashboardSidebar {
         orgItems.forEach(item => {
             const name = item.querySelector('.org-item-name').textContent.toLowerCase();
             const url = item.querySelector('.org-item-url').textContent.toLowerCase();
-            
+
             if (name.includes(normalizedQuery) || url.includes(normalizedQuery)) {
                 item.style.display = 'flex';
             } else {
@@ -127,7 +127,7 @@ class DashboardSidebar {
 
     selectOrganization(orgId, orgUrl) {
         this.currentOrg = { id: orgId, url: orgUrl };
-        
+
         // UI 업데이트
         const orgText = document.querySelector('.org-text');
         if (orgText) {
@@ -136,10 +136,10 @@ class DashboardSidebar {
 
         // 로컬 스토리지에 저장
         localStorage.setItem('selectedOrg', JSON.stringify(this.currentOrg));
-        
+
         // 드롭다운 닫기
         this.closeDropdown();
-        
+
         // 페이지 새로고침 또는 필요한 데이터 로드
         this.onOrganizationChange(orgId);
     }
@@ -147,7 +147,7 @@ class DashboardSidebar {
     onOrganizationChange(orgId) {
         // 조직 변경 시 실행될 로직
         console.log('조직이 변경되었습니다:', orgId);
-        
+
         // 대시보드 데이터 새로고침 등
         if (typeof window.refreshDashboard === 'function') {
             window.refreshDashboard(orgId);
@@ -157,7 +157,7 @@ class DashboardSidebar {
     toggleDropdown() {
         const orgSelector = document.getElementById('orgSelector');
         const orgDropdown = document.getElementById('orgDropdown');
-        
+
         if (orgDropdown.classList.contains('show')) {
             this.closeDropdown();
         } else {
@@ -168,7 +168,7 @@ class DashboardSidebar {
     openDropdown() {
         const orgSelector = document.getElementById('orgSelector');
         const orgDropdown = document.getElementById('orgDropdown');
-        
+
         orgSelector.classList.add('open');
         // 인라인 스타일로 드롭다운 표시
         if (orgDropdown) {
@@ -176,13 +176,13 @@ class DashboardSidebar {
             orgDropdown.style.visibility = 'visible';
             orgDropdown.style.transform = 'translateY(0)';
         }
-        
+
         // 드롭다운 화살표 회전
         const arrow = orgSelector.querySelector('.dropdown-arrow');
         if (arrow) {
             arrow.style.transform = 'rotate(180deg)';
         }
-        
+
         // 검색 인풋에 포커스
         const orgSearch = document.getElementById('orgSearch');
         if (orgSearch) {
@@ -193,22 +193,22 @@ class DashboardSidebar {
     closeDropdown() {
         const orgSelector = document.getElementById('orgSelector');
         const orgDropdown = document.getElementById('orgDropdown');
-        
+
         orgSelector.classList.remove('open');
-        
+
         // 인라인 스타일로 드롭다운 숨김
         if (orgDropdown) {
             orgDropdown.style.opacity = '0';
             orgDropdown.style.visibility = 'hidden';
             orgDropdown.style.transform = 'translateY(-10px)';
         }
-        
+
         // 드롭다운 화살표 원상복구
         const arrow = orgSelector.querySelector('.dropdown-arrow');
         if (arrow) {
             arrow.style.transform = 'rotate(0deg)';
         }
-        
+
         // 검색 초기화
         const orgSearch = document.getElementById('orgSearch');
         if (orgSearch) {
@@ -237,7 +237,7 @@ class DashboardSidebar {
                             <label for="orgUrl">조직 URL <span class="required">*</span></label>
                             <div class="input-prefix">
                                 <span class="prefix">@</span>
-                                <input type="text" id="orgUrl" name="url" 
+                                <input type="text" id="orgUrl" name="url"
                                        pattern="[a-zA-Z]{3,12}" minlength="3" maxlength="12" required
                                        placeholder="organizationurl">
                             </div>
@@ -254,10 +254,10 @@ class DashboardSidebar {
 
         // 모달 추가
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+
         // 모달 이벤트 바인딩
         this.bindModalEvents();
-        
+
         // 모달 표시
         document.getElementById('createOrgModal').style.display = 'flex';
         document.getElementById('orgName').focus();
@@ -305,13 +305,13 @@ class DashboardSidebar {
         const form = document.getElementById('createOrgForm');
         const formData = new FormData(form);
         const createBtn = form.querySelector('.btn-create');
-        
+
         // 로딩 상태
         createBtn.disabled = true;
         createBtn.textContent = '생성 중...';
 
         try {
-            const response = await fetch('/api/organizations', {
+            const response = await fetch('/api/organizations/create', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.getAuthToken()}`,
@@ -319,7 +319,7 @@ class DashboardSidebar {
                 },
                 body: JSON.stringify({
                     name: formData.get('name'),
-                    url: formData.get('url')
+                    url_path: formData.get('url')
                 })
             });
 
@@ -329,10 +329,10 @@ class DashboardSidebar {
                 // 성공 시
                 this.closeModal();
                 await this.loadOrganizations(); // 목록 새로고침
-                
+
                 // 새로 생성된 조직 자동 선택
                 this.selectOrganization(data.data.id, data.data.url);
-                
+
                 // 성공 메시지 (선택적)
                 this.showToast('조직이 성공적으로 생성되었습니다.', 'success');
             } else {
@@ -354,7 +354,7 @@ class DashboardSidebar {
 
         for (const [field, messages] of Object.entries(errors)) {
             const input = field === 'general' ? null : document.getElementById(`org${field.charAt(0).toUpperCase() + field.slice(1)}`);
-            
+
             messages.forEach(message => {
                 const errorEl = document.createElement('div');
                 errorEl.className = 'error-message';
@@ -387,7 +387,7 @@ class DashboardSidebar {
             mobileToggle.addEventListener('click', () => {
                 const sidebar = document.querySelector('.sidebar');
                 const overlay = document.querySelector('.sidebar-overlay');
-                
+
                 sidebar.classList.toggle('mobile-open');
                 if (overlay) overlay.classList.toggle('show');
             });
@@ -398,7 +398,7 @@ class DashboardSidebar {
         // 네비게이션 활성 상태 설정
         const currentPath = window.location.pathname;
         const navItems = document.querySelectorAll('.nav-item');
-        
+
         navItems.forEach(item => {
             const href = item.getAttribute('href');
             if (href === currentPath) {
@@ -413,7 +413,7 @@ class DashboardSidebar {
         // Laravel Sanctum 토큰 가져오기
         const token = document.querySelector('meta[name="auth-token"]')?.content;
         if (token) return token;
-        
+
         // 로컬 스토리지에서 가져오기 (필요시)
         return localStorage.getItem('auth_token') || '';
     }
@@ -422,14 +422,14 @@ class DashboardSidebar {
         // 간단한 토스트 메시지
         const toast = document.createElement('div');
         toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-            type === 'success' ? 'bg-green-500' : 
-            type === 'error' ? 'bg-red-500' : 
+            type === 'success' ? 'bg-green-500' :
+            type === 'error' ? 'bg-red-500' :
             'bg-blue-500'
         } text-white`;
         toast.textContent = message;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
         }, 3000);

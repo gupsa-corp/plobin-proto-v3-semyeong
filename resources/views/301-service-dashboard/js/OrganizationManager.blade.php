@@ -35,12 +35,26 @@ class OrganizationManager {
             }
 
             const data = await response.json();
-            this.organizations = data.data || data.organizations || data;
+            console.log('조직 목록 API 응답:', data);
+            
+            // 응답 데이터에서 organizations 배열 추출
+            let organizations = [];
+            if (data.success && data.data && data.data.organizations) {
+                organizations = data.data.organizations;
+            } else if (data.data && Array.isArray(data.data)) {
+                organizations = data.data;
+            } else if (data.organizations && Array.isArray(data.organizations)) {
+                organizations = data.organizations;
+            } else if (Array.isArray(data)) {
+                organizations = data;
+            }
+            
+            this.organizations = organizations;
 
             this.organizationListElement = document.getElementById('organizationList');
             this.organizationListElement.innerHTML = '';
 
-            if (!this.organizations || this.organizations.length === 0) {
+            if (!Array.isArray(this.organizations) || this.organizations.length === 0) {
                 this.showEmptyOrganizations();
                 return;
             }
@@ -51,10 +65,12 @@ class OrganizationManager {
             });
 
         } catch (error) {
+            console.error('조직 목록 로드 실패:', error.message);
             ApiErrorHandler.handle(error, '조직 목록 로드');
 
             // 401이 아닌 다른 오류의 경우 빈 상태 표시
             if (!ApiErrorHandler.is401Error(error)) {
+                console.error('조직 목록 로드 오류:', error);
                 this.showEmptyOrganizations();
             }
         }

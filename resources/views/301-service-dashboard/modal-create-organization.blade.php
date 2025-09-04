@@ -23,15 +23,10 @@
                     <div class="flex flex-col justify-center items-start gap-1 w-full">
                         <div class="flex items-center pl-1 gap-2">
                             <label for="urlPath" class="text-sm text-gray-900">URL 명</label>
+                            <span id="urlCheckStatus" class="text-xs"></span>
                         </div>
-                        <div class="flex items-center gap-2 w-full">
-                            <input type="text" id="urlPath" placeholder="영문 소문자 3~12자"
-                                   class="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                            <button type="button" id="checkDuplicateBtn"
-                                    class="px-6 py-3 border border-teal-500 bg-teal-50 text-teal-500 font-bold text-sm rounded-lg hover:bg-teal-100">
-                                중복확인
-                            </button>
-                        </div>
+                        <input type="text" id="urlPath" placeholder="영문 소문자 3~12자"
+                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
                         <p class="text-sm text-gray-500 mt-1">e.g. acme → www.plobin.com/orgs/acme</p>
                     </div>
                 </div>

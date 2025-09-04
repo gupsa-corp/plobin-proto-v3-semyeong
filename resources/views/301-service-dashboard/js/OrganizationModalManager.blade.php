@@ -9,8 +9,9 @@ class OrganizationModalManager {
         this.successModal = null;
         this.orgNameInput = null;
         this.urlPathInput = null;
-        this.checkDuplicateBtn = null;
         this.createSubmitBtn = null;
+        this.urlCheckTimeout = null;
+        this.lastCheckedUrl = '';
     }
 
     /**
@@ -27,7 +28,10 @@ class OrganizationModalManager {
             this.urlPathInput = document.getElementById('urlPath');
 
             if (this.orgNameInput) this.orgNameInput.value = '';
-            if (this.urlPathInput) this.urlPathInput.value = '';
+            if (this.urlPathInput) {
+                this.urlPathInput.value = '';
+                this.clearUrlCheckStatus();
+            }
         }
     }
 
@@ -77,36 +81,79 @@ class OrganizationModalManager {
     }
 
     /**
-     * 도메인 중복을 확인합니다
+     * URL 중복 확인 상태를 지웁니다
      */
-    async checkDuplicate() {
-        const urlPath = this.urlPathInput?.value.trim();
-        this.checkDuplicateBtn = document.getElementById('checkDuplicateBtn');
-
-        if (!urlPath) {
-            alert('URL 명을 입력해주세요.');
-            return;
+    clearUrlCheckStatus() {
+        const statusElement = document.getElementById('urlCheckStatus');
+        const urlPathInput = document.getElementById('urlPath');
+        
+        if (statusElement) {
+            statusElement.textContent = '';
+            statusElement.className = 'text-xs';
         }
+        
+        if (urlPathInput) {
+            urlPathInput.className = 'w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500';
+        }
+    }
 
-        // 영문 소문자 3~12자 유효성 검사
+    /**
+     * URL 중복 확인 상태를 업데이트합니다
+     * @param {string} status - 'checking', 'available', 'unavailable', 'error'
+     * @param {string} message - 상태 메시지
+     */
+    updateUrlCheckStatus(status, message = '') {
+        const statusElement = document.getElementById('urlCheckStatus');
+        const urlPathInput = document.getElementById('urlPath');
+        
+        if (!statusElement || !urlPathInput) return;
+        
+        statusElement.textContent = message;
+        
+        switch (status) {
+            case 'checking':
+                statusElement.className = 'text-xs text-blue-500';
+                urlPathInput.className = 'w-full px-3 py-3 border border-blue-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+                break;
+            case 'available':
+                statusElement.className = 'text-xs text-green-600';
+                urlPathInput.className = 'w-full px-3 py-3 border border-green-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500';
+                break;
+            case 'unavailable':
+                statusElement.className = 'text-xs text-red-600';
+                urlPathInput.className = 'w-full px-3 py-3 border border-red-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500';
+                break;
+            case 'error':
+                statusElement.className = 'text-xs text-gray-500';
+                urlPathInput.className = 'w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500';
+                break;
+        }
+    }
+
+    /**
+     * URL 중복을 확인합니다
+     * @param {string} urlPath - 확인할 URL 경로
+     */
+    async checkUrlAvailability(urlPath) {
+        // 형식 검증
         const urlPathPattern = /^[a-z]{3,12}$/;
         if (!urlPathPattern.test(urlPath)) {
-            alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
+            this.clearUrlCheckStatus();
             return;
         }
 
-        // 버튼 비활성화 및 로딩 상태
-        if (this.checkDuplicateBtn) {
-            this.checkDuplicateBtn.disabled = true;
-            this.checkDuplicateBtn.textContent = '확인중...';
+        // 같은 URL을 다시 확인하지 않음
+        if (urlPath === this.lastCheckedUrl) {
+            return;
         }
+
+        this.lastCheckedUrl = urlPath;
+        this.updateUrlCheckStatus('checking', '확인 중...');
 
         try {
             const token = localStorage.getItem('auth_token');
-
-            // 실제 API 호출 (중복 확인을 위한 별도 엔드포인트가 필요할 수 있음)
-            // 현재는 조직 목록을 가져와서 중복 체크
-            const response = await fetch('/api/organizations/list', {
+            
+            const response = await fetch(`/api/organizations/check-url/${urlPath}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -120,44 +167,50 @@ class OrganizationModalManager {
             }
 
             const data = await response.json();
-            let organizations = data.data || data.organizations || data || [];
-
-            // organizations가 배열이 아닌 경우 빈 배열로 설정
-            if (!Array.isArray(organizations)) {
-                organizations = [];
-            }
-
-            // 현재 조직 목록에서 같은 urlPath이 있는지 확인
-            const isDuplicate = organizations.some(org =>
-                (org.code === urlPath) ||
-                (org.url_path === urlPath) ||
-                (org.slug === urlPath)
-            );
-
-            if (isDuplicate) {
-                alert('이미 사용 중인 도메인입니다. 다른 도메인을 입력해주세요.');
+            
+            if (data.success && data.data) {
+                if (data.data.available) {
+                    this.updateUrlCheckStatus('available', '✓ 사용 가능');
+                } else {
+                    this.updateUrlCheckStatus('unavailable', '✗ 이미 사용 중');
+                }
             } else {
-                alert('사용 가능한 도메인입니다.');
-            }
-
-            // 성공적인 중복 확인 후 버튼 복원
-            if (this.checkDuplicateBtn) {
-                this.checkDuplicateBtn.disabled = false;
-                this.checkDuplicateBtn.textContent = '중복확인';
+                this.updateUrlCheckStatus('error', '확인 실패');
             }
 
         } catch (error) {
-            ApiErrorHandler.handle(error, '중복 확인');
-
-            // 401이 아닌 경우에만 사용자 알림 및 버튼 복원
-            if (!ApiErrorHandler.is401Error(error)) {
-                alert('중복 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
-                if (this.checkDuplicateBtn) {
-                    this.checkDuplicateBtn.disabled = false;
-                    this.checkDuplicateBtn.textContent = '중복확인';
-                }
-            }
+            console.error('URL 중복 확인 오류:', error);
+            this.updateUrlCheckStatus('error', '확인 실패');
         }
+    }
+
+    /**
+     * URL 입력 필드에 디바운싱된 중복 확인을 설정합니다
+     */
+    setupUrlValidation() {
+        const urlPathInput = document.getElementById('urlPath');
+        if (!urlPathInput) return;
+
+        urlPathInput.addEventListener('input', (e) => {
+            const urlPath = e.target.value.trim();
+            
+            // 이전 타이머 취소
+            if (this.urlCheckTimeout) {
+                clearTimeout(this.urlCheckTimeout);
+            }
+            
+            // 빈 값이면 상태 초기화
+            if (!urlPath) {
+                this.clearUrlCheckStatus();
+                this.lastCheckedUrl = '';
+                return;
+            }
+            
+            // 500ms 후 중복 확인 실행
+            this.urlCheckTimeout = setTimeout(() => {
+                this.checkUrlAvailability(urlPath);
+            }, 500);
+        });
     }
 
     /**
@@ -249,8 +302,8 @@ class OrganizationModalManager {
 
                 if (error.message.includes('422')) {
                     errorMessage = '입력한 정보를 다시 확인해주세요.';
-                } else if (error.message.includes('409') || error.message.includes('conflict')) {
-                    errorMessage = '이미 존재하는 도메인입니다. 다른 도메인을 사용해주세요.';
+                } else if (error.message.includes('409') || error.message.includes('conflict') || error.message.includes('unique')) {
+                    errorMessage = '이미 사용 중인 URL 명입니다. 다른 URL 명을 사용해주세요.';
                 }
 
                 alert(errorMessage);
@@ -270,7 +323,11 @@ class OrganizationModalManager {
         // 새 조직 생성 버튼
         const createOrgBtn = document.getElementById('createOrganizationBtn');
         if (createOrgBtn) {
-            createOrgBtn.addEventListener('click', () => this.showCreateModal());
+            createOrgBtn.addEventListener('click', () => {
+                this.showCreateModal();
+                // 모달이 열린 후 URL 유효성 검사 설정
+                setTimeout(() => this.setupUrlValidation(), 100);
+            });
         }
 
         // 모달 닫기 버튼
@@ -289,11 +346,6 @@ class OrganizationModalManager {
             });
         }
 
-        // 중복 확인 버튼
-        const checkDuplicateBtn = document.getElementById('checkDuplicateBtn');
-        if (checkDuplicateBtn) {
-            checkDuplicateBtn.addEventListener('click', () => this.checkDuplicate());
-        }
 
         // 생성하기 버튼
         const createOrgSubmitBtn = document.getElementById('createOrgSubmitBtn');

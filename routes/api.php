@@ -12,6 +12,7 @@ use App\Http\Organization\GetOrganizations\Controller as GetOrganizationsControl
 use App\Http\Organization\GetOrganization\Controller as GetOrganizationController;
 use App\Http\Organization\UpdateOrganization\Controller as UpdateOrganizationController;
 use App\Http\Organization\DeleteOrganization\Controller as DeleteOrganizationController;
+use App\Http\Organization\CheckUrlPath\Controller as CheckUrlPathController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,15 +44,16 @@ Route::prefix('auth')->group(function () {
         ->middleware('rate.limit:5,1');
 
     // 인증 필요한 API (웹 세션 OR API 토큰)
-    Route::middleware(['auth.web-or-token', 'rate.limit:10,1'])->group(function () {
+    Route::middleware(['auth.web-or-token', 'rate.limit:60,1'])->group(function () {
         Route::get('/me', MeController::class);
         Route::post('/logout', LogoutController::class);
     });
 });
 
-Route::prefix('organizations')->middleware(['auth.web-or-token', 'rate.limit:10,1'])->group(function () {
+Route::prefix('organizations')->middleware(['auth.web-or-token', 'rate.limit:60,1'])->group(function () {
     Route::get('/list', GetOrganizationsController::class);
     Route::post('/create', CreateOrganizationController::class);
+    Route::get('/check-url/{url_path}', CheckUrlPathController::class);
     Route::get('/{organization}', GetOrganizationController::class);
     Route::put('/{organization}', UpdateOrganizationController::class);
     Route::delete('/{organization}', DeleteOrganizationController::class);
