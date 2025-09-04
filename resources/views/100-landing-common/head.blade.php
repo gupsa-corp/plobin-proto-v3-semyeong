@@ -3,10 +3,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Plobin</title>
-    
+
     <!-- 랜딩페이지 전용 Vite 번들 -->
-    @vite(['resources/css/landing.css', 'resources/js/landing.js'])
-    
+    @vite(['resources/css/100-landing-common.css', 'resources/js/100-landing-common.js'])
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

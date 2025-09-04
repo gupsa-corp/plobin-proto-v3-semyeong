@@ -4,16 +4,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Plobin' }} - 관리자</title>
-    
+
     <!-- 관리자용 Vite 번들 -->
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
     @stack('styles')
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Chart.js for admin dashboards -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Tailwind Config for Dark Theme -->
     <script>
         tailwind.config = {
@@ -39,6 +39,6 @@
             darkMode: 'class'
         }
     </script>
-    
+
     @stack('scripts')
 </head>
