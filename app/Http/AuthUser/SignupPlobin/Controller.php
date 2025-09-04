@@ -9,10 +9,9 @@ class Controller extends ApiController
 {
     public function __invoke(Request $request)
     {
-        // 이메일은 SecurityMiddleware에서 이미 정규화됨
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => strtolower(trim($request->email)),
             'password' => $request->password,
         ]);
 

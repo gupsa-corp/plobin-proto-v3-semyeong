@@ -3,7 +3,6 @@
 namespace App\Http\AuthUser\LoginPlobin;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Middleware\WebAuthSecurityMiddleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,19 +10,17 @@ class Controller extends ApiController
 {
     public function __invoke(Request $request)
     {
-        $user = User::whereRaw('LOWER(email) = ?', [$request->email])->first();
-
-        // 타이밍 어택 방지
-        WebAuthSecurityMiddleware::preventTimingAttack();
+        // 이메일 정규화
+        $email = strtolower(trim($request->email));
+        
+        $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw \App\Exceptions\ApiException::unauthorized('이메일 또는 비밀번호가 올바르지 않습니다.');
         }
 
-        // 기존 토큰들 삭제
+        // 기존 토큰들 삭제하고 새 토큰 생성
         $user->tokens()->delete();
-
-        // 새 토큰 생성
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return $this->success([

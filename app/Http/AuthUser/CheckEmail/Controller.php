@@ -3,7 +3,6 @@
 namespace App\Http\AuthUser\CheckEmail;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Middleware\WebAuthSecurityMiddleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
@@ -11,15 +10,13 @@ class Controller extends ApiController
 {
     public function __invoke(Request $request)
     {
-        // 이메일은 SecurityMiddleware에서 이미 정규화됨
-        $cacheKey = 'email_check:' . $request->email;
+        // 이메일 정규화
+        $email = strtolower(trim($request->email));
+        $cacheKey = 'email_check:' . $email;
         
-        $exists = Cache::remember($cacheKey, 300, function () use ($request) {
-            return User::whereRaw('LOWER(email) = ?', [$request->email])->exists();
+        $exists = Cache::remember($cacheKey, 300, function () use ($email) {
+            return User::whereRaw('LOWER(email) = ?', [$email])->exists();
         });
-        
-        // 타이밍 어택 방지
-        WebAuthSecurityMiddleware::preventTimingAttack();
         
         return $this->success([
             'available' => !$exists,

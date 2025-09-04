@@ -12,9 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // 단순한 미들웨어 설정
+        // 명확한 미들웨어 설정
         $middleware->alias([
-            'simple.auth' => \App\Http\Middleware\SimpleAuth::class,
+            'auth.web-or-token' => \App\Http\Middleware\SimpleAuth::class,
             'rate.limit' => \App\Http\Middleware\ApiRateLimit::class,
         ]);
     })
