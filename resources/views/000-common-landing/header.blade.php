@@ -6,7 +6,7 @@
             </div>
             <nav class="flex space-x-4">
                 <a href="/login" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">로그인</a>
-                <a href="/register" class="bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 rounded-md text-sm font-medium">회원가입</a>
+                <a href="/signup" class="bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 rounded-md text-sm font-medium">회원가입</a>
             </nav>
         </div>
     </div>

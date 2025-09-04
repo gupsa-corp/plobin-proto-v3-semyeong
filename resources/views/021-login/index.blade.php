@@ -4,7 +4,7 @@
 <body class="bg-gray-50 min-h-screen">
     <div class="min-h-screen flex flex-col">
         @include('000-common-landing.header')
-        @include('011-landing.body')
+        @include('021-login.body')
         @include('000-common-landing.footer')
     </div>
 </body>

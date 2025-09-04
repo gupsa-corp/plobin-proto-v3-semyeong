@@ -6,8 +6,8 @@ Route::get('/', function () {
     return view('011-landing.index');
 });
 
-Route::get('/signin', function () {
-    return view('021-signin.index');
+Route::get('/login', function () {
+    return view('021-login.index');
 });
 
 Route::get('/signup', function () {
