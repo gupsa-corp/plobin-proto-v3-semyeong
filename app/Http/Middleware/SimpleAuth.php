@@ -17,6 +17,11 @@ class SimpleAuth
 {
     public function handle(Request $request, Closure $next)
     {
+        \Log::info('SimpleAuth called', [
+            'has_auth_header' => $request->hasHeader('Authorization'),
+            'auth_header' => $request->header('Authorization') ? 'Bearer ***' : 'none'
+        ]);
+        
         if ($this->hasApiToken($request)) {
             return $this->authenticateWithToken($request, $next);
         }
@@ -41,9 +46,13 @@ class SimpleAuth
     private function authenticateWithToken(Request $request, Closure $next)
     {
         $token = str_replace('Bearer ', '', $request->header('Authorization'));
+        \Log::info('Token auth attempt', ['token_prefix' => substr($token, 0, 10) . '...']);
 
         $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+        \Log::info('Token lookup result', ['found' => $accessToken ? 'yes' : 'no']);
+        
         if (!$accessToken) {
+            \Log::warning('Token not found in database');
             throw ApiException::unauthorized('유효하지 않은 토큰입니다.');
         }
 
