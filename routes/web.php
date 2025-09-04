@@ -15,9 +15,9 @@ Route::get('/signup', function () {
     return view('202-auth-signup.index');
 });
 
-// 100 ~ 199 서비스 페이지
+// 301 ~ 399 서비스 페이지
 Route::get('/dashboard', function () {
-    return view('101-service-dashboard.index');
+    return view('301-service-dashboard.index');
 });
 
 // 900 ~ 999 관리자 페이지
