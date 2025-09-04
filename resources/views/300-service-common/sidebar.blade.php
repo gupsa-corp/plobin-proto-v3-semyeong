@@ -1,32 +1,174 @@
-{{-- 서비스 공통 사이드바 구조 --}}
-<nav class="service-sidebar w-64">
-    <!-- 로고 -->
-    <div class="p-6 border-b border-gray-200">
-        <a href="/dashboard" class="flex items-center">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span class="text-white font-bold text-lg">P</span>
-            </div>
-            <span class="ml-3 text-xl font-bold text-gray-900">Plobin</span>
+{{-- 대시보드 사이드바 --}}
+<nav class="sidebar" style="position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #ffffff; border-right: 1px solid #E1E1E4; display: flex; flex-direction: column; z-index: 10; box-sizing: border-box;">
+    <!-- 로고 영역 -->
+    <div class="logo-section" style="padding: 18px 20px; border-bottom: 1px solid #E1E1E4;">
+        <a href="/dashboard" class="logo-link" style="display: flex; align-items: center; text-decoration: none; color: #111111;">
+            <div class="flex items-center"><svg width="125" height="45" viewBox="0 0 134 47" fill="none" xmlns="http://www.w3.org/2000/svg" class=""><rect y="6.63989" width="30.36" height="30.36" rx="15.18" fill="black"></rect><mask id="mask0_655_14121" maskUnits="userSpaceOnUse" x="0" y="6" width="31" height="31" style="mask-type: alpha;"><rect y="6.63989" width="30.36" height="30.36" rx="15.18" fill="black"></rect></mask><g mask="url(#mask0_655_14121)"><path d="M17.415 31.2874C10.8057 35.1033 -0.936376 27.139 -6.20904 18.0064C-11.4817 8.8739 -8.28834 2.0315 -1.67907 -1.78437C4.93021 -5.60023 12.4526 -4.94457 17.7253 4.18796C22.9979 13.3205 24.0242 27.4716 17.415 31.2874Z" stroke="white" stroke-width="0.153333"></path><g filter="url(#filter0_d_655_14121)"><path d="M21.6348 15.0742C21.6348 15.0742 21.2819 14.2461 20.8273 13.9588C20.3728 13.6714 19.4734 13.7079 19.4734 13.7079C19.4734 13.7079 20.3015 13.355 20.5888 12.9005C20.8762 12.4459 20.8397 11.5465 20.8397 11.5465C20.8397 11.5465 21.1926 12.3746 21.6471 12.662C22.1017 12.9493 23.0011 12.9128 23.0011 12.9128C23.0011 12.9128 22.173 13.2657 21.8857 13.7203C21.5983 14.1748 21.6348 15.0742 21.6348 15.0742Z" fill="white"></path></g><g filter="url(#filter1_d_655_14121)"><path d="M4.81543 29.2488C4.81543 29.2488 4.3802 29.0763 4.10768 29.1392C3.83517 29.2021 3.51962 29.548 3.51962 29.548C3.51962 29.548 3.6921 29.1128 3.62918 28.8402C3.56626 28.5677 3.22041 28.2522 3.22041 28.2522C3.22041 28.2522 3.65565 28.4247 3.92816 28.3617C4.20067 28.2988 4.51622 27.953 4.51622 27.953C4.51622 27.953 4.34374 28.3882 4.40666 28.6607C4.46959 28.9332 4.81543 29.2488 4.81543 29.2488Z" fill="white"></path></g><path d="M10.2379 13.7986C10.7003 12.9928 12.0204 12.9928 12.4828 13.7986C12.9504 14.6136 13.5316 15.4875 14.1623 16.1183C14.7931 16.749 15.667 17.3302 16.482 17.7978C17.2878 18.2602 17.2878 19.5803 16.482 20.0427C15.667 20.5103 14.7931 21.0915 14.1623 21.7222C13.5316 22.353 12.9504 23.2269 12.4828 24.0419C12.0204 24.8477 10.7003 24.8477 10.2379 24.0419C9.7703 23.2269 9.18911 22.353 8.55837 21.7222C7.92764 21.0915 7.05368 20.5103 6.23869 20.0427C5.43287 19.5803 5.43287 18.2602 6.23869 17.7978C7.05368 17.3302 7.92764 16.749 8.55837 16.1183C9.18911 15.4875 9.7703 14.6136 10.2379 13.7986Z" fill="url(#paint0_linear_655_14121)"></path><path d="M16.4924 17.7794C16.9031 18.015 17.1069 18.4688 17.107 18.9202C17.107 19.3716 16.9031 19.8253 16.4924 20.0609C15.678 20.5282 14.8058 21.1081 14.177 21.7368C13.5483 22.3656 12.9684 23.2378 12.5011 24.0522C12.2655 24.4629 11.8118 24.6668 11.3604 24.6668C10.9089 24.6668 10.4553 24.4629 10.2196 24.0522C9.75232 23.2378 9.17241 22.3656 8.54366 21.7368C7.91488 21.1081 7.04269 20.5282 6.2283 20.0609C5.81757 19.8253 5.61373 19.3716 5.61373 18.9202C5.61376 18.4688 5.81761 18.015 6.2283 17.7794C7.04268 17.3121 7.9149 16.7322 8.54366 16.1035C9.17244 15.4747 9.75232 14.6025 10.2196 13.7881C10.4553 13.3774 10.9089 13.1735 11.3604 13.1735C11.8118 13.1735 12.2655 13.3774 12.5011 13.7881C12.9684 14.6025 13.5483 15.4747 14.177 16.1035C14.8058 16.7322 15.678 17.3121 16.4924 17.7794Z" fill="url(#paint1_radial_655_14121)" fill-opacity="0.8" stroke="url(#paint2_linear_655_14121)" stroke-width="0.0417115"></path><g style="mix-blend-mode: screen;"><path d="M16.4924 17.7794C16.9031 18.015 17.1069 18.4688 17.107 18.9202C17.107 19.3716 16.9031 19.8253 16.4924 20.0609C15.678 20.5282 14.8058 21.1081 14.177 21.7368C13.5483 22.3656 12.9684 23.2378 12.5011 24.0522C12.2655 24.4629 11.8118 24.6668 11.3604 24.6668C10.9089 24.6668 10.4553 24.4629 10.2196 24.0522C9.75232 23.2378 9.17241 22.3656 8.54366 21.7368C7.91488 21.1081 7.04269 20.5282 6.2283 20.0609C5.81757 19.8253 5.61373 19.3716 5.61373 18.9202C5.61376 18.4688 5.81761 18.015 6.2283 17.7794C7.04268 17.3121 7.9149 16.7322 8.54366 16.1035C9.17244 15.4747 9.75232 14.6025 10.2196 13.7881C10.4553 13.3774 10.9089 13.1735 11.3604 13.1735C11.8118 13.1735 12.2655 13.3774 12.5011 13.7881C12.9684 14.6025 13.5483 15.4747 14.177 16.1035C14.8058 16.7322 15.678 17.3121 16.4924 17.7794Z" fill="url(#paint3_linear_655_14121)" fill-opacity="0.8"></path><path d="M16.4924 17.7794C16.9031 18.015 17.1069 18.4688 17.107 18.9202C17.107 19.3716 16.9031 19.8253 16.4924 20.0609C15.678 20.5282 14.8058 21.1081 14.177 21.7368C13.5483 22.3656 12.9684 23.2378 12.5011 24.0522C12.2655 24.4629 11.8118 24.6668 11.3604 24.6668C10.9089 24.6668 10.4553 24.4629 10.2196 24.0522C9.75232 23.2378 9.17241 22.3656 8.54366 21.7368C7.91488 21.1081 7.04269 20.5282 6.2283 20.0609C5.81757 19.8253 5.61373 19.3716 5.61373 18.9202C5.61376 18.4688 5.81761 18.015 6.2283 17.7794C7.04268 17.3121 7.9149 16.7322 8.54366 16.1035C9.17244 15.4747 9.75232 14.6025 10.2196 13.7881C10.4553 13.3774 10.9089 13.1735 11.3604 13.1735C11.8118 13.1735 12.2655 13.3774 12.5011 13.7881C12.9684 14.6025 13.5483 15.4747 14.177 16.1035C14.8058 16.7322 15.678 17.3121 16.4924 17.7794Z" stroke="url(#paint4_linear_655_14121)" stroke-width="0.0417115"></path></g><g filter="url(#filter2_d_655_14121)"><path d="M11.2863 13.6321C11.2863 13.6321 11.4921 17.6753 11.9746 18.1578C12.457 18.6403 16.7088 18.846 16.7088 18.846C16.7088 18.846 12.457 19.0518 11.9746 19.5343C11.4921 20.0167 11.2863 24.2685 11.2863 24.2685C11.2863 24.2685 11.0806 20.0167 10.5981 19.5343C10.1157 19.0518 6.07243 18.846 6.07243 18.846C6.07243 18.846 10.1157 18.6403 10.5981 18.1578C11.0806 17.6753 11.2863 13.6321 11.2863 13.6321Z" fill="url(#paint5_radial_655_14121)" shape-rendering="crispEdges"></path></g><path d="M23.0366 21.968C23.2821 21.7212 23.6435 21.6624 23.964 21.7483C24.2844 21.8342 24.5676 22.0653 24.6569 22.4015C24.8338 23.0686 25.0793 23.799 25.4061 24.3651C25.733 24.9313 26.2427 25.509 26.7321 25.9958C26.9789 26.2413 27.0377 26.6027 26.9518 26.9233C26.8659 27.2439 26.6343 27.5274 26.2978 27.6166C25.6305 27.7935 24.9003 28.0389 24.3341 28.3658C23.768 28.6927 23.1902 29.2025 22.7035 29.6918C22.458 29.9383 22.0972 29.9968 21.7768 29.9111C21.4563 29.8252 21.1727 29.5936 21.0835 29.257C20.9066 28.5898 20.6603 27.86 20.3334 27.2938C20.0065 26.7277 19.4977 26.1494 19.0083 25.6627C18.7617 25.4172 18.7032 25.0565 18.789 24.7361C18.8749 24.4156 19.106 24.1325 19.4422 24.0432C20.1094 23.8664 20.8393 23.62 21.4054 23.2932C21.9716 22.9663 22.5498 22.4574 23.0366 21.968Z" fill="url(#paint6_radial_655_14121)" stroke="url(#paint7_linear_655_14121)" stroke-width="0.0306667"></path><path d="M19.0195 25.6521C18.5352 25.1705 18.7864 24.2329 19.4466 24.0579C20.1144 23.8809 20.8456 23.6345 21.4136 23.3066C21.9815 22.9787 22.5605 22.4686 23.0477 21.9788C23.5294 21.4946 24.4669 21.7458 24.6419 22.406C24.8189 23.0738 25.0653 23.805 25.3932 24.3729C25.7211 24.9409 26.2312 25.5199 26.721 26.0071C27.2053 26.4888 26.9541 27.4263 26.2938 27.6013C25.6261 27.7783 24.8948 28.0247 24.3269 28.3526C23.7589 28.6805 23.1799 29.1906 22.6927 29.6804C22.2111 30.1647 21.2735 29.9134 21.0985 29.2532C20.9215 28.5855 20.6751 27.8542 20.3472 27.2863C20.0193 26.7183 19.5092 26.1393 19.0195 25.6521Z" fill="url(#paint8_linear_655_14121)"></path><g filter="url(#filter3_d_655_14121)"><path d="M20.7183 25.2922C20.7183 25.2922 22.3733 25.6466 22.6203 25.5039C22.8674 25.3613 23.4105 23.6666 23.4105 23.6666C23.4105 23.6666 23.0335 25.4058 23.1762 25.6529C23.3188 25.8999 25.0134 26.443 25.0134 26.443C25.0134 26.443 23.2742 26.0661 23.0272 26.2087C22.7802 26.3513 22.2596 27.9618 22.2596 27.9618C22.2596 27.9618 22.614 26.3068 22.4714 26.0598C22.3288 25.8127 20.7183 25.2922 20.7183 25.2922Z" fill="url(#paint9_radial_655_14121)" shape-rendering="crispEdges"></path></g></g><path d="M41.8479 26.9087H38.1209L36.8995 33.7676H31.2621L35.2396 11.2178H44.7919C47.1513 11.2178 48.8321 11.7607 49.8343 12.8464C50.5651 13.6816 50.9305 14.7464 50.9305 16.0409C50.9305 16.4794 50.8887 16.9388 50.8052 17.419L50.1788 20.958C49.8656 22.691 48.9469 24.1213 47.4227 25.2488C45.8985 26.3554 44.0403 26.9087 41.8479 26.9087ZM42.8188 16.1036H40.0001L38.9666 22.0229H41.754C43.4661 22.0229 44.4579 21.2608 44.7293 19.7366L44.9485 18.4525C44.9903 18.2646 45.0112 18.014 45.0112 17.7009C45.0112 17.3877 44.8546 17.0432 44.5414 16.6673C44.2282 16.2915 43.654 16.1036 42.8188 16.1036ZM63.9497 33.7676H49.6682L53.6457 11.2178H59.2832L56.1826 28.8818H64.8266L63.9497 33.7676ZM77.0766 10.9986C82.1085 10.9986 84.6245 13.0552 84.6245 17.1684C84.6245 17.8574 84.5514 18.5987 84.4053 19.3921L83.3091 25.6559C82.808 28.5582 81.7223 30.7087 80.0519 32.1077C78.3816 33.5066 76.0326 34.206 73.0051 34.206C69.9776 34.206 67.8688 33.5066 66.6786 32.1077C65.8643 31.1472 65.4572 29.8214 65.4572 28.1301C65.4572 27.3785 65.5407 26.5537 65.7077 25.6559L66.8039 19.3921C67.7852 13.7964 71.2095 10.9986 77.0766 10.9986ZM73.8507 29.3516C74.8947 29.3516 75.7299 29.0801 76.3562 28.5373C76.9826 27.9944 77.4211 26.9922 77.6717 25.5306L78.7365 19.5174C78.7991 19.0998 78.8305 18.7239 78.8305 18.3899C78.8305 16.6986 77.9744 15.853 76.2623 15.853C74.1117 15.8948 72.8276 17.1162 72.41 19.5174L71.3452 25.5306C71.2617 26.0526 71.2199 26.5955 71.2199 27.1592C71.2199 28.6208 72.0968 29.3516 73.8507 29.3516ZM97.1854 11.2178C99.5657 11.2178 101.257 11.7398 102.259 12.7837C103.011 13.5772 103.387 14.5794 103.387 15.7904C103.387 16.208 103.345 16.6464 103.261 17.1058L102.979 18.6091C102.75 19.7992 102.301 20.7284 101.633 21.3965C100.985 22.0647 100.411 22.3987 99.9102 22.3987L99.8789 22.6493C100.464 22.6493 101.059 22.9729 101.664 23.6202C102.27 24.2674 102.572 25.0295 102.572 25.9065C102.572 26.2614 102.531 26.6373 102.447 27.034L102.259 28.0049C101.925 29.8005 101.121 31.2098 99.8476 32.2329C98.5948 33.256 96.8409 33.7676 94.5859 33.7676H84.1254L88.1029 11.2178H97.1854ZM94.3667 24.5597H91.3914L90.6397 28.8818H93.6151C93.6568 28.8818 93.6986 28.8818 93.7403 28.8818C94.7008 28.8818 95.4629 28.6626 96.0266 28.2241C96.5904 27.7647 96.8722 27.2114 96.8722 26.5642C96.8722 25.2279 96.0371 24.5597 94.3667 24.5597ZM95.2123 16.1036H92.8634L92.0491 20.7701H94.3667C96.3711 20.7701 97.3734 19.8932 97.3734 18.1393C97.3734 17.5338 97.1854 17.0432 96.8096 16.6673C96.4547 16.2915 95.9222 16.1036 95.2123 16.1036ZM112.758 11.2178L108.812 33.7676H103.143L107.121 11.2178H112.758ZM133.03 11.2178L129.084 33.7676H123.415L119.469 21.4278L117.339 33.7676H111.67L115.648 11.2178H121.473L125.357 22.7432L127.393 11.2178H133.03Z" fill="black"></path><defs><filter id="filter0_d_655_14121" x="15.6548" y="7.72776" width="11.1651" height="11.1653" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="1.90943"></feGaussianBlur><feComposite in2="hardAlpha" operator="out"></feComposite><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_655_14121"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_655_14121" result="shape"></feBlend></filter><filter id="filter1_d_655_14121" x="-0.598165" y="24.134" width="9.23246" height="9.23295" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="1.90943"></feGaussianBlur><feComposite in2="hardAlpha" operator="out"></feComposite><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_655_14121"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_655_14121" result="shape"></feBlend></filter><filter id="filter2_d_655_14121" x="4.4038" y="12.3807" width="13.9736" height="13.9734" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset dy="0.417115"></feOffset><feGaussianBlur stdDeviation="0.834231"></feGaussianBlur><feComposite in2="hardAlpha" operator="out"></feComposite><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_655_14121"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_655_14121" result="shape"></feBlend></filter><filter id="filter3_d_655_14121" x="20.0212" y="23.1436" width="5.68995" height="5.68995" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset dy="0.174378"></feOffset><feGaussianBlur stdDeviation="0.348757"></feGaussianBlur><feComposite in2="hardAlpha" operator="out"></feComposite><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_655_14121"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_655_14121" result="shape"></feBlend></filter><linearGradient id="paint0_linear_655_14121" x1="11.3604" y1="25.8515" x2="11.2866" y2="11.3254" gradientUnits="userSpaceOnUse"><stop></stop><stop offset="1" stop-color="#0A82EC"></stop></linearGradient><radialGradient id="paint1_radial_655_14121" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11.2862 18.8461) scale(6.67384 9.39831)"><stop stop-color="#062686"></stop><stop offset="1" stop-color="#0AECE0"></stop></radialGradient><linearGradient id="paint2_linear_655_14121" x1="6.48939" y1="13.3194" x2="15.6659" y2="25.9371" gradientUnits="userSpaceOnUse"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0.71"></stop></linearGradient><linearGradient id="paint3_linear_655_14121" x1="8.57497" y1="16.2392" x2="14.8317" y2="22.0788" gradientUnits="userSpaceOnUse"><stop stop-color="#168AF6"></stop><stop offset="1" stop-color="#51F249"></stop></linearGradient><linearGradient id="paint4_linear_655_14121" x1="6.48939" y1="13.3194" x2="15.6659" y2="25.9371" gradientUnits="userSpaceOnUse"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0.71"></stop></linearGradient><radialGradient id="paint5_radial_655_14121" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11.2863 18.846) scale(5.4225)"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0.1"></stop></radialGradient><radialGradient id="paint6_radial_655_14121" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22.8035 25.8682) rotate(-75) scale(3.68 5.37832)"><stop stop-color="#032927"></stop><stop offset="1" stop-color="#0AECE0"></stop></radialGradient><linearGradient id="paint7_linear_655_14121" x1="17.9658" y1="28.223" x2="28.6726" y2="24.1072" gradientUnits="userSpaceOnUse"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0.71"></stop></linearGradient><linearGradient id="paint8_linear_655_14121" x1="27.7925" y1="27.1485" x2="18.9668" y2="24.7837" gradientUnits="userSpaceOnUse"><stop stop-color="#0AACEC"></stop><stop offset="1" stop-color="#15F1A4"></stop></linearGradient><radialGradient id="paint9_radial_655_14121" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22.8238 25.8563) rotate(-74.9997) scale(2.26692)"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0.1"></stop></radialGradient></defs></svg></a></div>
         </a>
     </div>
 
-    <!-- 메뉴 -->
-    <div class="p-4">
-        <ul>
-            @php
-                // 글로벌 변수에서 메뉴 아이템 가져오기 (전달된 변수가 없을 경우 대비)
-                $items = $menuItems ?? $GLOBALS['menuItems'] ?? [];
-            @endphp
-            @if(count($items) > 0)
-                @foreach($items as $item)
-                    <li>
-                        <a href="{{ $item['url'] }}"
-                           class="service-nav-item {{ $item['active'] ? 'active' : '' }}">
-                            {{ $item['title'] }}
-                        </a>
-                    </li>
-                @endforeach
-            @endif
+    <!-- 조직 선택 영역 -->
+    <div class="organization-section" style="padding: 16px 20px; position: relative;">
+        <div class="org-selector" id="orgSelector" style="display: flex; align-items: center; padding: 10px 12px; background: #E9E9ED; border: 0.5px solid #E1E1E4; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+            <div class="org-icon" style="width: 28px; height: 28px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                <div class="chart-icon" style="width: 20px; height: 20px; background: #0DC8AF; border-radius: 2px; position: relative;"></div>
+            </div>
+            <span class="org-text" style="flex: 1; font-size: 14px; color: #666666;">조직 없음</span>
+            <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" style="color: #666666; transition: transform 0.2s ease;">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" fill="none" stroke-width="1.5"/>
+            </svg>
+        </div>
+
+        <!-- 조직 드롭다운 메뉴 -->
+        <div class="org-dropdown" id="orgDropdown" style="position: absolute; top: 100%; left: 20px; right: 20px; background: #ffffff; border: 1px solid #E1E1E4; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s ease;">
+            <div class="org-dropdown-header" style="padding: 12px; border-bottom: 1px solid #E1E1E4;">
+                <input type="text" placeholder="조직 검색..." class="org-search" id="orgSearch" style="width: 100%; padding: 8px 12px; border: 1px solid #E1E1E4; border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box;">
+            </div>
+            <div class="org-list" id="orgList" style="max-height: 200px; overflow-y: auto;">
+                <!-- 조직이 없을 때 표시할 메시지 -->
+                <div class="no-org-message" style="padding: 20px; text-align: center; color: #666666; font-size: 14px;">
+                    조직이 없습니다.<br>
+                    <span style="font-size: 12px; color: #888888;">새 조직을 만들어 시작하세요.</span>
+                </div>
+            </div>
+            <div class="org-actions" style="padding: 12px; border-top: 1px solid #E1E1E4;">
+                <button class="create-org-btn" id="createOrgBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: transparent; border: 1px solid #E1E1E4; border-radius: 6px; font-size: 12px; color: #111111; cursor: pointer; transition: all 0.2s ease;">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                        <path d="M8 3v10M3 8h10" stroke="currentColor" fill="none" stroke-width="1.5"/>
+                    </svg>
+                    새 조직 만들기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 네비게이션 메뉴 -->
+    <div class="navigation-section" style="padding: 20px; flex: 1;">
+        <ul class="nav-menu" style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 4px;">
+                <a href="/dashboard" class="nav-item active" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px; background: #E9E9ED;">
+                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #0DC8AF;">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M3 4h4v4H3V4zM9 4h4v4H9V4zM3 10h4v4H3v-4zM9 10h4v4H9v-4z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    대시보드
+                </a>
+            </li>
+            <li style="margin-bottom: 4px;">
+                <a href="/projects" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
+                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M4 4h12v2H4V4zM4 8h12v2H4V8zM4 12h12v2H4v-2z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    프로젝트
+                </a>
+            </li>
+            <li style="margin-bottom: 4px;">
+                <a href="/analytics" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
+                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M3 16V8h2v8H3zM7 16V4h2v12H7zM11 16V10h2v6h-2zM15 16V6h2v10h-2z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    분석
+                </a>
+            </li>
+            <li style="margin-bottom: 4px;">
+                <a href="/settings" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
+                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M8.5 2.5A1.5 1.5 0 0110 4h0a1.5 1.5 0 011.5 1.5v.5h3a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h3v-.5A1.5 1.5 0 019.5 4h0A1.5 1.5 0 018.5 2.5z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    설정
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const orgSelector = document.getElementById('orgSelector');
+    const orgDropdown = document.getElementById('orgDropdown');
+    const dropdownArrow = document.querySelector('.dropdown-arrow');
+    const orgSearch = document.getElementById('orgSearch');
+    const createOrgBtn = document.getElementById('createOrgBtn');
+
+    // 드롭다운 토글 기능
+    orgSelector.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleDropdown();
+    });
+
+    // 드롭다운 토글 함수
+    function toggleDropdown() {
+        const isVisible = orgDropdown.style.opacity === '1';
+        
+        if (isVisible) {
+            closeDropdown();
+        } else {
+            openDropdown();
+        }
+    }
+
+    // 드롭다운 열기
+    function openDropdown() {
+        orgDropdown.style.opacity = '1';
+        orgDropdown.style.visibility = 'visible';
+        orgDropdown.style.transform = 'translateY(0)';
+        dropdownArrow.style.transform = 'rotate(180deg)';
+        
+        // 검색 입력창에 포커스
+        setTimeout(() => {
+            orgSearch.focus();
+        }, 100);
+    }
+
+    // 드롭다운 닫기
+    function closeDropdown() {
+        orgDropdown.style.opacity = '0';
+        orgDropdown.style.visibility = 'hidden';
+        orgDropdown.style.transform = 'translateY(-10px)';
+        dropdownArrow.style.transform = 'rotate(0deg)';
+        
+        // 검색 입력창 초기화
+        orgSearch.value = '';
+    }
+
+    // 외부 클릭시 드롭다운 닫기
+    document.addEventListener('click', function(e) {
+        if (!orgSelector.contains(e.target) && !orgDropdown.contains(e.target)) {
+            closeDropdown();
+        }
+    });
+
+    // 검색 기능
+    orgSearch.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        // 여기에 조직 검색 로직 추가
+        console.log('조직 검색:', searchTerm);
+    });
+
+    // 새 조직 만들기 버튼
+    createOrgBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        console.log('새 조직 만들기');
+        // 새 조직 만들기 모달이나 페이지로 이동
+        // window.location.href = '/organization/create';
+    });
+
+    // 버튼 호버 효과
+    createOrgBtn.addEventListener('mouseenter', function() {
+        this.style.background = '#F3F4F6';
+        this.style.borderColor = '#D1D5DB';
+    });
+
+    createOrgBtn.addEventListener('mouseleave', function() {
+        this.style.background = 'transparent';
+        this.style.borderColor = '#E1E1E4';
+    });
+});
+</script>
