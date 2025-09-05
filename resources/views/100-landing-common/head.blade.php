@@ -4,8 +4,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Plobin</title>
 
-    <!-- 랜딩페이지 전용 Vite 번들 -->
-    @vite(['resources/css/100-landing-common.css', 'resources/js/100-landing-common.js'])
+    <!-- 랜딩페이지 전용 스타일 -->
+    @include('100-landing-common.styles')
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

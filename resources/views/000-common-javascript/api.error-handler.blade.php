@@ -1,7 +1,7 @@
-{{-- API 오류 처리 클래스 --}}
+{{-- API 오류 처리 공통 클래스 --}}
 <script>
 /**
- * API 오류 처리를 담당하는 클래스
+ * API 오류 처리를 담당하는 공통 클래스
  */
 class ApiErrorHandler {
     /**

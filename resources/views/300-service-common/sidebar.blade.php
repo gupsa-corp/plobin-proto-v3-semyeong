@@ -6,7 +6,7 @@
 
 {{-- 대시보드 사이드바 --}}
 <nav class="sidebar" style="position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #ffffff; border-right: 1px solid #E1E1E4; display: flex; flex-direction: column; z-index: 10; box-sizing: border-box;">
-    @include('300-service-common.logo')
+    @include('000-common-assets.logo')
 
     <!-- 조직 선택 영역 -->
     <div class="organization-section" style="padding: 16px 20px; position: relative;">

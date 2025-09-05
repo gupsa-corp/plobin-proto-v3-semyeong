@@ -6,7 +6,10 @@
     <title>{{ $title ?? 'Plobin' }} - 관리자</title>
 
     <!-- 관리자용 Vite 번들 -->
-    @vite(['resources/css/900-admin-common.css', 'resources/js/900-admin-common.js'])
+    @vite(['resources/js/900-admin-common.js'])
+
+    <!-- 관리자용 스타일 -->
+    @include('900-admin-common.styles')
     @stack('styles')
 
     <script src="https://cdn.tailwindcss.com"></script>

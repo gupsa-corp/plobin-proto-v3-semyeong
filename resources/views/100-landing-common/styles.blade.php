@@ -1,5 +1,5 @@
-/* Landing Page Styles */
-
+{{-- Landing Page Styles --}}
+<style>
 /* 기본 테마 */
 :root {
     --primary-50: #f0f9ff;
@@ -48,3 +48,5 @@
         padding: 2rem 1rem;
     }
 }
+</style>
+

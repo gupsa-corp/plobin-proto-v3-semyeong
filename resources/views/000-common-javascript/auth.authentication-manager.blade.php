@@ -1,7 +1,7 @@
-{{-- 인증 관리 클래스 --}}
+{{-- 인증 관리 공통 클래스 --}}
 <script>
 /**
- * 사용자 인증을 관리하는 클래스
+ * 사용자 인증을 관리하는 공통 클래스
  */
 class AuthenticationManager {
     constructor() {

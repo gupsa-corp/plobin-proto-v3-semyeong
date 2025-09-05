@@ -1,5 +1,5 @@
-/* Auth Common CSS */
-
+{{-- Auth Common CSS --}}
+<style>
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -42,7 +42,7 @@
     100% { transform: rotate(360deg); }
 }
 
-/* ��/1� T�� `�TtX */
+/* 메시지 애니메이션 */
 .message-enter {
     animation: slideDown 0.3s ease-out;
 }
@@ -89,3 +89,5 @@
         background-color: #374151;
     }
 }
+</style>
+

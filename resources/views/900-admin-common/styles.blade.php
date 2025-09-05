@@ -1,5 +1,5 @@
-/* Admin Page Styles - Dark Theme */
-
+{{-- Admin Page Styles - Dark Theme --}}
+<style>
 /* 관리자 전용 변수 */
 :root {
     --admin-bg: #111827;
@@ -138,8 +138,10 @@
         transition: left 0.3s ease;
         z-index: 40;
     }
-    
+
     .admin-sidebar.open {
         left: 0;
     }
 }
+</style>
+

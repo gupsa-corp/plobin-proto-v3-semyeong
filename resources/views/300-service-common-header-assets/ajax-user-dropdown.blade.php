@@ -1,1 +1,0 @@
-<!-- Alpine.js로 리팩토링됨 - 기존 JavaScript 제거 -->

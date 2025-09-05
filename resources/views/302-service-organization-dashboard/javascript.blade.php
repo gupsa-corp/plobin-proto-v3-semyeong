@@ -1,4 +1,3 @@
-{{-- JavaScript 파일 포함 --}}
-@include('302-service-organization-dashboard.js.ApiErrorHandler')
-@include('302-service-organization-dashboard.js.OrganizationDashboardController')
+{{-- 페이지별 JavaScript 모듈 로드 --}}
 @include('302-service-organization-dashboard.js.OrganizationDataManager')
+@include('302-service-organization-dashboard.js.OrganizationDashboardController')

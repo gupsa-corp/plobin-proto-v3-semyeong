@@ -6,13 +6,10 @@
     @include('301-service-dashboard.main-dashboard')
 
     {{-- 조직 생성 요청 모달 --}}
-    @include('301-service-dashboard.modal-create-organization')
+    @include('301-service-dashboard-modal-001-create-organization.modal')
 
     {{-- 조직 생성 완료 모달 --}}
-    @include('301-service-dashboard.modal-create-organization-success')
-
-    {{-- AJAX 로직 포함 --}}
-    @include('301-service-dashboard.ajax')
+    @include('301-service-dashboard-modal-002-create-organization-success.modal')
 
     {{-- JavaScript 로직 포함 --}}
     @include('301-service-dashboard.javascript')

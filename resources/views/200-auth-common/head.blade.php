@@ -5,8 +5,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Plobin</title>
 
-    <!-- 랜딩페이지 전용 Vite 번들 -->
-    @vite(['resources/css/200-auth-common.css', 'resources/js/200-auth-common.js'])
+    <!-- 인증 페이지 전용 스타일 -->
+    @include('200-auth-common.styles')
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

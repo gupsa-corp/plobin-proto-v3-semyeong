@@ -13,4 +13,4 @@
     </div>
 </header>
 
-@vite('resources/js/alpine.js')
+@include('000-common-javascript.alpine-init')

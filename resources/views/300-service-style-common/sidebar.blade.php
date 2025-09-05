@@ -1,5 +1,5 @@
-/* Dashboard Sidebar Styles - High Priority */
-
+{{-- Dashboard Sidebar Styles - High Priority --}}
+<style>
 /* 대시보드 변수 */
 :root {
     --sidebar-width: 240px;
@@ -294,11 +294,11 @@ nav.sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
-    
+
     .sidebar.mobile-open {
         transform: translateX(0);
     }
-    
+
     .sidebar-overlay {
         position: fixed;
         top: 0;
@@ -311,7 +311,7 @@ nav.sidebar {
         visibility: hidden;
         transition: all 0.3s ease;
     }
-    
+
     .sidebar-overlay.show {
         opacity: 1;
         visibility: visible;
@@ -329,3 +329,5 @@ nav.sidebar {
         margin-left: 0;
     }
 }
+</style>
+
