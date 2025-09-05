@@ -174,34 +174,19 @@ class OrganizationManager {
     selectOrganization(orgId) {
         console.log('조직 선택:', orgId);
         
-        // 선택된 조직 정보를 찾기
-        const selectedOrg = this.organizations.find(org => org.id == orgId);
+        // 선택된 조직 정보 찾기
+        const selectedOrg = this.organizations.find(org => org.id === orgId);
         if (!selectedOrg) {
             console.error('선택된 조직을 찾을 수 없습니다:', orgId);
             return;
         }
 
-        // 선택된 조직 정보를 로컬 스토리지에 저장
-        const orgData = {
-            id: selectedOrg.id,
-            name: selectedOrg.name,
-            url: selectedOrg.url || selectedOrg.urlPath || selectedOrg.slug || selectedOrg.code
-        };
-        localStorage.setItem('selectedOrganization', JSON.stringify(orgData));
-
-        // 사이드바의 조직 선택기 업데이트
-        const orgText = document.querySelector('.org-text');
-        if (orgText) {
-            orgText.textContent = orgData.url;
-        }
-
-        // 대시보드 컨트롤러를 통해 메인 대시보드 표시
-        if (window.dashboardController) {
-            window.dashboardController.showMainDashboard(orgData);
-        } else {
-            // 페이지 새로고침하여 선택된 조직으로 대시보드 로드
-            window.location.reload();
-        }
+        // 로컬 스토리지에 선택된 조직 정보 저장
+        localStorage.setItem('selected_organization', JSON.stringify(selectedOrg));
+        localStorage.setItem('selected_organization_id', orgId.toString());
+        
+        // 조직 대시보드 페이지로 이동
+        window.location.href = `/organizations/${orgId}/dashboard`;
     }
 
     /**

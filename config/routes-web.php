@@ -8,6 +8,7 @@ return [
     '/forgot-password' => ['view' => '203-auth-forgot-password', 'name' => 'password.request'],
     '/reset-password' => ['view' => '204-auth-reset-password', 'name' => 'password.reset'],
     '/dashboard' => ['view' => '301-service-dashboard', 'name' => 'dashboard'],
+    '/organizations/{id}/dashboard' => ['view' => '302-service-organization-dashboard', 'name' => 'organization.dashboard'],
     '/admin' => ['view' => '901-admin-dashboard', 'name' => 'admin.dashboard'],
     '/admin/users' => ['view' => '902-admin-users', 'name' => 'admin.users'],
     '/admin/settings' => ['view' => '903-admin-settings', 'name' => 'admin.settings'],
