@@ -19,12 +19,4 @@ return [
                       </svg>'
         ]
     ],
-    
-    'organization_config' => [
-        'no_org_text' => '조직 없음',
-        'search_placeholder' => '조직 검색...',
-        'no_org_message' => '조직이 없습니다.',
-        'no_org_submessage' => '새 조직을 만들어 시작하세요.',
-        'create_org_button_text' => '새 조직 만들기'
-    ]
 ];

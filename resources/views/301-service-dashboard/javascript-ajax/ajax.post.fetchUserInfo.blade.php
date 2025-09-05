@@ -1,16 +1,16 @@
+{{-- 사용자 정보 조회 유틸리티 (Alpine.js 컴포넌트에서 사용) --}}
 <script>
-// 사용자 정보 조회 AJAX
-async function fetchUserInfo(token) {
+// 사용자 정보 조회 유틸리티 함수 (Alpine.js에서 통합 관리)
+window.fetchUserInfo = async function(token) {
     const response = await fetch('/api/auth/me', {
-        method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + token,
-            'X-Requested-With': 'XMLHttpRequest'
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
     });
 
     if (!response.ok) {
-        throw new Error(`API 오류: ${response.status}`);
+        throw new Error(`인증 실패: ${response.status}`);
     }
 
     const result = await response.json();
