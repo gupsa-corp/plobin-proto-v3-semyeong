@@ -36,7 +36,7 @@
          x-transition:leave-end="opacity-0 scale-95"
          @click.outside="open = false"
          class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-        <a href="/mypage/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">프로필</a>
+        <a href="/mypage" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">프로필</a>
         <div class="border-t border-gray-100"></div>
         <button @click="logout()" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</button>
     </div>
