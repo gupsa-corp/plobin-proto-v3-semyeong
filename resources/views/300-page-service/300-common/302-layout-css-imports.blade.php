@@ -1,8 +1,8 @@
 {{-- CSS 임포트 --}}
 <!-- 서비스용 스타일 -->
-@include('300-service-style-common.sidebar')
-@include('300-service-style-common.modal')
-@include('000-common-javascript.modal-styles')
+@include('300-service-style-common.301-sidebar-style')
+@include('300-service-style-common.302-modal-style')
+@include('000-common-javascript.301-modal-styles')
 @stack('styles')
 
 <script src="https://cdn.tailwindcss.com"></script>
