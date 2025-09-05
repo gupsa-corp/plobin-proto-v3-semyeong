@@ -4,6 +4,7 @@ namespace App\Http\AuthUser\SignupPlobin;
 
 use App\Http\Controllers\ApiController;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -40,7 +41,8 @@ class Controller extends ApiController
                     'email' => $user->email,
                     'created_at' => $user->created_at,
                 ],
-                'token' => $token
+                'token' => $token,
+                'redirect_url' => '/dashboard'
             ], '회원가입이 완료되었습니다.');
 
         } catch (Exception $e) {

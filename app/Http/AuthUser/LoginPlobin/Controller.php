@@ -4,6 +4,7 @@ namespace App\Http\AuthUser\LoginPlobin;
 
 use App\Http\Controllers\ApiController;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class Controller extends ApiController
@@ -29,7 +30,8 @@ class Controller extends ApiController
                 'name' => $user->name,
                 'email' => $user->email,
             ],
-            'token' => $token
+            'token' => $token,
+            'redirect_url' => '/dashboard'
         ], '로그인이 완료되었습니다.');
     }
 }

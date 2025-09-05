@@ -118,18 +118,14 @@ async function submitSignup(data) {
         const result = await response.json();
         
         if (response.ok) {
-            // 성공 메시지 개선
-            showSuccessMessage('회원가입이 완료되었습니다!');
-            
             // 토큰이 있다면 저장
             if (result.data && result.data.token) {
                 setAuthToken(result.data.token);
             }
             
-            // 2초 후 대시보드로 리다이렉트
-            setTimeout(() => {
-                window.location.href = '/dashboard';
-            }, 2000);
+            // 서버에서 지정한 URL로 즉시 리다이렉트
+            const redirectUrl = (result.data && result.data.redirect_url) || '/dashboard';
+            window.location.href = redirectUrl;
         } else {
             // 에러 메시지 표시 개선
             if (result.errors) {

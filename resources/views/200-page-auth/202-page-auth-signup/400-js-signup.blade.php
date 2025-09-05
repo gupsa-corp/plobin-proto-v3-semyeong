@@ -6,23 +6,30 @@ let emailAvailable = false;
 // 실시간 유효성 검사
 function setupRealTimeValidation() {
     // 이름 필드 검증
-    document.getElementById('name').addEventListener('blur', function() {
-        const name = this.value.trim();
-        const errorElement = document.getElementById('nameError');
-        
-        if (!name || name.length < 2) {
-            errorElement.textContent = '이름은 2글자 이상 입력해주세요.';
-            errorElement.classList.remove('hidden');
-        } else if (!/^[가-힣a-zA-Z\s]+$/.test(name)) {
-            errorElement.textContent = '이름은 한글, 영문만 입력 가능합니다.';
-            errorElement.classList.remove('hidden');
-        } else {
-            errorElement.classList.add('hidden');
-        }
-    });
+    const nameField = document.getElementById('name');
+    if (nameField) {
+        nameField.addEventListener('blur', function() {
+            const name = this.value.trim();
+            const errorElement = document.getElementById('nameError');
+            
+            if (errorElement) {
+                if (!name || name.length < 2) {
+                    errorElement.textContent = '이름은 2글자 이상 입력해주세요.';
+                    errorElement.classList.remove('hidden');
+                } else if (!/^[가-힣a-zA-Z\s]+$/.test(name)) {
+                    errorElement.textContent = '이름은 한글, 영문만 입력 가능합니다.';
+                    errorElement.classList.remove('hidden');
+                } else {
+                    errorElement.classList.add('hidden');
+                }
+            }
+        });
+    }
     
     // 비밀번호 필드 검증
-    document.getElementById('password').addEventListener('blur', function() {
+    const passwordField = document.getElementById('password');
+    if (passwordField) {
+        passwordField.addEventListener('blur', function() {
         const password = this.value;
         const errorElement = document.getElementById('passwordError');
         
@@ -41,7 +48,7 @@ function setupRealTimeValidation() {
     document.getElementById('password_confirmation').addEventListener('blur', function() {
         const password = document.getElementById('password').value;
         const passwordConfirmation = this.value;
-        const errorElement = document.getElementById('password_confirmationError');
+        const errorElement = document.getElementById('passwordConfirmationError');
         
         if (!passwordConfirmation || password !== passwordConfirmation) {
             errorElement.textContent = '비밀번호가 일치하지 않습니다.';
@@ -92,7 +99,7 @@ function validateForm(data) {
     
     // 비밀번호 확인
     if (!data.password_confirmation || data.password !== data.password_confirmation) {
-        errors.password_confirmation = '비밀번호가 일치하지 않습니다.';
+        errors.passwordConfirmation = '비밀번호가 일치하지 않습니다.';
     }
     
     return errors;
@@ -110,7 +117,9 @@ function displayErrors(errors) {
     
     // 첫 번째 에러 필드로 포커스 이동
     const firstErrorField = Object.keys(errors)[0];
-    const firstInput = document.getElementById(firstErrorField);
+    // passwordConfirmation 필드는 실제 input ID가 password_confirmation이므로 매핑
+    const inputId = firstErrorField === 'passwordConfirmation' ? 'password_confirmation' : firstErrorField;
+    const firstInput = document.getElementById(inputId);
     if (firstInput) {
         firstInput.focus();
     }

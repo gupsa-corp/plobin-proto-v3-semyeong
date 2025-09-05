@@ -71,6 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('로그인한 사용자:', user);
                     }
 
+                    // 서버에서 지정한 URL로 리다이렉트
+                    const redirectUrl = data.redirect_url || (data.data && data.data.redirect_url) || '/dashboard';
+                    window.location.href = redirectUrl;
+
                 } else {
                     // 로그인 실패
                     let errorMsg = '';
@@ -117,6 +121,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 메시지 영역으로 스크롤
         errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function showSuccess(message) {
+        const successText = successMessage.querySelector('p');
+        if (successText) {
+            successText.textContent = message;
+        }
+        successMessage.classList.remove('hidden');
+        successMessage.classList.add('message-enter');
+        errorMessage.classList.add('hidden');
+
+        // 메시지 영역으로 스크롤
+        successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
 
