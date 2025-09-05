@@ -1,3 +1,19 @@
+@php
+    $orgConfig =
+    [
+        'name' => '기본 조직',
+        'logo' => '/images/logo.png',
+        'description' => '기본 조직입니다.',
+        'current_plan' => 'free',
+        'members_count' => 1,
+        'no_org_text' => '조직을 선택해주세요',
+        'search_placeholder' => '조직 검색...',
+        'no_org_message' => '조직이 없습니다',
+        'no_org_submessage' => '새 조직을 만들어 시작해보세요',
+        'create_org_button_text' => '조직 만들기'
+    ];
+@endphp
+
 <!-- 조직 선택 영역 -->
 <div class="organization-section" style="padding: 16px 20px; position: relative;">
     <div class="org-selector" id="orgSelector" style="display: flex; align-items: center; padding: 10px 12px; background: #E9E9ED; border: 0.5px solid #E1E1E4; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
