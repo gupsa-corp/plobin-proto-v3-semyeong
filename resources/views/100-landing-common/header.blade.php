@@ -5,7 +5,8 @@
                 <h1 class="text-2xl font-bold text-primary-600">Plobin</h1>
             </div>
             <nav class="flex space-x-4">
-                {!! renderAuthLinks() !!}
+                <a href="/login" class="text-gray-600 hover:text-primary-600 px-3 py-2">로그인</a>
+                <a href="/signup" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700">회원가입</a>
             </nav>
         </div>
     </div>

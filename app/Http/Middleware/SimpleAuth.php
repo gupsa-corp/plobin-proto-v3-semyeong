@@ -19,7 +19,10 @@ class SimpleAuth
     {
         \Log::info('SimpleAuth called', [
             'has_auth_header' => $request->hasHeader('Authorization'),
-            'auth_header' => $request->header('Authorization') ? 'Bearer ***' : 'none'
+            'auth_header' => $request->header('Authorization') ? 'Bearer ***' : 'none',
+            'expects_json' => $request->expectsJson(),
+            'content_type' => $request->header('Content-Type'),
+            'accept' => $request->header('Accept')
         ]);
         
         if ($this->hasApiToken($request)) {
