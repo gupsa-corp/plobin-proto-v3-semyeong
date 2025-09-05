@@ -1,1 +1,0 @@
-@include('300-service-common-header-assets.header-assets-service-block-header')

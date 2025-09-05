@@ -2,9 +2,57 @@
 
 Plobin Proto V3 프로젝트의 공통 모듈 구조와 사용법에 대한 문서입니다.
 
+## 🎯 최신 구조 (2024.09 업데이트)
+
+### 📁 300-page-service 새로운 구조
+
+**📋 설계 원칙**:
+- **1파일 1함수**: 모든 JavaScript 함수는 개별 파일로 분리
+- **AJAX 메소드별 분리**: GET, POST, PUT, DELETE 각각 독립 파일
+- **번호 체계**: 000(인증), 100(헤더), 200(사이드바), 300(레이아웃/모달), 400(JS), 500(AJAX), 600(데이터)
+- **재활용성 강화**: 공통 구조와 페이지별 컨텐츠 완전 분리
+
+```
+300-page-service/
+├── 300-common/                           # 공통 모듈 (모든 페이지에서 재활용)
+│   ├── 000-auth-token-manager.blade.php  # 토큰 관리 공통 함수
+│   ├── 100-header-main.blade.php         # 메인 헤더 구조
+│   ├── 102-header-breadcrumb.blade.php   # 브레드크럼
+│   ├── 103-header-user-dropdown.blade.php # 사용자 드롭다운
+│   ├── 104-header-alarm.blade.php        # 알림 버튼
+│   ├── 105-header-settings.blade.php     # 설정 버튼
+│   ├── 106-header-mobile-menu.blade.php  # 모바일 메뉴 버튼
+│   ├── 107-header-right-menu.blade.php   # 우측 메뉴 통합
+│   ├── 200-sidebar-main.blade.php        # 메인 사이드바 구조
+│   ├── 201-sidebar-navigation.blade.php  # 네비게이션 메뉴
+│   ├── 202-sidebar-organization-info.blade.php # 조직 선택 영역
+│   ├── 301-layout-head.blade.php         # HTML Head 레이아웃
+│   ├── 302-layout-css-imports.blade.php  # CSS 임포트 관리
+│   ├── 303-layout-js-imports.blade.php   # JS 임포트 관리
+│   ├── 500-ajax-get.blade.php            # AJAX GET 요청 함수
+│   ├── 500-ajax-post.blade.php           # AJAX POST 요청 함수
+│   ├── 500-ajax-put.blade.php            # AJAX PUT 요청 함수
+│   ├── 500-ajax-delete.blade.php         # AJAX DELETE 요청 함수
+│   └── 900-alpine-init.blade.php         # Alpine.js 초기화
+├── 301-page-dashboard/                    # 대시보드 페이지
+│   ├── 000-index.blade.php               # 페이지 인덱스
+│   ├── 200-content-*.blade.php           # 콘텐츠 블록들
+│   ├── 300-modal-*.blade.php            # 모달 컴포넌트들
+│   ├── 400-js-*.blade.php               # JavaScript 함수들 (1파일 1함수)
+│   ├── 500-ajax-*.blade.php             # AJAX 함수들 (메소드별 분리)
+│   └── 600-data-sidebar.blade.php        # 페이지별 사이드바 데이터
+└── 302-page-organization-dashboard/       # 조직 대시보드 페이지
+    ├── 000-index.blade.php               # 페이지 인덱스
+    ├── 200-content-main.blade.php        # 메인 콘텐츠
+    ├── 300-modal-organization-manager.blade.php # 조직 관리 모달
+    ├── 400-js-*.blade.php               # JavaScript 함수들 (1파일 1함수)
+    ├── 500-ajax-*.blade.php             # AJAX 함수들 (메소드별 분리)
+    └── 600-data-sidebar.blade.php        # 페이지별 사이드바 데이터
+```
+
 ## 1. JavaScript 공통 모듈
 
-### 📁 위치: `resources/views/000-common-javascript/`
+### 📁 기존 위치: `resources/views/000-common-javascript/` (레거시)
 
 #### 🔧 API 관련 모듈
 
@@ -93,7 +141,37 @@ Plobin Proto V3 프로젝트의 공통 모듈 구조와 사용법에 대한 문�
 - **`view.`** - 일반적인 UI 컴포넌트
 - **`modal.`** - 특정 모달 전용 기능
 
-## 2. Layout 공통 컴포넌트
+## 2. 새로운 AJAX 구조 (500번대)
+
+### 📋 AJAX 메소드별 분리 원칙
+
+#### 🌐 공통 AJAX 함수 (`300-common/500-ajax-*.blade.php`)
+- **`500-ajax-get.blade.php`** - 범용 GET 요청 함수 `ajaxGet(url, options)`
+- **`500-ajax-post.blade.php`** - 범용 POST 요청 함수 `ajaxPost(url, data, options)`
+- **`500-ajax-put.blade.php`** - 범용 PUT 요청 함수 `ajaxPut(url, data, options)`
+- **`500-ajax-delete.blade.php`** - 범용 DELETE 요청 함수 `ajaxDelete(url, options)`
+
+#### 🎯 페이지별 AJAX 함수 예시 (`302-page-organization-dashboard/500-ajax-*.blade.php`)
+- **`500-ajax-organization-detail-get.blade.php`** - 조직 상세 정보 조회
+- **`500-ajax-organization-stats-get.blade.php`** - 대시보드 통계 조회
+- **`500-ajax-organization-activities-get.blade.php`** - 최근 활동 조회
+- **`500-ajax-organization-projects-get.blade.php`** - 최근 프로젝트 조회
+- **`500-ajax-organization-members-get.blade.php`** - 멤버 목록 조회
+- **`500-ajax-organization-invite-post.blade.php`** - 멤버 초대 (POST)
+
+### 📱 JavaScript 함수 구조 (400번대)
+
+#### 🔧 공통 유틸리티 함수 (`302-page-organization-dashboard/400-js-*.blade.php`)
+- **`400-js-org-get-auth-headers.blade.php`** - 인증 헤더 생성 함수
+- **`400-js-org-get-default-stats.blade.php`** - 기본 통계 데이터 함수
+- **`400-js-org-get-default-activities.blade.php`** - 기본 활동 데이터 함수
+- **`400-js-org-get-default-projects.blade.php`** - 기본 프로젝트 데이터 함수
+
+#### 📊 데이터 로딩 함수 (`302-page-organization-dashboard/401-js-*.blade.php`)
+- **`401-js-org-dashboard-load-all-data.blade.php`** - 모든 데이터 로딩 함수
+- **`401-js-org-dashboard-load-organization-data.blade.php`** - 조직 데이터 로딩 함수
+
+## 3. Layout 공통 컴포넌트
 
 ### 📁 위치별 분류
 
@@ -107,18 +185,15 @@ Plobin Proto V3 프로젝트의 공통 모듈 구조와 사용법에 대한 문�
 - **`footer.blade.php`** - 인증 페이지 푸터
 - **`head.blade.php`** - 인증 페이지용 메타 태그, CSS
 
-#### 🏢 서비스 페이지 (`300-service-common/`)
-- **`header.blade.php`** - 서비스 헤더 (사용자 정보, 메뉴)
-- **`sidebar.blade.php`** - 서비스 사이드바 (조직 선택, 네비게이션)
-- **`logo.blade.php`** - 로고 컴포넌트
-- **`head.blade.php`** - 서비스 페이지용 메타 태그, CSS
-
-#### 🔧 서비스 헤더 에셋 (`300-service-common-header-assets/`)
-- **`header-assets-user-dropdown.blade.php`** - 사용자 드롭다운 메뉴
-- **`header-assets-user-button.blade.php`** - 사용자 버튼
-- **`header-assets-breadcrumb.blade.php`** - 브레드크럼브
-- **`header-assets-right-menu.blade.php`** - 우측 메뉴
-- **`ajax-user-dropdown.blade.php`** - 사용자 드롭다운 AJAX
+#### 🏢 서비스 페이지 (`300-common/`) - 새로운 구조
+- **`100-header-main.blade.php`** - 메인 헤더 구조 (통합)
+- **`102-header-breadcrumb.blade.php`** - 브레드크럼 (세분화)
+- **`103-header-user-dropdown.blade.php`** - 사용자 드롭다운 (세분화)
+- **`104-header-alarm.blade.php`** - 알림 버튼 (세분화)
+- **`105-header-settings.blade.php`** - 설정 버튼 (세분화)
+- **`200-sidebar-main.blade.php`** - 메인 사이드바 구조 (통합)
+- **`201-sidebar-navigation.blade.php`** - 네비게이션 메뉴 (세분화)
+- **`202-sidebar-organization-info.blade.php`** - 조직 선택 영역 (세분화)
 
 #### 👨‍💼 관리자 페이지 (`900-admin-common/`)
 - **`header.blade.php`** - 관리자 헤더
