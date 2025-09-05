@@ -123,7 +123,7 @@ async function submitSignup(data) {
             
             // 토큰이 있다면 저장
             if (result.data && result.data.token) {
-                localStorage.setItem('auth_token', result.data.token);
+                setAuthToken(result.data.token);
             }
             
             // 2초 후 대시보드로 리다이렉트

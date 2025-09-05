@@ -108,7 +108,7 @@ function organizationModal() {
         // Utilities
         getAuthToken() {
             const token = document.querySelector('meta[name="auth-token"]')?.content;
-            return token || localStorage.getItem('auth_token') || '';
+            return token || getAuthToken() || '';
         },
 
         getFieldError(field) {

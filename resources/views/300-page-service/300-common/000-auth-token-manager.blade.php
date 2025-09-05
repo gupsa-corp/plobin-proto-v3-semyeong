@@ -34,4 +34,17 @@ function removeAuthToken() {
 function hasAuthToken() {
     return !!localStorage.getItem('auth_token');
 }
+
+/**
+ * 인증 헤더를 가져옵니다
+ * @returns {object} 인증 헤더 객체
+ */
+function getAuthHeaders() {
+    const token = getAuthToken();
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    };
+}
 </script>

@@ -7,19 +7,12 @@
  * @returns {Promise<Object>} JSON 응답
  */
 async function ajaxGet(url, options = {}) {
-    const token = localStorage.getItem('auth_token');
+    const authHeaders = getAuthHeaders();
     
     const defaultOptions = {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+        headers: authHeaders
     };
-
-    if (token) {
-        defaultOptions.headers['Authorization'] = `Bearer ${token}`;
-    }
 
     const finalOptions = {
         ...defaultOptions,

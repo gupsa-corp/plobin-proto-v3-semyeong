@@ -8,20 +8,13 @@
  * @returns {Promise<Object>} JSON 응답
  */
 async function ajaxPost(url, data = {}, options = {}) {
-    const token = localStorage.getItem('auth_token');
+    const authHeaders = getAuthHeaders();
     
     const defaultOptions = {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
+        headers: authHeaders,
         body: JSON.stringify(data)
     };
-
-    if (token) {
-        defaultOptions.headers['Authorization'] = `Bearer ${token}`;
-    }
 
     const finalOptions = {
         ...defaultOptions,
