@@ -1,6 +1,6 @@
 <?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
-<html lang="ko">
+@include('000-common-layouts.001-html-lang')
 @include($common . '.301-layout-head', ['title' => '대시보드'])
 <body class="bg-gray-100">
     <div class="min-h-screen" style="position: relative;">

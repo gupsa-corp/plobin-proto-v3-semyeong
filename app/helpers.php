@@ -27,3 +27,21 @@ if (!function_exists('getCurrentViewPath')) {
         return app(ViewService::class)->getCurrentViewPath();
     }
 }
+
+// ========================================
+// LOCALE HELPER FUNCTIONS
+// ========================================
+
+if (!function_exists('getHtmlLang')) {
+    function getHtmlLang()
+    {
+        return app()->getLocale();
+    }
+}
+
+if (!function_exists('getHtmlLangAttribute')) {
+    function getHtmlLangAttribute()
+    {
+        return 'lang="' . getHtmlLang() . '"';
+    }
+}
