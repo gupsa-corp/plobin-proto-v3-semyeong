@@ -54,7 +54,7 @@
 ### 🔧 적용된 수정사항
 
 1. **Auth Helper 추가**
-   - `resources/js/200-auth-common.js`에 인증 관련 헬퍼 함수 추가
+   - `resources/js/200-auth-common.js` 파일에 인증 관련 헬퍼 함수 추가
    - localStorage 토큰 관리 기능 구현
    - 로그아웃 처리 함수 추가
 
