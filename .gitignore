@@ -24,3 +24,8 @@ Homestead.yaml
 Thumbs.db
 .playwright-mcp/*
 vite.config.js
+playwright-report/
+playwright-report/data/
+tests/e2e/screenshots/
+test-results/
+playwright.config.js
