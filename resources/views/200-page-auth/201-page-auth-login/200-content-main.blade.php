@@ -136,4 +136,4 @@
 </main>
 
 {{-- AJAX 스크립트 포함 --}}
-@include('201-auth-login.ajax')
+@include('200-page-auth.201-page-auth-login.500-ajax-login')

@@ -6,7 +6,7 @@
     <title>Plobin</title>
 
     <!-- 인증 페이지 전용 스타일 -->
-    @include('200-auth-common.styles')
+    @include('200-page-auth.200-common.302-layout-css-imports')
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

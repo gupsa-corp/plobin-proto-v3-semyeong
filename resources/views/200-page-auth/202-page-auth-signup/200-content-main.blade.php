@@ -53,8 +53,8 @@
 
 
     {{-- AJAX 로직 포함 --}}
-    @include('202-auth-signup.ajax')
+    @include('200-page-auth.202-page-auth-signup.500-ajax-signup')
     
     {{-- JavaScript 로직 포함 --}}
-    @include('202-auth-signup.javascript')
+    @include('200-page-auth.202-page-auth-signup.400-js-signup')
 </main>

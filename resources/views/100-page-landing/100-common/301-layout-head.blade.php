@@ -5,7 +5,7 @@
     <title>Plobin</title>
 
     <!-- 랜딩페이지 전용 스타일 -->
-    @include('100-landing-common.styles')
+    @include('100-page-landing.100-common.302-layout-css-imports')
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

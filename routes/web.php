@@ -21,7 +21,7 @@ foreach ($routes as $path => $config) {
     }
 
     $route = Route::get($path, function () use ($viewName) {
-        return view($viewName . '.index');
+        return view($viewName);
     });
 
     // 라우트명이 있으면 추가
@@ -32,5 +32,5 @@ foreach ($routes as $path => $config) {
 
 // 매개변수가 있는 특수 라우트들을 수동으로 등록
 Route::get('/organizations/{id}/dashboard', function ($id) {
-    return view('302-service-organization-dashboard.index');
+    return view('300-page-service.302-page-organization-dashboard.000-index');
 })->name('organization.dashboard');

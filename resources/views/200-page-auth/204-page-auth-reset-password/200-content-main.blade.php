@@ -182,4 +182,4 @@
 </main>
 
 {{-- AJAX 스크립트 포함 --}}
-@include('204-auth-reset-password.ajax')
+@include('200-page-auth.204-page-auth-reset-password.500-ajax-reset-password')

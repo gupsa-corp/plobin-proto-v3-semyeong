@@ -132,4 +132,4 @@
 </main>
 
 {{-- AJAX 스크립트 포함 --}}
-@include('203-auth-forgot-password.ajax')
+@include('200-page-auth.203-page-auth-forgot-password.500-ajax-forgot-password')
