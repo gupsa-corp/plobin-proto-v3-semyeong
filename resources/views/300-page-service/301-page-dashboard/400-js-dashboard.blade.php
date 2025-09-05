@@ -109,25 +109,31 @@ function dashboardMain() {
             window.location.href = `/organizations/${orgId}/dashboard`;
         },
 
-        // 모달 표시 (from modalManager)
+        // 모달 표시 - 새로운 모달 시스템과 연동
         showCreateOrganizationModal() {
-            const modal = document.getElementById('createOrganizationModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                
-                // 모달 닫기 버튼 이벤트 추가
-                const closeBtn = document.getElementById('closeModalBtn');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => this.hideCreateOrganizationModal());
+            if (window.modalUI) {
+                // 새로운 시스템 사용
+                window.modalUI.showCreateOrganizationModal();
+            } else {
+                // 기존 방식으로 폴백
+                const modal = document.getElementById('createOrganizationModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
                 }
             }
         },
 
-        // 모달 숨기기
+        // 모달 숨기기 - 새로운 모달 시스템과 연동
         hideCreateOrganizationModal() {
-            const modal = document.getElementById('createOrganizationModal');
-            if (modal) {
-                modal.classList.add('hidden');
+            if (window.modalUI) {
+                // 새로운 시스템 사용
+                window.modalUI.hideCreateOrganizationModal();
+            } else {
+                // 기존 방식으로 폴백
+                const modal = document.getElementById('createOrganizationModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
             }
         },
 

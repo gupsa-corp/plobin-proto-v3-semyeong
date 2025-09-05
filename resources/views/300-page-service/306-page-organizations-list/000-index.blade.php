@@ -11,5 +11,10 @@
             @include(getCurrentViewPath())
         </div>
     </div>
+
+    {{-- 조직 모달 관리 시스템 --}}
+    @include('300-page-service.301-page-dashboard.403-js-modal-manager')
+    {{-- Alpine.js 초기화 --}}
+    @include($common . '.900-alpine-init')
 </body>
 </html>
