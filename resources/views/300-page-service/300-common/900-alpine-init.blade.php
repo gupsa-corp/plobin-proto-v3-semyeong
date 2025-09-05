@@ -1,9 +1,1 @@
-<script>
-import Alpine from 'alpinejs'
-
-// Alpine.js 초기화
-window.Alpine = Alpine
-
-// Alpine.js 시작
-Alpine.start()
-</script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
