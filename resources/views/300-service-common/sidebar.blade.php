@@ -1,3 +1,9 @@
+@php
+    $sidebarData = include resource_path('views/301-service-dashboard/sidebar-data.php');
+    $navItems = $sidebarData['navigation_items'];
+    $orgConfig = $sidebarData['organization_config'];
+@endphp
+
 {{-- 대시보드 사이드바 --}}
 <nav class="sidebar" style="position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #ffffff; border-right: 1px solid #E1E1E4; display: flex; flex-direction: column; z-index: 10; box-sizing: border-box;">
     @include('300-service-common.logo')
@@ -8,7 +14,7 @@
             <div class="org-icon" style="width: 28px; height: 28px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
                 <div class="chart-icon" style="width: 20px; height: 20px; background: #0DC8AF; border-radius: 2px; position: relative;"></div>
             </div>
-            <span class="org-text" style="flex: 1; font-size: 14px; color: #666666;">조직 없음</span>
+            <span class="org-text" style="flex: 1; font-size: 14px; color: #666666;">{{ $orgConfig['no_org_text'] }}</span>
             <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" style="color: #666666; transition: transform 0.2s ease;">
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" fill="none" stroke-width="1.5"/>
             </svg>
@@ -17,13 +23,13 @@
         <!-- 조직 드롭다운 메뉴 -->
         <div class="org-dropdown" id="orgDropdown" style="position: absolute; top: 100%; left: 20px; right: 20px; background: #ffffff; border: 1px solid #E1E1E4; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 50; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s ease;">
             <div class="org-dropdown-header" style="padding: 12px; border-bottom: 1px solid #E1E1E4;">
-                <input type="text" placeholder="조직 검색..." class="org-search" id="orgSearch" style="width: 100%; padding: 8px 12px; border: 1px solid #E1E1E4; border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box;">
+                <input type="text" placeholder="{{ $orgConfig['search_placeholder'] }}" class="org-search" id="orgSearch" style="width: 100%; padding: 8px 12px; border: 1px solid #E1E1E4; border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box;">
             </div>
             <div class="org-list" id="orgList" style="max-height: 200px; overflow-y: auto;">
                 <!-- 조직이 없을 때 표시할 메시지 -->
                 <div class="no-org-message" style="padding: 20px; text-align: center; color: #666666; font-size: 14px;">
-                    조직이 없습니다.<br>
-                    <span style="font-size: 12px; color: #888888;">새 조직을 만들어 시작하세요.</span>
+                    {{ $orgConfig['no_org_message'] }}<br>
+                    <span style="font-size: 12px; color: #888888;">{{ $orgConfig['no_org_submessage'] }}</span>
                 </div>
             </div>
             <div class="org-actions" style="padding: 12px; border-top: 1px solid #E1E1E4;">
@@ -31,7 +37,7 @@
                     <svg width="16" height="16" viewBox="0 0 16 16">
                         <path d="M8 3v10M3 8h10" stroke="currentColor" fill="none" stroke-width="1.5"/>
                     </svg>
-                    새 조직 만들기
+                    {{ $orgConfig['create_org_button_text'] }}
                 </button>
             </div>
         </div>
@@ -40,46 +46,16 @@
     <!-- 네비게이션 메뉴 -->
     <div class="navigation-section" style="padding: 20px; flex: 1;">
         <ul class="nav-menu" style="list-style: none; padding: 0; margin: 0;">
+            @foreach($navItems as $item)
             <li style="margin-bottom: 4px;">
-                <a href="/dashboard" class="nav-item active" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px; background: #E9E9ED;">
-                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #0DC8AF;">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M3 4h4v4H3V4zM9 4h4v4H9V4zM3 10h4v4H3v-4zM9 10h4v4H9v-4z" fill="currentColor"/>
-                        </svg>
+                <a href="{{ $item['url'] }}" class="nav-item {{ $item['active'] ? 'active' : '' }}" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px; {{ $item['active'] ? 'background: #E9E9ED;' : '' }}">
+                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: {{ $item['active'] ? '#0DC8AF' : '#666666' }};">
+                        {!! $item['icon'] !!}
                     </div>
-                    대시보드
+                    {{ $item['title'] }}
                 </a>
             </li>
-            <li style="margin-bottom: 4px;">
-                <a href="/projects" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
-                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M4 4h12v2H4V4zM4 8h12v2H4V8zM4 12h12v2H4v-2z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    프로젝트
-                </a>
-            </li>
-            <li style="margin-bottom: 4px;">
-                <a href="/analytics" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
-                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M3 16V8h2v8H3zM7 16V4h2v12H7zM11 16V10h2v6h-2zM15 16V6h2v10h-2z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    분석
-                </a>
-            </li>
-            <li style="margin-bottom: 4px;">
-                <a href="/settings" class="nav-item" style="display: flex; align-items: center; padding: 10px 12px; color: #111111; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; font-size: 14px;">
-                    <div class="nav-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; color: #666666;">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M8.5 2.5A1.5 1.5 0 0110 4h0a1.5 1.5 0 011.5 1.5v.5h3a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h3v-.5A1.5 1.5 0 019.5 4h0A1.5 1.5 0 018.5 2.5z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    설정
-                </a>
-            </li>
+            @endforeach
         </ul>
     </div>
 </nav>
