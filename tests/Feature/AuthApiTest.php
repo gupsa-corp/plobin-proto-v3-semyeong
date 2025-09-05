@@ -21,8 +21,8 @@ class AuthApiTest extends TestCase
         $userData = [
             'name' => '홍길동',
             'email' => 'test@gmail.com',
-            'password' => 'Test123!@#',
-            'password_confirmation' => 'Test123!@#'
+            'password' => 'test123!',
+            'password_confirmation' => 'test123!'
         ];
 
         // When: 회원가입 API 호출
@@ -61,13 +61,13 @@ class AuthApiTest extends TestCase
         // Given: 테스트 사용자 생성
         $user = User::factory()->create([
             'email' => 'test@gmail.com',
-            'password' => Hash::make('Test123!@#')
+            'password' => Hash::make('test123!')
         ]);
 
         // When: 로그인 API 호출
         $response = $this->post('/api/auth/login', [
             'email' => 'test@gmail.com',
-            'password' => 'Test123!@#'
+            'password' => 'test123!'
         ]);
 
         // Then: 성공 응답 확인

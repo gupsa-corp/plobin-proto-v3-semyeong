@@ -42,7 +42,7 @@ async function checkEmail() {
     }
     
     // 기본 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
         errorDiv.textContent = '올바른 이메일 형식을 입력해주세요.';
         errorDiv.classList.remove('hidden');

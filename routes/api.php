@@ -27,30 +27,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->group(function () {
-    // 공개 API (인증 불필요) - 단순한 Rate Limit만
-    Route::post('/check-email', CheckEmailController::class)
-        ->middleware('rate.limit:10,1');
-
-    Route::post('/signup', SignupController::class)
-        ->middleware('rate.limit:3,5');
-
-    Route::post('/login', LoginController::class)
-        ->middleware('rate.limit:5,1');
-
-    Route::post('/forgot-password', ForgotPasswordController::class)
-        ->middleware('rate.limit:3,1');
-
-    Route::post('/reset-password', ResetPasswordController::class)
-        ->middleware('rate.limit:5,1');
+    // 공개 API (인증 불필요) - 개발용으로 제한 완화
+    Route::post('/check-email', CheckEmailController::class);
+    Route::post('/signup', SignupController::class);
+    Route::post('/login', LoginController::class);
+    Route::post('/forgot-password', ForgotPasswordController::class);
+    Route::post('/reset-password', ResetPasswordController::class);
 
     // 인증 필요한 API (웹 세션 OR API 토큰)
-    Route::middleware(['auth.web-or-token', 'rate.limit:60,1'])->group(function () {
+    Route::middleware(['auth.web-or-token'])->group(function () {
         Route::get('/me', MeController::class);
         Route::post('/logout', LogoutController::class);
     });
 });
 
-Route::prefix('organizations')->middleware(['auth.web-or-token', 'rate.limit:60,1'])->group(function () {
+Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(function () {
     Route::get('/list', GetOrganizationsController::class);
     Route::post('/create', CreateOrganizationController::class);
     Route::get('/check-url/{url_path}', CheckUrlPathController::class);

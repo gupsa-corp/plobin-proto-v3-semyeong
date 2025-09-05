@@ -29,10 +29,9 @@ abstract class ApiRequest extends FormRequest
         return [
             'required',
             'string',
-            'email:rfc,dns',
+            'email:rfc',
             'max:255',
-            'min:5',
-            'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
+            'min:5'
         ];
     }
 
@@ -46,7 +45,7 @@ abstract class ApiRequest extends FormRequest
             'string',
             'min:8',
             'max:100',
-            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'
+            'regex:/^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[a-z\d@$!%*?&]/'
         ];
     }
 

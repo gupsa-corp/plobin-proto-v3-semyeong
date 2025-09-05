@@ -106,7 +106,7 @@ class SignupPlobinTest extends TestCase
             'name' => '홍길동',
             'email' => 'test@gmail.com',
             'password' => 'password123!',
-            'password_confirmation' => 'different_password!'
+            'password_confirmation' => 'differentpassword'
         ];
 
         // When: 회원가입 API 호출
