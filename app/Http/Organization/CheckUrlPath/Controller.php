@@ -11,7 +11,7 @@ class Controller extends ApiController
     {
         // URL path 형식 검증
         if (!preg_match('/^[a-z]{3,12}$/', $urlPath)) {
-            return $this->error('유효하지 않은 URL 명 형식입니다.', 400);
+            return $this->error('유효하지 않은 URL 경로 형식입니다.', 400);
         }
 
         // 중복 여부 확인
@@ -20,6 +20,6 @@ class Controller extends ApiController
         return $this->success([
             'url_path' => $urlPath,
             'available' => !$exists
-        ], $exists ? '이미 사용 중인 URL 명입니다.' : '사용 가능한 URL 명입니다.');
+        ], $exists ? '이미 사용 중인 URL 경로입니다.' : '사용 가능한 URL 경로입니다.');
     }
 }

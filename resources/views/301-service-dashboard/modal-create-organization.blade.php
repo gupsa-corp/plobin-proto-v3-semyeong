@@ -19,16 +19,6 @@
                                class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
                     </div>
 
-                    {{-- URL 명 입력 --}}
-                    <div class="flex flex-col justify-center items-start gap-1 w-full">
-                        <div class="flex items-center pl-1 gap-2">
-                            <label for="urlPath" class="text-sm text-gray-900">URL 명</label>
-                            <span id="urlCheckStatus" class="text-xs"></span>
-                        </div>
-                        <input type="text" id="urlPath" placeholder="영문 소문자 3~12자"
-                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                        <p class="text-sm text-gray-500 mt-1">e.g. acme → www.plobin.com/orgs/acme</p>
-                    </div>
                 </div>
 
                 {{-- 생성 버튼 --}}

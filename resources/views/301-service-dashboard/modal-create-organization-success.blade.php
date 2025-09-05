@@ -23,11 +23,6 @@
                     <div class="text-6xl">🎉</div>
                 </div>
                 
-                {{-- URL 표시 박스 --}}
-                <div class="absolute bottom-0 w-[356px] h-14 bg-teal-50 border-2 border-teal-500 rounded flex flex-col justify-center items-center px-5 gap-2">
-                    <p class="text-sm text-gray-700">이제 다음의 경로로 조직에 접근할 수 있어요</p>
-                    <p id="organizationUrl" class="text-base font-bold text-teal-600">www.plobin.com/orgs/example</p>
-                </div>
             </div>
         </div>
 

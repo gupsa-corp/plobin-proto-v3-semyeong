@@ -8,10 +8,7 @@ class OrganizationModalManager {
         this.createModal = null;
         this.successModal = null;
         this.orgNameInput = null;
-        this.urlPathInput = null;
         this.createSubmitBtn = null;
-        this.urlCheckTimeout = null;
-        this.lastCheckedUrl = '';
     }
 
     /**
@@ -25,13 +22,8 @@ class OrganizationModalManager {
 
             // 입력 필드 초기화
             this.orgNameInput = document.getElementById('orgName');
-            this.urlPathInput = document.getElementById('urlPath');
 
             if (this.orgNameInput) this.orgNameInput.value = '';
-            if (this.urlPathInput) {
-                this.urlPathInput.value = '';
-                this.clearUrlCheckStatus();
-            }
         }
     }
 
@@ -48,21 +40,14 @@ class OrganizationModalManager {
     /**
      * 성공 모달을 표시합니다
      * @param {string} orgName - 조직명
-     * @param {string} urlPath - URL 명
      */
-    showSuccessModal(orgName, urlPath) {
+    showSuccessModal(orgName) {
         this.successModal = document.getElementById('createOrganizationSuccessModal');
         if (this.successModal) {
             // 제목 업데이트
             const successTitle = document.getElementById('successTitle');
             if (successTitle) {
                 successTitle.textContent = `${orgName} 조직이 생성되었습니다`;
-            }
-
-            // URL 업데이트
-            const organizationUrl = document.getElementById('organizationUrl');
-            if (organizationUrl) {
-                organizationUrl.textContent = `www.plobin.com/orgs/${urlPath}`;
             }
 
             this.successModal.classList.remove('hidden');
@@ -80,138 +65,6 @@ class OrganizationModalManager {
         }
     }
 
-    /**
-     * URL 중복 확인 상태를 지웁니다
-     */
-    clearUrlCheckStatus() {
-        const statusElement = document.getElementById('urlCheckStatus');
-        const urlPathInput = document.getElementById('urlPath');
-        
-        if (statusElement) {
-            statusElement.textContent = '';
-            statusElement.className = 'text-xs';
-        }
-        
-        if (urlPathInput) {
-            urlPathInput.className = 'w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500';
-        }
-    }
-
-    /**
-     * URL 중복 확인 상태를 업데이트합니다
-     * @param {string} status - 'checking', 'available', 'unavailable', 'error'
-     * @param {string} message - 상태 메시지
-     */
-    updateUrlCheckStatus(status, message = '') {
-        const statusElement = document.getElementById('urlCheckStatus');
-        const urlPathInput = document.getElementById('urlPath');
-        
-        if (!statusElement || !urlPathInput) return;
-        
-        statusElement.textContent = message;
-        
-        switch (status) {
-            case 'checking':
-                statusElement.className = 'text-xs text-blue-500';
-                urlPathInput.className = 'w-full px-3 py-3 border border-blue-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
-                break;
-            case 'available':
-                statusElement.className = 'text-xs text-green-600';
-                urlPathInput.className = 'w-full px-3 py-3 border border-green-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500';
-                break;
-            case 'unavailable':
-                statusElement.className = 'text-xs text-red-600';
-                urlPathInput.className = 'w-full px-3 py-3 border border-red-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500';
-                break;
-            case 'error':
-                statusElement.className = 'text-xs text-gray-500';
-                urlPathInput.className = 'w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500';
-                break;
-        }
-    }
-
-    /**
-     * URL 중복을 확인합니다
-     * @param {string} urlPath - 확인할 URL 경로
-     */
-    async checkUrlAvailability(urlPath) {
-        // 형식 검증
-        const urlPathPattern = /^[a-z]{3,12}$/;
-        if (!urlPathPattern.test(urlPath)) {
-            this.clearUrlCheckStatus();
-            return;
-        }
-
-        // 같은 URL을 다시 확인하지 않음
-        if (urlPath === this.lastCheckedUrl) {
-            return;
-        }
-
-        this.lastCheckedUrl = urlPath;
-        this.updateUrlCheckStatus('checking', '확인 중...');
-
-        try {
-            const token = localStorage.getItem('auth_token');
-            
-            const response = await fetch(`/api/organizations/check-url/${urlPath}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`API 오류: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.success && data.data) {
-                if (data.data.available) {
-                    this.updateUrlCheckStatus('available', '✓ 사용 가능');
-                } else {
-                    this.updateUrlCheckStatus('unavailable', '✗ 이미 사용 중');
-                }
-            } else {
-                this.updateUrlCheckStatus('error', '확인 실패');
-            }
-
-        } catch (error) {
-            console.error('URL 중복 확인 오류:', error);
-            this.updateUrlCheckStatus('error', '확인 실패');
-        }
-    }
-
-    /**
-     * URL 입력 필드에 디바운싱된 중복 확인을 설정합니다
-     */
-    setupUrlValidation() {
-        const urlPathInput = document.getElementById('urlPath');
-        if (!urlPathInput) return;
-
-        urlPathInput.addEventListener('input', (e) => {
-            const urlPath = e.target.value.trim();
-            
-            // 이전 타이머 취소
-            if (this.urlCheckTimeout) {
-                clearTimeout(this.urlCheckTimeout);
-            }
-            
-            // 빈 값이면 상태 초기화
-            if (!urlPath) {
-                this.clearUrlCheckStatus();
-                this.lastCheckedUrl = '';
-                return;
-            }
-            
-            // 500ms 후 중복 확인 실행
-            this.urlCheckTimeout = setTimeout(() => {
-                this.checkUrlAvailability(urlPath);
-            }, 500);
-        });
-    }
 
     /**
      * 조직을 생성합니다
@@ -219,10 +72,7 @@ class OrganizationModalManager {
     async createOrganization() {
         // 입력 필드를 다시 참조 (모달이 열린 후 변경될 수 있으므로)
         this.orgNameInput = document.getElementById('orgName');
-        this.urlPathInput = document.getElementById('urlPath');
-
         const orgName = this.orgNameInput?.value.trim();
-        const urlPath = this.urlPathInput?.value.trim();
         this.createSubmitBtn = document.getElementById('createOrgSubmitBtn');
 
         // 유효성 검사
@@ -233,17 +83,6 @@ class OrganizationModalManager {
 
         if (orgName.length < 1 || orgName.length > 25) {
             alert('조직 이름은 1~25자로 입력해주세요.');
-            return;
-        }
-
-        if (!urlPath) {
-            alert('URL 명을 입력해주세요.');
-            return;
-        }
-
-        const urlPathPattern = /^[a-z]{3,12}$/;
-        if (!urlPathPattern.test(urlPath)) {
-            alert('URL 명은 영문 소문자 3~12자로 입력해주세요.');
             return;
         }
 
@@ -266,7 +105,6 @@ class OrganizationModalManager {
                 },
                 body: JSON.stringify({
                     name: orgName,
-                    url_path: urlPath,
                     // 필요한 경우 추가 필드들
                     description: '', // 빈 설명
                     type: 'organization' // 기본 타입
@@ -286,7 +124,7 @@ class OrganizationModalManager {
             this.hideCreateModal();
 
             // 성공 모달 표시
-            this.showSuccessModal(orgName, urlPath);
+            this.showSuccessModal(orgName);
 
             // 조직 목록 다시 로드
             const organizationManager = new OrganizationManager();
@@ -302,8 +140,6 @@ class OrganizationModalManager {
 
                 if (error.message.includes('422')) {
                     errorMessage = '입력한 정보를 다시 확인해주세요.';
-                } else if (error.message.includes('409') || error.message.includes('conflict') || error.message.includes('unique')) {
-                    errorMessage = '이미 사용 중인 URL 명입니다. 다른 URL 명을 사용해주세요.';
                 }
 
                 alert(errorMessage);
@@ -325,8 +161,6 @@ class OrganizationModalManager {
         if (createOrgBtn) {
             createOrgBtn.addEventListener('click', () => {
                 this.showCreateModal();
-                // 모달이 열린 후 URL 유효성 검사 설정
-                setTimeout(() => this.setupUrlValidation(), 100);
             });
         }
 

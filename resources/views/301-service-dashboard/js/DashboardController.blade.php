@@ -7,6 +7,8 @@ class DashboardController {
     constructor() {
         this.authManager = new AuthenticationManager();
         this.modalManager = new OrganizationModalManager();
+        // 전역 변수로 설정하여 HTML에서 접근 가능하도록 함
+        window.organizationManager = new OrganizationManager();
         this.init();
     }
 

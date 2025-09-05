@@ -18,11 +18,11 @@ class Controller extends ApiController
             'name.required' => '조직 이름을 입력해주세요.',
             'name.min' => '조직 이름은 1자 이상이어야 합니다.',
             'name.max' => '조직 이름은 25자 이하여야 합니다.',
-            'url_path.required' => 'URL 명을 입력해주세요.',
-            'url_path.min' => 'URL 명은 3자 이상이어야 합니다.',
-            'url_path.max' => 'URL 명은 12자 이하여야 합니다.',
-            'url_path.regex' => 'URL 명은 영문 소문자만 가능합니다.',
-            'url_path.unique' => '이미 사용 중인 URL 명입니다.'
+            'url_path.required' => 'URL 경로을 입력해주세요.',
+            'url_path.min' => 'URL 경로은 3자 이상이어야 합니다.',
+            'url_path.max' => 'URL 경로은 12자 이하여야 합니다.',
+            'url_path.regex' => 'URL 경로은 영문 소문자만 가능합니다.',
+            'url_path.unique' => '이미 사용 중인 URL 경로입니다.'
         ]);
 
         $organization = Organization::create([

@@ -143,7 +143,7 @@ class OrganizationManager {
                         ${avatarText}
                     </div>
                     <div class="relative">
-                        <button class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full" onclick="event.stopPropagation(); this.showOrganizationMenu(${org.id})">
+                        <button class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full" onclick="event.stopPropagation(); organizationManager.showOrganizationMenu(${org.id})">
                             <div class="flex flex-col gap-1">
                                 <div class="w-1 h-1 bg-gray-800 rounded-full"></div>
                                 <div class="w-1 h-1 bg-gray-800 rounded-full"></div>
@@ -182,7 +182,110 @@ class OrganizationManager {
      */
     showOrganizationMenu(orgId) {
         console.log('조직 메뉴 표시:', orgId);
-        // TODO: 조직 메뉴 처리 로직
+        
+        // 기존 메뉴가 있다면 제거
+        const existingMenu = document.querySelector('.organization-dropdown-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+
+        // 클릭된 버튼 찾기
+        const buttonElement = event.target.closest('button');
+        if (!buttonElement) return;
+
+        // 드롭다운 메뉴 생성
+        const dropdownMenu = document.createElement('div');
+        dropdownMenu.className = 'organization-dropdown-menu absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-[160px] z-50';
+        
+        dropdownMenu.innerHTML = `
+            <button onclick="organizationManager.editOrganization(${orgId})" class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="m18.5 2.5 3 3L21 6l-3-3"/>
+                </svg>
+                조직 정보 편집
+            </button>
+            <button onclick="organizationManager.manageMembers(${orgId})" class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="8.5" cy="7" r="4"/>
+                    <line x1="20" y1="8" x2="20" y2="14"/>
+                    <line x1="23" y1="11" x2="17" y2="11"/>
+                </svg>
+                멤버 관리
+            </button>
+            <hr class="my-2 border-gray-100">
+            <button onclick="organizationManager.deleteOrganization(${orgId})" class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="3,6 5,6 21,6"/>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+                </svg>
+                조직 삭제
+            </button>
+        `;
+
+        // 버튼의 부모 요소를 relative로 설정
+        const parentContainer = buttonElement.parentElement;
+        parentContainer.classList.add('relative');
+        
+        // 드롭다운 추가
+        parentContainer.appendChild(dropdownMenu);
+
+        // 외부 클릭시 메뉴 닫기
+        setTimeout(() => {
+            document.addEventListener('click', this.handleOutsideClick.bind(this), { once: true });
+        }, 0);
+    }
+
+    /**
+     * 외부 클릭 시 드롭다운 메뉴를 닫습니다
+     */
+    handleOutsideClick(event) {
+        const dropdown = document.querySelector('.organization-dropdown-menu');
+        if (dropdown && !dropdown.contains(event.target)) {
+            dropdown.remove();
+        }
+    }
+
+    /**
+     * 조직 정보를 편집합니다
+     * @param {number} orgId - 조직 ID
+     */
+    editOrganization(orgId) {
+        console.log('조직 편집:', orgId);
+        // 드롭다운 메뉴 닫기
+        const dropdown = document.querySelector('.organization-dropdown-menu');
+        if (dropdown) dropdown.remove();
+        
+        // TODO: 조직 편집 모달 표시
+    }
+
+    /**
+     * 멤버를 관리합니다
+     * @param {number} orgId - 조직 ID
+     */
+    manageMembers(orgId) {
+        console.log('멤버 관리:', orgId);
+        // 드롭다운 메뉴 닫기
+        const dropdown = document.querySelector('.organization-dropdown-menu');
+        if (dropdown) dropdown.remove();
+        
+        // TODO: 멤버 관리 모달 표시
+    }
+
+    /**
+     * 조직을 삭제합니다
+     * @param {number} orgId - 조직 ID
+     */
+    deleteOrganization(orgId) {
+        console.log('조직 삭제:', orgId);
+        // 드롭다운 메뉴 닫기
+        const dropdown = document.querySelector('.organization-dropdown-menu');
+        if (dropdown) dropdown.remove();
+        
+        if (confirm('정말로 이 조직을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+            // TODO: 조직 삭제 API 호출
+        }
     }
 }
 </script>
