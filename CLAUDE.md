@@ -4,6 +4,13 @@
 4. 말하지 않은 컴포넌트 내용 만들지 말고 내용 비울 것
 5. 임시 토큰은 더 이상 사용하지 않음 (개발/운영 구분 없이 실제 API만 사용)
 6. 프론트엔드는 alpine js 와 blade 템플릿 사용중
+7. **파일명 규칙 준수 필수**: 모든 뷰 파일은 숫자 접두사-설명 형식으로 명명 (예: 301-layout-head.blade.php, 200-sidebar-main.blade.php)
+
+## 파일명 규칙
+- 뷰 파일: `[숫자]-[설명].blade.php` (예: `301-layout-head.blade.php`)
+- 공통 컴포넌트: `[숫자]-[카테고리]-[설명].blade.php` (예: `200-sidebar-main.blade.php`)
+- 데이터 파일: `[숫자]-data-[설명].php` (예: `600-data-sidebar.php`)
+- **절대 금지**: 임의의 파일명 생성 (예: `head.blade.php`, `sidebar.blade.php`)
 
 ## 참고 문서
 
