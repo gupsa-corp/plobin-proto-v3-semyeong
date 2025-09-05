@@ -17,10 +17,14 @@ class UserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@gupsa.com'],
             [
-                'name' => 'Admin',
                 'email' => 'admin@gupsa.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'country_code' => '+82',
+                'phone_number' => '01012345678',
+                'nickname' => 'admin',
+                'first_name' => '김',
+                'last_name' => '준',
             ]
         );
 
