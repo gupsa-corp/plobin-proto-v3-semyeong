@@ -19,10 +19,11 @@ function organizationModal() {
         // Success data
         createdOrg: null,
 
-        // Create Modal Management
+        // Create Modal Management (ModalUtils 활용)
         showCreateModal() {
             this.isCreateModalOpen = true;
             this.resetForm();
+            ModalUtils.showModal('createOrgModal');
             this.$nextTick(() => {
                 this.$refs.orgNameInput?.focus();
             });
@@ -31,6 +32,7 @@ function organizationModal() {
         closeCreateModal() {
             this.isCreateModalOpen = false;
             this.resetForm();
+            ModalUtils.hideModal('createOrgModal');
         },
 
         resetForm() {
@@ -51,30 +53,18 @@ function organizationModal() {
                 this.isLoading = true;
                 this.formErrors = {};
 
-                const response = await fetch('/api/organizations/create', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.getAuthToken()}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: this.newOrgName,
-                        url_path: this.newOrgUrl
-                    })
+                const data = await ApiClient.post('/api/organizations/create', {
+                    name: this.newOrgName,
+                    url_path: this.newOrgUrl
                 });
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    this.createdOrg = data.data;
-                    this.closeCreateModal();
-                    this.showSuccessModal();
-                } else {
-                    this.formErrors = data.errors || { general: [data.message] };
-                }
+                this.createdOrg = data.data;
+                this.closeCreateModal();
+                this.showSuccessModal();
             } catch (error) {
-                console.error('조직 생성 오류:', error);
-                this.formErrors = { general: ['네트워크 오류가 발생했습니다.'] };
+                ApiErrorHandler.handle(error, '조직 생성');
+                // API 클라이언트에서 이미 422 에러를 처리하므로 기본 메시지만 표시
+                this.formErrors = { general: ['조직 생성에 실패했습니다.'] };
             } finally {
                 this.isLoading = false;
             }
@@ -88,13 +78,15 @@ function organizationModal() {
             return true;
         },
 
-        // Success Modal Management
+        // Success Modal Management (ModalUtils 활용)
         showSuccessModal() {
             this.isSuccessModalOpen = true;
+            ModalUtils.showModal('successModal');
         },
 
         closeSuccessModal() {
             this.isSuccessModalOpen = false;
+            ModalUtils.hideModal('successModal');
         },
 
         goToOrganization() {

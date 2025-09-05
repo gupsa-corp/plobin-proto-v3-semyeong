@@ -14,7 +14,7 @@
             @include($common . '.header')
             @include(getCurrentViewPath())
         </div>
-        @include('301-service-dashboard-modal-003-organization-manager.modal')
+        @include('301-service-dashboard.302-modal-organization-manager')
     </div>
 </body>
 </html>
