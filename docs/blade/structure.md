@@ -5,7 +5,7 @@
 이 문서는 Plobin Proto V3 프로젝트의 실제 Blade 템플릿 구조와 네이밍 컨벤션을 설명합니다.
 서비스는 **랜딩페이지(100)**, **인증(200)**, **서비스(300)** 3개 영역으로 구분됩니다.
 
-## 실제 디렉토리 구조
+## 실제 디렉토리 구조 (수정 X)
 
 ```
 resources/views/
@@ -15,32 +15,12 @@ resources/views/
 │   │   ├── 301-layout-head.blade.php      # HTML head
 │   │   ├── 302-layout-css-imports.blade.php  # CSS imports
 │   │   └── 900-layout-footer.blade.php    # 랜딩 푸터
-│   └── 101-page-landing-home/  # 메인 랜딩페이지
-│       ├── 000-index.blade.php # 메인 레이아웃
-│       └── 200-content-main.blade.php # 본문 내용
 ├── 200-page-auth/             # 인증 페이지 영역
 │   ├── 200-common/            # 인증 공통 컴포넌트
 │   │   ├── 100-header-main.blade.php      # 인증 헤더
 │   │   ├── 301-layout-head.blade.php      # HTML head
 │   │   ├── 302-layout-css-imports.blade.php  # CSS imports
 │   │   └── 900-layout-footer.blade.php    # 인증 푸터
-│   ├── 201-page-auth-login/   # 로그인 페이지
-│   │   ├── 000-index.blade.php # 메인 레이아웃
-│   │   ├── 200-content-main.blade.php # 로그인 폼
-│   │   └── 500-ajax-login.blade.php # AJAX 로그인
-│   ├── 202-page-auth-signup/  # 회원가입 페이지
-│   │   ├── 000-index.blade.php # 메인 레이아웃
-│   │   ├── 200-content-main.blade.php # 회원가입 폼
-│   │   ├── 400-js-signup.blade.php # JavaScript
-│   │   └── 500-ajax-signup.blade.php # AJAX 회원가입
-│   ├── 203-page-auth-forgot-password/ # 비밀번호 찾기
-│   │   ├── 000-index.blade.php
-│   │   ├── 200-content-main.blade.php
-│   │   └── 500-ajax-forgot-password.blade.php
-│   └── 204-page-auth-reset-password/ # 비밀번호 재설정
-│       ├── 000-index.blade.php
-│       ├── 200-content-main.blade.php
-│       └── 500-ajax-reset-password.blade.php
 └── 300-page-service/          # 본 서비스 영역
     ├── 300-common/            # 서비스 공통 컴포넌트
     │   ├── 000-auth-token-manager.blade.php # 토큰 관리
@@ -62,26 +42,6 @@ resources/views/
     │   ├── 500-ajax-put.blade.php         # AJAX PUT
     │   ├── 500-ajax-delete.blade.php      # AJAX DELETE
     │   └── 900-alpine-init.blade.php      # Alpine.js 초기화
-    ├── 301-page-dashboard/    # 대시보드
-    │   ├── 000-index.blade.php # 메인 레이아웃
-    │   ├── 101-layout-body.blade.php # 레이아웃 본문
-    │   ├── 200-content-auth-check.blade.php # 인증 체크
-    │   ├── 201-content-organization-selection.blade.php # 조직 선택
-    │   ├── 300-modal-create-organization.blade.php # 조직 생성 모달
-    │   ├── 301-modal-create-success.blade.php # 성공 모달
-    │   ├── 302-modal-organization-manager.blade.php # 조직 관리 모달
-    │   ├── 400-js-dashboard.blade.php     # 대시보드 JS
-    │   ├── 401-js-organization-selection.blade.php # 조직 선택 JS
-    │   ├── 402-js-modal-*.blade.php       # 모달 관련 JS들
-    │   ├── 500-ajax-organization-create.blade.php # 조직 생성 AJAX
-    │   └── 600-data-sidebar.blade.php     # 사이드바 데이터
-    └── 302-page-organization-dashboard/ # 조직 대시보드
-        ├── 000-index.blade.php # 메인 레이아웃
-        ├── 200-content-main.blade.php # 메인 컨텐츠
-        ├── 300-modal-organization-manager.blade.php # 조직 관리 모달
-        ├── 400-js-org-*.blade.php        # JS 함수들
-        ├── 500-ajax-organization-*.blade.php # AJAX 함수들
-        └── 600-data-sidebar.blade.php    # 사이드바 데이터
 ```
 
 ## 네이밍 컨벤션
@@ -106,89 +66,34 @@ resources/views/
 - `100-xxx.blade.php`: 헤더 관련 파일들
 - `200-xxx.blade.php`: 메인 콘텐츠, 사이드바 파일들
 - `300-xxx.blade.php`: 레이아웃, 모달 파일들
-- `400-xxx.blade.php`: JavaScript 파일들
+- `400-xxx.blade.php`: JavaScript 파일들 (**필수: 400번대 사용**)
 - `500-xxx.blade.php`: AJAX 요청 파일들
 - `600-xxx.blade.php`: 데이터 관련 파일들
 - `900-xxx.blade.php`: 초기화, 푸터 파일들
 
-## CSS/JS 파일 연결 구조
+#### JavaScript 파일 세분화 규칙 (400번대 사용 필수)
+JavaScript 파일이 복잡할 경우, 다음과 같이 기능별로 분리하여 관리:
 
-### Vite 설정에 따른 자산 구조
-```
-resources/
-├── css/
-│   ├── 000-app-common.css      # 기본 공통 스타일
-│   ├── 100-landing-common.css  # 랜딩페이지용 (100-199)
-│   ├── 200-auth-common.css     # 인증페이지용 (200-299)
-│   ├── 300-service-common.css  # 서비스용 (300-399)
-│   └── 900-admin-common.css    # 관리자용 (900-999)
-└── js/
-    ├── 000-app-common.js       # 기본 공통 기능
-    ├── 000-bootstrap-common.js # Axios 등 기본 라이브러리
-    ├── 100-landing-common.js   # 랜딩페이지용
-    ├── 200-auth-common.js      # 인증페이지용
-    ├── 300-service-common.js   # 서비스용
-    └── 900-admin-common.js     # 관리자용
-```
+**예시: 회원가입 페이지 JavaScript 분리**
+- `400-js-signup.blade.php`: 메인 JavaScript 파일 (통합 include + 통합함수 + 초기화)
+- `400-js-global-state.blade.php`: 전역 상태 변수들
+- `401-js-country-loader.blade.php`: 국가 목록 로드 기능
+- `402-js-name-validation.blade.php`: 이름 필드 검증 기능  
+- `403-js-nickname-validation.blade.php`: 닉네임 검증 기능
+- `404-js-phone-validation.blade.php`: 휴대폰 번호 검증 기능
+- `405-js-password-validation.blade.php`: 비밀번호 검증 기능
+- `406-js-email-handler.blade.php`: 이메일 중복확인 기능
+- `407-js-form-validation.blade.php`: 폼 유효성 검사 및 에러 처리
+- `408-js-form-submit.blade.php`: 폼 제출 처리 기능
 
-### Head 컴포넌트별 자산 로드
+**JavaScript 분리 시 주의사항:**
+- 모든 JavaScript 관련 파일은 **반드시 400번대 사용**
+- 메인 파일(400-js-{page}.blade.php)에서 @include로 분리된 파일들 통합
+- 순서대로 번호 부여 (400, 401, 402, ... 408)
+- 각 파일은 특정 기능만 담당하도록 분리
+- 파일명에 기능을 명확히 표시 (validation, handler, loader 등)
+- **간단한 통합 함수와 초기화 코드는 메인 파일에 직접 작성**
 
-#### 랜딩페이지용 (100-page-landing/100-common/301-layout-head.blade.php)
-```html
-@vite(['resources/css/100-landing-common.css', 'resources/js/100-landing-common.js'])
-```
-
-#### 인증페이지용 (200-page-auth/200-common/301-layout-head.blade.php)
-```html
-@vite(['resources/css/200-auth-common.css', 'resources/js/200-auth-common.js'])
-```
-
-#### 서비스용 (300-page-service/300-common/301-layout-head.blade.php)
-```html
-@vite(['resources/css/300-service-common.css', 'resources/js/300-service-common.js'])
-```
-
-## 템플릿 구조 패턴
-
-### 1. 랜딩 페이지 레이아웃 (101-page-landing-home/000-index.blade.php)
-
-```html
-<!DOCTYPE html>
-<html lang="ko">
-@include('100-page-landing.100-common.301-layout-head')
-<body class="bg-gray-50 min-h-screen">
-    <div class="min-h-screen flex flex-col">
-        @include('100-page-landing.100-common.100-header-main')
-        @include('100-page-landing.101-page-landing-home.200-content-main')
-        @include('100-page-landing.100-common.900-layout-footer')
-    </div>
-</body>
-</html>
-```
-
-### 2. 인증 페이지 레이아웃 (2XX-page-auth-{page}/000-index.blade.php)
-
-```html
-<!DOCTYPE html>
-<html lang="ko">
-@include('200-page-auth.200-common.301-layout-head')
-<body class="bg-white min-h-screen">
-    <div class="min-h-screen flex flex-col">
-        @include('200-page-auth.200-common.100-header-main')
-        @include('200-page-auth.{current-page}.200-content-main')
-        @include('200-page-auth.200-common.900-layout-footer')
-    </div>
-    
-    <!-- AJAX 스크립트 포함 -->
-    @include('200-page-auth.{current-page}.500-ajax-{action}')
-    
-    <!-- JavaScript 포함 (있는 경우) -->
-    @isset('jsFile')
-        @include('200-page-auth.{current-page}.400-js-{action}')
-    @endisset
-</body>
-</html>
-```
 
 ### 3. 서비스 페이지 레이아웃 (3XX-page-{service}/000-index.blade.php)
 
@@ -219,39 +124,6 @@ resources/
     @include('300-page-service.300-common.900-alpine-init')
 </body>
 </html>
-```
-
-## 라우팅 연결 예시
-
-```php
-// 랜딩 페이지 (100번대)
-Route::get('/', function () { 
-    return view('100-page-landing.101-page-landing-home.000-index'); 
-});
-
-// 인증 페이지 (200번대) 
-Route::get('/login', function () { 
-    return view('200-page-auth.201-page-auth-login.000-index'); 
-});
-Route::get('/signup', function () { 
-    return view('200-page-auth.202-page-auth-signup.000-index'); 
-});
-Route::get('/forgot-password', function () { 
-    return view('200-page-auth.203-page-auth-forgot-password.000-index'); 
-});
-Route::get('/reset-password', function () { 
-    return view('200-page-auth.204-page-auth-reset-password.000-index'); 
-});
-
-// 본 서비스 (300번대)
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () { 
-        return view('300-page-service.301-page-dashboard.000-index'); 
-    });
-    Route::get('/organization/{id}', function () { 
-        return view('300-page-service.302-page-organization-dashboard.000-index'); 
-    });
-});
 ```
 
 ## 스타일링 가이드
@@ -299,10 +171,38 @@ Route::middleware('auth')->group(function () {
    - 100: 헤더  
    - 200: 콘텐츠/사이드바
    - 300: 레이아웃/모달
-   - 400: JavaScript
+   - 400: JavaScript (**400-499 순서 사용, 기능별 분리 시 순차 번호**)
    - 500: AJAX
    - 600: 데이터
    - 900: 푸터/초기화
+
+### JavaScript 파일 분리 가이드
+
+**분리해야 하는 경우:**
+- JavaScript 파일이 300줄 이상
+- 5개 이상의 독립적인 기능이 포함
+- 유지보수가 어려운 경우
+
+**분리 방법:**
+1. 메인 파일(`400-js-{page}.blade.php`)은 @include만 포함
+2. 기능별 파일을 401부터 순차적으로 번호 부여
+3. 각 파일은 하나의 기능 그룹만 담당
+4. 전역 변수는 400번 파일에 별도 분리
+
+**예시 구조:**
+```
+202-page-auth-signup/
+├── 400-js-signup.blade.php (메인: @include + 통합함수 + 초기화)
+├── 400-js-global-state.blade.php (전역 변수)
+├── 401-js-country-loader.blade.php (국가 로드)
+├── 402-js-name-validation.blade.php (이름 검증)
+├── 403-js-nickname-validation.blade.php (닉네임 검증)
+├── 404-js-phone-validation.blade.php (전화 검증)
+├── 405-js-password-validation.blade.php (비밀번호 검증)
+├── 406-js-email-handler.blade.php (이메일 처리)
+├── 407-js-form-validation.blade.php (폼 검증)
+└── 408-js-form-submit.blade.php (폼 제출)
+```
 
 ### CSS/JS 개발
 
@@ -326,12 +226,9 @@ Route::middleware('auth')->group(function () {
 - **절대 금지**: 숫자 prefix 없는 파일 생성
 - **권장**: 기능별 숫자 구간 사용 (000, 100, 200, 300, 400, 500, 600, 900)
 - **필수**: 의미 있는 파일명 사용
+- **JavaScript 분리 규칙**: 
+  - 메인 파일은 400번 사용
+  - 분리 파일은 401부터 순차적으로 사용
+  - 기능별 명확한 네이밍 (validation, handler, loader, setup 등)
+  - 모든 JavaScript 파일은 반드시 .blade.php 확장자 사용
 
-### CSS/JS 분리
-- 영역별 CSS/JS는 완전히 분리하여 관리
-- 불필요한 자산 로딩 방지로 성능 최적화
-
-### Vite 개발 서버 활용
-- 개발 시 반드시 `npm run dev` 실행
-- 실시간 빌드로 개발 효율성 극대화
-- 프로덕션 배포 시에만 `npm run build` 사용

@@ -3,11 +3,40 @@
         <h2 class="text-2xl font-bold text-center mb-6">회원가입</h2>
         
         <form id="signupForm">
+            <div class="mb-4 grid grid-cols-2 gap-4">
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">성</label>
+                    <input type="text" id="first_name" name="first_name"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div id="firstNameError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                    <input type="text" id="last_name" name="last_name"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div id="lastNameError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+            </div>
+
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">이름</label>
-                <input type="text" id="name" name="name" required
+                <label for="nickname" class="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
+                <input type="text" id="nickname" name="nickname"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <div id="nameError" class="text-red-500 text-sm mt-1 hidden"></div>
+                <div id="nicknameError" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">휴대폰 번호</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <select id="country_code" name="country_code"
+                        class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="+82">+82 (한국)</option>
+                        <!-- 동적으로 로드됨 -->
+                    </select>
+                    <input type="tel" id="phone_number" name="phone_number" placeholder="01012345678"
+                        class="col-span-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div id="phoneError" class="text-red-500 text-sm mt-1 hidden"></div>
             </div>
 
             <div class="mb-4">

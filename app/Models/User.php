@@ -6,15 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Propaganistas\LaravelPhone\PhoneNumber;
+use App\Services\PhoneNumberHelper;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'country_code',
+        'phone_number',
+        'nickname',
+        'first_name',
+        'last_name',
     ];
 
     protected $hidden = [
@@ -28,5 +34,55 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->nickname) {
+            return $this->nickname;
+        }
+
+        $fullName = $this->full_name;
+        if ($fullName) {
+            return $fullName;
+        }
+
+        return explode('@', $this->email)[0];
+    }
+
+    public function getPhoneNumberInstance(): ?PhoneNumber
+    {
+        return PhoneNumberHelper::createPhoneNumber($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+
+    public function getFormattedPhoneAttribute(): ?string
+    {
+        return PhoneNumberHelper::formatNational($this->phone_number ?? '', $this->country_code ?? '') ?? $this->phone_number;
+    }
+
+    public function getE164PhoneAttribute(): ?string
+    {
+        return PhoneNumberHelper::formatE164($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+    public function getInternationalPhoneAttribute(): ?string
+    {
+        return PhoneNumberHelper::formatInternational($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+    public function isValidPhone(): bool
+    {
+        return PhoneNumberHelper::isValid($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+    public function getPhoneTypeAttribute(): ?string
+    {
+        return PhoneNumberHelper::getPhoneType($this->phone_number ?? '', $this->country_code ?? '');
     }
 }

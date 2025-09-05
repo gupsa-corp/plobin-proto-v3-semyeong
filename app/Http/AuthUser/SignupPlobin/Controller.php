@@ -4,7 +4,6 @@ namespace App\Http\AuthUser\SignupPlobin;
 
 use App\Http\Controllers\ApiController;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -16,17 +15,17 @@ class Controller extends ApiController
         try {
             DB::beginTransaction();
 
-            // 이메일 중복 체크
-            if (User::where('email', strtolower(trim($request->email)))->exists()) {
-                return $this->unprocessableEntity([
-                    'email' => ['이미 사용중인 이메일입니다.']
-                ]);
-            }
-
+            // SignupRequest에서 이미 모든 검증이 완료됨
+            $validatedData = $request->validated();
+            
             $user = User::create([
-                'name' => $request->name,
-                'email' => strtolower(trim($request->email)),
-                'password' => Hash::make($request->password),
+                'email' => strtolower(trim($validatedData['email'])),
+                'password' => Hash::make($validatedData['password']),
+                'country_code' => $validatedData['country_code'] ?? null,
+                'phone_number' => $validatedData['phone_number'] ?? null,
+                'nickname' => $validatedData['nickname'] ?? null,
+                'first_name' => $validatedData['first_name'] ?? null,
+                'last_name' => $validatedData['last_name'] ?? null,
             ]);
 
             // 회원가입과 동시에 로그인 토큰 발급
@@ -37,8 +36,19 @@ class Controller extends ApiController
             return $this->created([
                 'user' => [
                     'id' => $user->id,
-                    'name' => $user->name,
                     'email' => $user->email,
+                    'full_name' => $user->full_name,
+                    'display_name' => $user->display_name,
+                    'country_code' => $user->country_code,
+                    'phone_number' => $user->phone_number,
+                    'formatted_phone' => $user->formatted_phone,
+                    'e164_phone' => $user->e164_phone,
+                    'international_phone' => $user->international_phone,
+                    'phone_type' => $user->phone_type,
+                    'is_valid_phone' => $user->isValidPhone(),
+                    'nickname' => $user->nickname,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'created_at' => $user->created_at,
                 ],
                 'token' => $token,
