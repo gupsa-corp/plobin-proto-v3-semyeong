@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/000-app-common.css',
                 'resources/js/000-app-common.js',
                 'resources/js/000-bootstrap-common.js',
+                'resources/js/alpine.js',
 
                 // 100-landing-common
                 'resources/css/100-landing-common.css',

@@ -13,4 +13,4 @@
     </div>
 </header>
 
-@include('300-service-common-header-assets.ajax-user-dropdown')
+@vite('resources/js/alpine.js')
