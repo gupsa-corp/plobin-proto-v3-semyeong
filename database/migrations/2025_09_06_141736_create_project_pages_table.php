@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pages', function (Blueprint $table) {
+        Schema::create('project_pages', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('slug');
             $table->text('content')->nullable();
             $table->string('status')->default('draft'); // draft, published, archived
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->foreignId('parent_id')->nullable()->constrained('pages')->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('project_pages')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('sort_order')->default(0);
             $table->timestamps();
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pages');
+        Schema::dropIfExists('project_pages');
     }
 };

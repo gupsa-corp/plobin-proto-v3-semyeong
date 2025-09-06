@@ -17,7 +17,7 @@ class Request extends FormRequest
             'title' => 'string|max:255',
             'content' => 'nullable|string',
             'status' => 'in:draft,published,archived',
-            'parent_id' => 'nullable|exists:pages,id'
+            'parent_id' => 'nullable|exists:project_pages,id'
         ];
     }
 

@@ -16,7 +16,7 @@ class Request extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
-            'parent_id' => 'nullable|exists:pages,id',
+            'parent_id' => 'nullable|exists:project_pages,id',
             'status' => 'in:draft,published,archived'
         ];
     }
