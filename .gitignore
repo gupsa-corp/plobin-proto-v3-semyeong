@@ -29,3 +29,4 @@ playwright-report/data/
 tests/e2e/screenshots/
 test-results/
 playwright.config.js
+receipt_test.pdf

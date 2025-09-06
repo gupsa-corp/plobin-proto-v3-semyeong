@@ -29,6 +29,11 @@ use App\Http\ProjectPage\UpdatePage\Controller as UpdatePageController;
 use App\Http\ProjectPage\DeletePage\Controller as DeletePageController;
 use App\Http\Organization\SearchMembers\Controller as SearchMembersController;
 use App\Http\Organization\InviteMembers\Controller as InviteMembersController;
+use App\Http\OrganizationBilling\GetBillingData\Controller as GetBillingDataController;
+use App\Http\OrganizationBilling\ProcessPayment\Controller as ProcessPaymentController;
+use App\Http\OrganizationBilling\CreateBusinessInfo\Controller as CreateBusinessInfoController;
+use App\Http\OrganizationBilling\BusinessLookup\Controller as BusinessLookupController;
+use App\Http\OrganizationBilling\DownloadReceipt\Controller as DownloadReceiptController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -88,6 +93,15 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
         Route::get('/search', SearchMembersController::class);
         Route::post('/invite', InviteMembersController::class);
     });
+
+    // 조직 결제 관리 API
+    Route::prefix('{organization}/billing')->group(function () {
+        Route::get('/data', GetBillingDataController::class);
+        Route::post('/payment/confirm', ProcessPaymentController::class);
+        Route::post('/business-info', CreateBusinessInfoController::class);
+        Route::post('/business-lookup', BusinessLookupController::class);
+        Route::post('/receipt/download', DownloadReceiptController::class);
+    });
 });
 
 // 프로젝트 페이지 관리 API
@@ -97,4 +111,12 @@ Route::prefix('projects')->middleware(['auth.web-or-token'])->group(function () 
     Route::get('/{project}/pages/{page}', GetPageController::class);
     Route::put('/{project}/pages/{page}', UpdatePageController::class);
     Route::delete('/{project}/pages/{page}', DeletePageController::class);
+});
+
+// 테스트용 결제 API (인증 없음 - 개발용)
+Route::prefix('test/organizations')->group(function () {
+    Route::get('{organization}/billing/data', GetBillingDataController::class);
+    Route::post('{organization}/billing/business-info', CreateBusinessInfoController::class);
+    Route::post('{organization}/billing/business-lookup', BusinessLookupController::class);
+    Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
 });

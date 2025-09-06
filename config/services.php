@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'toss' => [
+        'api_url' => env('TOSS_API_URL', 'https://api.tosspayments.com'),
+        'client_key' => env('test_ck_ADpexMgkW36plo0DgLErGbR5ozO0'),
+        'secret_key' => env('test_sk_O6BYq7GWPVvAO42yX253NE5vbo1d'),
+        'security_key' => env('892f0ac3795a2a53fe40f92926e2b8a1f0bb2b05fda255cd9dcb55c68b08be21'),
+        'success_url' => env('TOSS_SUCCESS_URL', env('APP_URL') . '/billing/payment/success'),
+        'fail_url' => env('TOSS_FAIL_URL', env('APP_URL') . '/billing/payment/fail'),
+        'webhook_url' => env('TOSS_WEBHOOK_URL', env('APP_URL') . '/api/webhooks/toss'),
+    ],
+
 ];

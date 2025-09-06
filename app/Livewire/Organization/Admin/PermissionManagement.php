@@ -98,7 +98,7 @@ class PermissionManagement extends Component
 
     public function render()
     {
-        return view('900-page-admin.920-livewire-permission-management', [
+        return view('900-page-platform-admin.920-livewire-permission-management', [
             'permissionLevels' => $this->getPermissionLevelsProperty(),
             'availableFeatures' => $this->getAvailableFeaturesForSelectedPermission()
         ]);

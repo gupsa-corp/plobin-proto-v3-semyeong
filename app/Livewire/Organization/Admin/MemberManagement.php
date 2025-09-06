@@ -361,7 +361,7 @@ class MemberManagement extends Component
 
     public function render()
     {
-        return view('900-page-admin.910-livewire-member-management', [
+        return view('900-page-platform-admin.910-livewire-member-management', [
             'filteredMembers' => $this->getFilteredMembersProperty(),
             'permissionLevels' => $this->getPermissionLevelsProperty()
         ]);

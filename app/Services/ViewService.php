@@ -62,6 +62,11 @@ class ViewService
     {
         $folder = $this->findViewDirectory();
         
+        // 800-page-organization-admin 형식 지원
+        if (preg_match('/^(800-page-organization-admin)\./', $folder)) {
+            return '800-page-organization-admin.800-common';
+        }
+        
         // 새로운 형식: 100-page-landing.101-page-landing-home.000-index
         if (preg_match('/^(\d)00-([^\.]+)\./', $folder, $matches)) {
             return $matches[1] . '00-' . $matches[2] . '.' . $matches[1] . '00-common';

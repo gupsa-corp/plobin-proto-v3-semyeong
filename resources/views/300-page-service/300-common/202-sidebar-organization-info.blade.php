@@ -1,11 +1,18 @@
 @php
-    $orgConfig =
-    [
-        'name' => '기본 조직',
-        'logo' => '/images/logo.png',
-        'description' => '기본 조직입니다.',
-        'current_plan' => 'free',
-        'members_count' => 1,
+    // 현재 URL에서 조직 ID 추출
+    $currentOrgId = null;
+    if (preg_match('/\/organizations\/(\d+)/', request()->getRequestUri(), $matches)) {
+        $currentOrgId = (int) $matches[1];
+    }
+    
+    // 현재 조직 정보 찾기
+    $currentOrg = null;
+    if ($currentOrgId && isset($organizations)) {
+        $currentOrg = $organizations->firstWhere('id', $currentOrgId);
+    }
+    
+    $orgConfig = [
+        'current_org_name' => $currentOrg ? $currentOrg->name : '조직을 선택해주세요',
         'no_org_text' => '조직을 선택해주세요',
         'search_placeholder' => '조직 검색...',
         'no_org_message' => '조직이 없습니다',
@@ -20,7 +27,7 @@
         <div class="org-icon" style="width: 28px; height: 28px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
             <div class="chart-icon" style="width: 20px; height: 20px; background: #0DC8AF; border-radius: 2px; position: relative;"></div>
         </div>
-        <span class="org-text" style="flex: 1; font-size: 14px; color: #666666;">{{ $orgConfig['no_org_text'] }}</span>
+        <span class="org-text" style="flex: 1; font-size: 14px; color: #666666;">{{ $orgConfig['current_org_name'] }}</span>
         <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" style="color: #666666; transition: transform 0.2s ease;">
             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" fill="none" stroke-width="1.5"/>
         </svg>
@@ -56,6 +63,95 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdownArrow = document.querySelector('.dropdown-arrow');
     const orgSearch = document.getElementById('orgSearch');
     const createOrgBtn = document.getElementById('createOrgBtn');
+    const orgList = document.getElementById('orgList');
+    const orgText = document.querySelector('.org-text');
+
+    // 서버에서 전달된 조직 데이터 사용
+    @if(isset($organizations))
+        let organizations = @json($organizations);
+    @else
+        let organizations = [];
+    @endif
+    
+    let filteredOrganizations = [...organizations];
+    let currentOrgId = {{ $currentOrgId ?? 'null' }};
+
+    console.log('Organizations loaded:', organizations);
+    console.log('Current org ID:', currentOrgId);
+
+    // 조직 목록 렌더링
+    function renderOrganizationList() {
+        if (filteredOrganizations.length === 0) {
+            orgList.innerHTML = `
+                <div class="no-org-message" style="padding: 20px; text-align: center; color: #666666; font-size: 14px;">
+                    조직이 없습니다<br>
+                    <span style="font-size: 12px; color: #888888;">새 조직을 만들어 시작해보세요</span>
+                </div>
+            `;
+            return;
+        }
+
+        const orgItems = filteredOrganizations.map(org => `
+            <div class="org-item" data-org-id="${org.id}" style="display: flex; align-items: center; padding: 12px; cursor: pointer; border-bottom: 1px solid #F3F4F6; transition: background 0.2s ease;">
+                <div class="org-icon" style="width: 32px; height: 32px; background: #ffffff; border: 1px solid #E1E1E4; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <div class="chart-icon" style="width: 20px; height: 20px; background: #0DC8AF; border-radius: 2px; position: relative;"></div>
+                </div>
+                <div class="org-info" style="flex: 1;">
+                    <div class="org-name" style="font-size: 14px; font-weight: 500; color: #111111; margin-bottom: 2px;">${org.name}</div>
+                    <div class="org-desc" style="font-size: 12px; color: #666666;">조직 ID: ${org.id}</div>
+                </div>
+                ${org.id === currentOrgId ? '<div class="check-icon" style="color: #0DC8AF;"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" fill="none" stroke-width="2"/></svg></div>' : ''}
+            </div>
+        `).join('');
+
+        orgList.innerHTML = orgItems;
+
+        // 조직 선택 이벤트 리스너 추가
+        orgList.querySelectorAll('.org-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const orgId = parseInt(this.dataset.orgId);
+                selectOrganization(orgId);
+            });
+
+            item.addEventListener('mouseenter', function() {
+                this.style.background = '#F9FAFB';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.background = 'transparent';
+            });
+        });
+    }
+
+    // 조직 선택
+    function selectOrganization(orgId) {
+        if (orgId !== currentOrgId) {
+            // URL을 조직별 페이지로 변경
+            const currentPath = window.location.pathname;
+            let newPath;
+            
+            if (currentPath.includes('/organizations/')) {
+                // 현재 조직 페이지에 있다면 조직 ID만 변경
+                newPath = currentPath.replace(/\/organizations\/\d+/, `/organizations/${orgId}`);
+            } else {
+                // 조직 페이지가 아니라면 기본 대시보드로
+                newPath = `/organizations/${orgId}/dashboard`;
+            }
+            
+            window.location.href = newPath;
+        }
+        closeDropdown();
+    }
+
+    // 조직 검색
+    function filterOrganizations(searchTerm) {
+        searchTerm = searchTerm.toLowerCase();
+        filteredOrganizations = organizations.filter(org => 
+            org.name.toLowerCase().includes(searchTerm) ||
+            org.id.toString().includes(searchTerm)
+        );
+        renderOrganizationList();
+    }
 
     // 드롭다운 토글 기능
     orgSelector.addEventListener('click', function(e) {
@@ -96,6 +192,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 검색 입력창 초기화
         orgSearch.value = '';
+        filteredOrganizations = [...organizations];
+        renderOrganizationList();
     }
 
     // 외부 클릭시 드롭다운 닫기
@@ -107,17 +205,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 검색 기능
     orgSearch.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        // 여기에 조직 검색 로직 추가
-        console.log('조직 검색:', searchTerm);
+        const searchTerm = e.target.value;
+        filterOrganizations(searchTerm);
     });
 
     // 새 조직 만들기 버튼
     createOrgBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        console.log('새 조직 만들기');
-        // 새 조직 만들기 모달이나 페이지로 이동
-        // window.location.href = '/organization/create';
+        window.location.href = '/organizations/create';
     });
 
     // 버튼 호버 효과
@@ -130,5 +225,8 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.background = 'transparent';
         this.style.borderColor = '#E1E1E4';
     });
+
+    // 초기 조직 목록 렌더링
+    renderOrganizationList();
 });
 </script>
