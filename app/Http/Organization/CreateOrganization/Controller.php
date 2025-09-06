@@ -10,11 +10,24 @@ class Controller extends ApiController
 {
     public function __invoke(Request $request)
     {
+        // 간단한 토큰 인증 로직
+        if ($request->hasHeader('Authorization')) {
+            $token = str_replace('Bearer ', '', $request->header('Authorization'));
+            $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            if ($accessToken && $accessToken->tokenable) {
+                auth()->setUser($accessToken->tokenable);
+            }
+        }
+
         \Log::info('CreateOrganization Controller called', [
             'request_data' => $request->all(),
             'user_id' => auth()->id(),
             'user_exists' => auth()->check()
         ]);
+
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => '인증이 필요합니다.'], 401);
+        }
 
         try {
             // 유효성 검사

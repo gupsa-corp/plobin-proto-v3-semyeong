@@ -36,7 +36,7 @@ class UserController extends Controller
             }
 
             $user = $request->user();
-            
+
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -45,18 +45,18 @@ class UserController extends Controller
             }
 
             // 사용자 정보 업데이트
-            $user->name = $request->input('name');
+            $user->display_name = $request->input('display_name');
             if ($request->has('phone')) {
                 $user->phone = $request->input('phone');
             }
-            
+
             $user->save();
 
             return response()->json([
                 'success' => true,
                 'message' => '프로필이 성공적으로 업데이트되었습니다.',
                 'data' => [
-                    'name' => $user->name,
+                    'display_name' => $user->display_name,
                     'email' => $user->email,
                     'phone' => $user->phone,
                 ]
@@ -103,7 +103,7 @@ class UserController extends Controller
             }
 
             $user = $request->user();
-            
+
             if (!$user) {
                 return response()->json([
                     'success' => false,

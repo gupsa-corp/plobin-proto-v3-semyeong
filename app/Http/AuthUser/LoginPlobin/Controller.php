@@ -13,7 +13,7 @@ class Controller extends ApiController
     {
         // 이메일 정규화
         $email = strtolower(trim($request->email));
-        
+
         $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -27,7 +27,7 @@ class Controller extends ApiController
         return $this->success([
             'user' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $user->display_name,
                 'email' => $user->email,
             ],
             'token' => $token,
