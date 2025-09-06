@@ -1,4 +1,4 @@
-# 중앙집중식 AuthManager 사용법
+# AuthManager 사용법
 
 ## 개요
 
@@ -14,8 +14,7 @@
 
 ## 파일 위치
 
-- AuthManager: 300-page-service/300-common/005-auth-manager.blade.php
-- ApiClient: 300-page-service/300-common/006-api-client.blade.php
+- AuthManager: 300-page-service/300-common/000-auth-manager.blade.php
 
 ## 주요 기능
 
@@ -29,13 +28,10 @@
 - window.AuthManager.isAuthenticated()
 - window.AuthManager.getUser()
 
-### API 요청
+### HTTP 요청 (인증 포함)
 - window.AuthManager.makeRequest(url, options)
-- window.apiClient.get(endpoint, params)
-- window.apiClient.post(endpoint, data)
-- window.apiClient.put(endpoint, data)
-- window.apiClient.delete(endpoint)
-- 자동 헤더 관리 및 401 처리
+  - 자동으로 Authorization 헤더 포함
+  - 401 에러시 자동 로그아웃
 
 ### 유효성 검사
 - window.AuthManager.validateLoginForm(email, password)

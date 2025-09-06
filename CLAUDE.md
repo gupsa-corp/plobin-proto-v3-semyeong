@@ -2,10 +2,11 @@
 4. 말하지 않은 컴포넌트 내용 만들지 말고 내용 비울 것
 5. 임시 토큰은 더 이상 사용하지 않음 (개발/운영 구분 없이 실제 API만 사용)
 6. 프론트엔드는 alpine js 와 blade 템플릿 사용중
-7. **파일명 규칙 준수 필수**: 모든 뷰 파일은 숫자 접두사-설명 형식으로 명명 (예: 301-layout-head.blade.php, 200-sidebar-main.blade.php)
-8. 대시보드 페이지의 콘텐츠는 현재 기본 빈 상태로 설정되어 있으며, 실제 데이터와 기능은 개발자가 구현해야 함
-9. 요청받지 않은 구현 필요한 영역은 어떤 css 도 div 도 없이 '구현필요' 라는 문자만 넣을 것
-10. README.md 파일을 새로 생성할 때는, /docs/checking/{폴더경로} 에 맞추어 만들 것
+7. 사이드바와 사이드바 데이터는 각각 30x 페이지에서 관리하며 300-common에서는 중앙관리하지 않음
+8. **파일명 규칙 준수 필수**: 모든 뷰 파일은 숫자 접두사-설명 형식으로 명명 (예: 301-layout-head.blade.php, 200-sidebar-main.blade.php)
+9. 대시보드 페이지의 콘텐츠는 현재 기본 빈 상태로 설정되어 있으며, 실제 데이터와 기능은 개발자가 구현해야 함
+10. 요청받지 않은 구현 필요한 영역은 어떤 css 도 div 도 없이 '구현필요' 라는 문자만 넣을 것
+11. README.md 파일을 새로 생성할 때는, /docs/checking/{폴더경로} 에 맞추어 만들 것
 
 ## ⚠️ 주의사항
 1. **하드코딩 금지**: 실제 데이터나 예시 텍스트를 하드코딩하지 말 것
@@ -34,6 +35,10 @@
 - [백엔드 테스트](docs/CODING-TEST-BACKEND.md)
 - [E2E 테스트](docs/CODING-TEST-E2E.md)
 - [문서화](docs/DOCUMENTATION.md)
+
+### 컴포넌트 사용법
+- [AuthManager 가이드](docs/AUTH-MANAGER-GUIDE.md)
+- [ApiClient 가이드](docs/API-CLIENT-GUIDE.md)
 
 ## 문서 작성 규칙 (docs/DOCUMENTATION.md 준수)
 

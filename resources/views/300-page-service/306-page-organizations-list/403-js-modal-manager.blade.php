@@ -1,7 +1,6 @@
 {{-- 모달 관리 시스템 (분할된 파일들) --}}
 
 {{-- 기존 공통 함수들 --}}
-@include('300-page-service.300-common.000-auth-token-manager')
 @include('300-page-service.300-common.500-ajax-post')
 
 {{-- 1. 모달 UI 관리자 --}}

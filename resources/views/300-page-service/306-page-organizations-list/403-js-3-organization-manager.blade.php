@@ -109,12 +109,12 @@ class OrganizationManager {
         this.updateSubmitButton(true);
 
         try {
-            // 기존 ajaxPost 함수 사용 (Bearer 토큰 자동 처리)
-            const result = await ajaxPost('/api/organizations/create', {
+            // ApiClient 사용 (중앙집중식 관리)
+            const result = await this.api.post('/organizations/create', {
                 name: validation.name
             });
 
-            // ajaxPost는 성공시 data를 리턴함
+            // 성공 처리
             this.handleSuccess();
 
         } catch (error) {

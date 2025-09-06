@@ -107,31 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // 성공 시
             alert('계정이 성공적으로 삭제되었습니다.\n지금까지 서비스를 이용해주셔서 감사합니다.');
         }, 3000);
-
-        // 실제 구현 예시:
-        /*
-        fetch('/api/account/delete', {
-            method: 'DELETE',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('계정이 성공적으로 삭제되었습니다.');
-                window.location.href = '/login';
-            } else {
-                alert('계정 삭제 중 오류가 발생했습니다.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = '계정 영구 삭제';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('계정 삭제 중 오류가 발생했습니다.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = '계정 영구 삭제';
-        });
-        */
     });
 
     // 확인 텍스트 실시간 검증

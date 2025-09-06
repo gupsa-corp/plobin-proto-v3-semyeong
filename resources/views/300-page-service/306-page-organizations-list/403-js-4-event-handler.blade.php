@@ -77,7 +77,7 @@ class EventHandler {
     // 조직 관련 이벤트 설정
     setupOrganizationEvents() {
         // 조직 생성 버튼 (모달 열기)
-        const createOrgBtn = document.getElementById('createOrganizationBtn');
+        const createOrgBtn = document.getElementById('createNewOrganizationBtn');
         this.addEventListener(createOrgBtn, 'click', () => {
             this.modalUI.showCreateOrganizationModal();
         });
