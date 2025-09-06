@@ -1,20 +1,10 @@
 @include('000-common-layouts.001-html-lang')
-<head>
-    @include('300-page-service.300-common.301-layout-head')
-    @include('300-page-service.300-common.302-layout-css-imports')
-</head>
-
-<body class="bg-gray-50 pt-[94px]" x-data="projectDashboard()">
-    <!-- Header -->
-    @include('300-page-service.308-page-project-dashboard.100-header-main')
-
-    <!-- Main Content -->
-    <div class="flex">
-        <!-- Sidebar -->
+@include('300-page-service.300-common.301-layout-head', ['title' => '프로젝트 대시보드'])
+<body class="bg-gray-100" x-data="projectDashboard()">
+    <div class="min-h-screen" style="position: relative;">
         @include('300-page-service.308-page-project-dashboard.200-sidebar-main')
-
-        <!-- Content Area -->
-        <div class="ml-[236px] flex-1">
+        <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
+            @include('300-page-service.308-page-project-dashboard.100-header-main')
             @include('300-page-service.308-page-project-dashboard.200-content-main')
         </div>
     </div>
