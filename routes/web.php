@@ -29,11 +29,37 @@ foreach ($routes as $path => $config) {
     // 보호된 페이지들에 auth 미들웨어 적용
     $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
     $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects'];
-    
+
     if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
         $route->middleware('auth');
     }
 }
+
+// 매개변수가 있는 특수 라우트들을 수동으로 등록
+Route::get('/organizations/{id}/dashboard', function ($id) {
+    return view('300-page-service.302-page-organization-dashboard.000-index');
+})->name('organization.dashboard')->middleware('auth');
+
+// 조직 관리자 페이지 라우트들
+Route::get('/organizations/{id}/admin', function ($id) {
+    return view('300-page-service.310-organization-admin.000-index');
+})->name('organization.admin')->middleware('auth');
+
+Route::get('/organizations/{id}/admin/members', function ($id) {
+    return view('300-page-service.310-organization-admin.100-members');
+})->name('organization.admin.members')->middleware('auth');
+
+Route::get('/organizations/{id}/admin/permissions', function ($id) {
+    return view('300-page-service.310-organization-admin.200-permissions');
+})->name('organization.admin.permissions')->middleware('auth');
+
+Route::get('/organizations/{id}/admin/billing', function ($id) {
+    return view('300-page-service.310-organization-admin.300-billing');
+})->name('organization.admin.billing')->middleware('auth');
+
+Route::get('/organizations/{id}/admin/projects', function ($id) {
+    return view('300-page-service.310-organization-admin.400-projects');
+})->name('organization.admin.projects')->middleware('auth');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {

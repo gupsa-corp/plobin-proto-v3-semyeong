@@ -17,4 +17,9 @@ return [
     '/admin' => ['view' => '900-page-admin.901-admin-dashboard', 'name' => 'admin.dashboard'],
     '/admin/users' => ['view' => '900-page-admin.902-admin-users', 'name' => 'admin.users'],
     '/admin/settings' => ['view' => '900-page-admin.903-admin-settings', 'name' => 'admin.settings'],
+    '/organizations/{id}/admin' => ['view' => '300-page-service.310-organization-admin.000-index', 'name' => 'organization.admin'],
+    '/organizations/{id}/admin/members' => ['view' => '300-page-service.310-organization-admin.100-members', 'name' => 'organization.admin.members'],
+    '/organizations/{id}/admin/permissions' => ['view' => '300-page-service.310-organization-admin.200-permissions', 'name' => 'organization.admin.permissions'],
+    '/organizations/{id}/admin/billing' => ['view' => '300-page-service.310-organization-admin.300-billing', 'name' => 'organization.admin.billing'],
+    '/organizations/{id}/admin/projects' => ['view' => '300-page-service.310-organization-admin.400-projects', 'name' => 'organization.admin.projects'],
 ];
