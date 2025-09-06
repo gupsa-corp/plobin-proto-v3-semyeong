@@ -28,13 +28,14 @@
 ## 참고 문서
 
 ### 개발 가이드라인
-- [API 아키텍처](docs/API-ARCHITECTURE.md)
-- [API 예외 처리](docs/API-EXCEPTION.md) 
-- [주석 작성 규칙](docs/CODING-COMMENTING.md)
-- [코딩테스트 백엔드](docs/CODING-TEST-BACKEND.md)
-- [문서화 가이드라인](docs/DOCUMENTATION-GUIDELINES.md)
-- [E2E 테스트](docs/E2E-TESTS.md)
-- [프론트엔드 README](docs/FRONTEND_README.md)
+- [백엔드 API](docs/CODING-BACKEND-API.md)
+- [백엔드 예외 처리](docs/CODING-BACKEND-EXCEPTION.md) 
+- [주석 작성 규칙](docs/CODING-COMMENT.md)
+- [프론트엔드](docs/CODING-FRONTEND.md)
+- [마이그레이션](docs/CODING-MIGRATION.md)
+- [백엔드 테스트](docs/CODING-TEST-BACKEND.md)
+- [E2E 테스트](docs/CODING-TEST-E2E.md)
+- [문서화](docs/DOCUMENTATION.md)
 
 ## 문서 작성 금지사항
 
