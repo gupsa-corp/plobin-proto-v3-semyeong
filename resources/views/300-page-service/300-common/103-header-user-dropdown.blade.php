@@ -2,16 +2,11 @@
 <div x-data="{
     open: false,
     logout() {
-        // 중앙화된 로그아웃 함수 사용
-        if (typeof handleLogout === 'function') {
-            handleLogout('/login');
+        // AuthManager 사용
+        if (window.AuthManager) {
+            window.AuthManager.logout('/login');
         } else {
-            // 함수가 없는 경우 fallback
-            console.warn('handleLogout function not found, using fallback');
-            if (typeof removeAuthToken === 'function') {
-                removeAuthToken();
-            }
-            window.location.href = '/login';
+            console.error('AuthManager not found');
         }
     }
 }" class="relative">
@@ -19,7 +14,7 @@
         <div class="h-8 w-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
         </div>
-        <span class="hidden md:block text-sm font-medium text-gray-700">사용자</span>
+        <span class="hidden md:block text-sm font-medium text-gray-700">{{ auth()->user()->name ?? '사용자' }}</span>
         <svg class="h-4 w-4 text-gray-400 transition-transform duration-200"
              :class="{ 'rotate-180': open }"
              fill="none" stroke="currentColor" viewBox="0 0 24 24">

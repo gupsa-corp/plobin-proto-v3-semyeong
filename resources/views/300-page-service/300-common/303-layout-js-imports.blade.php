@@ -1,4 +1,10 @@
 {{-- JavaScript 임포트 --}}
+<!-- 중앙집중식 인증 관리자 (우선 로드) -->
+@include('300-page-service.300-common.005-auth-manager')
+
+<!-- 중앙집중식 API 클라이언트 -->
+@include('300-page-service.300-common.006-api-client')
+
 <!-- Alpine.js 초기화 -->
 @include('300-page-service.300-common.900-alpine-init')
 
