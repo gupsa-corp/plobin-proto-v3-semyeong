@@ -1,1 +1,1 @@
-@include('300-common-header-main', ['pageTitle' => '대시보드'])
+@include('300-page-service.300-common.300-common-header-main', ['pageTitle' => '대시보드'])

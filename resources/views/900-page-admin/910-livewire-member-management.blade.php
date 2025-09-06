@@ -9,9 +9,6 @@
                     <p class="text-gray-600 mt-1">조직 구성원을 관리하고 초대할 수 있습니다</p>
                 </div>
                 <div class="flex gap-3">
-                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        내보내기
-                    </button>
                     <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
                         + 멤버 초대
                     </button>
@@ -85,9 +82,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" 
+                        <input type="text"
                                wire:model.live.debounce.300ms="searchTerm"
-                               placeholder="이름, 이메일로 검색..." 
+                               placeholder="이름, 이메일로 검색..."
                                class="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-full text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                 </div>

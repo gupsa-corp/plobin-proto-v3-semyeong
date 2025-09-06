@@ -30,6 +30,6 @@ class UserDropdownLivewire extends Component
     
     public function render()
     {
-        return view('300-livewire-dropdown-user');
+        return view('300-page-service.300-common.300-livewire-dropdown-user');
     }
 }

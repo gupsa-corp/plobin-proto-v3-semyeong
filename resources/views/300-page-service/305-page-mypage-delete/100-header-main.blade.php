@@ -1,1 +1,1 @@
-@include('300-common-header-main', ['pageTitle' => '계정 삭제'])
+@include('300-page-service.300-common.300-common-header-main', ['pageTitle' => '계정 삭제'])
