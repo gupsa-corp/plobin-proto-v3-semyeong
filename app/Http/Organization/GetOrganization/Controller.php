@@ -23,7 +23,7 @@ class Controller extends ApiController
             'created_at' => $organization->created_at,
             'creator' => [
                 'id' => $organization->user->id,
-                'display_name' => $organization->user->display_name,
+                'nickname' => $organization->user->nickname,
                 'email' => $organization->user->email
             ],
             'is_owner' => $organization->user_id === auth()->id()

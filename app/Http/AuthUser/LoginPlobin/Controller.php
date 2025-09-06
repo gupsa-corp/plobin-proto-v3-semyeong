@@ -27,7 +27,7 @@ class Controller extends ApiController
         return $this->success([
             'user' => [
                 'id' => $user->id,
-                'name' => $user->display_name,
+                'nickname' => $user->nickname ?: ($user->first_name . ' ' . $user->last_name) ?: $user->email,
                 'email' => $user->email,
             ],
             'token' => $token,

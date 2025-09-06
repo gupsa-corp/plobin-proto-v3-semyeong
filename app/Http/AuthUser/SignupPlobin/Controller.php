@@ -17,7 +17,7 @@ class Controller extends ApiController
 
             // SignupRequest에서 이미 모든 검증이 완료됨
             $validatedData = $request->validated();
-            
+
             $user = User::create([
                 'email' => strtolower(trim($validatedData['email'])),
                 'password' => Hash::make($validatedData['password']),
@@ -38,7 +38,6 @@ class Controller extends ApiController
                     'id' => $user->id,
                     'email' => $user->email,
                     'full_name' => $user->full_name,
-                    'display_name' => $user->display_name,
                     'country_code' => $user->country_code,
                     'phone_number' => $user->phone_number,
                     'formatted_phone' => $user->formatted_phone,
@@ -57,7 +56,7 @@ class Controller extends ApiController
 
         } catch (Exception $e) {
             DB::rollBack();
-            
+
             return $this->internalServerError([], '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     }

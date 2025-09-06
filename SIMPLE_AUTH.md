@@ -124,7 +124,7 @@ public function __invoke(Request $request)
     $token = $user->createToken('auth-token')->plainTextToken;
 
     return $this->success([
-        'user' => ['id' => $user->id, 'name' => $user->display_name, 'email' => $user->email],
+        'nickname' => ['id' => $user->id, 'name' => $user->nickname, 'email' => $user->email],
         'token' => $token  // API 클라이언트는 이걸 저장해서 사용
     ]);
 }

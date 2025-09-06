@@ -2,13 +2,13 @@
 <script>
 // 기본 국가 목록 (API 실패 시 fallback)
 const defaultCountries = [
-    { country_code: '+82', display_name: '한국 (+82)', example: '010-1234-5678' },
-    { country_code: '+1', display_name: '미국 (+1)', example: '(212) 555-1234' },
-    { country_code: '+44', display_name: '영국 (+44)', example: '020 1234 5678' },
-    { country_code: '+81', display_name: '일본 (+81)', example: '090-1234-5678' },
-    { country_code: '+86', display_name: '중국 (+86)', example: '139 1234 5678' },
-    { country_code: '+33', display_name: '프랑스 (+33)', example: '06 12 34 56 78' },
-    { country_code: '+49', display_name: '독일 (+49)', example: '0151 23456789' }
+    { country_code: '+82', nickname: '한국 (+82)', example: '010-1234-5678' },
+    { country_code: '+1', nickname: '미국 (+1)', example: '(212) 555-1234' },
+    { country_code: '+44', nickname: '영국 (+44)', example: '020 1234 5678' },
+    { country_code: '+81', nickname: '일본 (+81)', example: '090-1234-5678' },
+    { country_code: '+86', nickname: '중국 (+86)', example: '139 1234 5678' },
+    { country_code: '+33', nickname: '프랑스 (+33)', example: '06 12 34 56 78' },
+    { country_code: '+49', nickname: '독일 (+49)', example: '0151 23456789' }
 ];
 
 // 국가 목록 로드

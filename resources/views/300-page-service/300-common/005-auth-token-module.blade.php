@@ -21,7 +21,7 @@ class AuthTokenModule {
      */
     setToken(token) {
         if (!token) return;
-        
+
         this.authManager.token = token;
         localStorage.setItem('auth_token', token);
         this.authManager.emit('tokenSet', token);
@@ -49,15 +49,15 @@ class AuthTokenModule {
      */
     async validateToken() {
         if (!this.authManager.token) return false;
-        
+
         try {
-            const response = await this.authManager.httpModule.makeRequest('/api/auth/verify', { 
-                method: 'GET' 
+            const response = await this.authManager.httpModule.makeRequest('/api/auth/me', {
+                method: 'GET'
             });
-            
-            if (response.success && response.user) {
-                this.authManager.userModule.setUser(response.user);
-                this.authManager.emit('userLoaded', response.user);
+
+            if (response.success && response.data) {
+                this.authManager.userModule.setUser(response.data);
+                this.authManager.emit('userLoaded', response.data);
                 return true;
             } else {
                 this.removeToken();

@@ -11,7 +11,7 @@ class Controller extends ApiController
     {
         // PhoneNumberHelper를 사용해서 지원되는 국가 코드 가져오기
         $allCountries = PhoneNumberHelper::getSupportedCountryCodes();
-        
+
         // 주요 국가들만 선별 (한국어 이름 추가)
         $countryNames = [
             'KR' => '한국',
@@ -51,10 +51,10 @@ class Controller extends ApiController
 
         // 선별된 국가들만 필터링하고 한국어 이름 추가
         $selectedCountries = [];
-        
+
         foreach ($allCountries as $country) {
             $region = $country['region'];
-            
+
             if (isset($countryNames[$region])) {
                 $selectedCountries[] = [
                     'region' => $region,
@@ -65,7 +65,7 @@ class Controller extends ApiController
                 ];
             }
         }
-        
+
         // 한국을 맨 앞에, 나머지는 국가 코드 순으로 정렬
         usort($selectedCountries, function($a, $b) {
             if ($a['region'] === 'KR') return -1;

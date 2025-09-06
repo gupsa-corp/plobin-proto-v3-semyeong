@@ -7,6 +7,10 @@ use App\Http\AuthUser\LogoutPlobin\Controller as LogoutController;
 use App\Http\AuthUser\ForgotPassword\Controller as ForgotPasswordController;
 use App\Http\AuthUser\ResetPassword\Controller as ResetPasswordController;
 use App\Http\AuthUser\Me\Controller as MeController;
+use App\Http\AuthUser\GetProfile\Controller as GetProfileController;
+use App\Http\AuthUser\VerifyPassword\Controller as VerifyPasswordController;
+use App\Http\AuthUser\UpdateProfile\Controller as UpdateProfileController;
+use App\Http\AuthUser\ChangePassword\Controller as ChangePasswordController;
 use App\Http\AuthUser\ValidatePhone\Controller as ValidatePhoneController;
 use App\Http\AuthUser\GetCountries\Controller as GetCountriesController;
 use App\Http\AuthUser\FormatPhone\Controller as FormatPhoneController;
@@ -58,8 +62,10 @@ Route::prefix('auth')->group(function () {
 
 // 사용자 프로필 관리 API
 Route::prefix('user')->middleware(['auth.web-or-token'])->group(function () {
-    Route::put('/profile', App\Http\Controllers\UserController::class . '@updateProfile');
-    Route::put('/password', App\Http\Controllers\UserController::class . '@changePassword');
+    Route::get('/profile', GetProfileController::class);
+    Route::post('/verify-password', VerifyPasswordController::class);
+    Route::put('/profile', UpdateProfileController::class);
+    Route::put('/password', ChangePasswordController::class);
 });
 
 Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(function () {

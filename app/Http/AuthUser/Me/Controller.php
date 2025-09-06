@@ -16,7 +16,7 @@ class Controller extends ApiController
 
         return $this->success([
             'id' => $user->id,
-            'name' => $user->display_name,
+            'nickname' => $user->nickname,
             'email' => $user->email,
             'created_at' => $user->created_at,
         ]);
