@@ -18,10 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = formData.get('email');
             const password = formData.get('password');
 
-            // 기본 유효성 검사
-            if (!email || !password) {
-                showError('이메일과 비밀번호를 모두 입력해주세요.');
-                return;
+            // 유효성 검사 (중앙화된 함수 사용)
+            if (typeof validateLoginForm === 'function') {
+                const validation = validateLoginForm(email, password);
+                if (!validation.valid) {
+                    showError(validation.message);
+                    return;
+                }
+            } else {
+                // fallback 유효성 검사
+                if (!email || !password) {
+                    showError('이메일과 비밀번호를 모두 입력해주세요.');
+                    return;
+                }
             }
 
             // 로그인 버튼 비활성화
@@ -32,77 +41,25 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.classList.add('btn-loading');
 
             try {
-                // CSRF 토큰 가져오기
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                    || document.querySelector('input[name="_token"]')?.value;
-
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password,
-                        remember: formData.get('remember-me') ? true : false
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && (data.success || data.token || (data.data && data.data.token))) {
-
-                    // 토큰이 있으면 저장 (data.token 또는 data.data.token 확인)
-                    const token = data.token || (data.data && data.data.token);
-                    if (token) {
-                        setAuthToken(token);
-                        // AuthHelper에도 설정
-                        if (window.AuthHelper) {
-                            window.AuthHelper.setToken(token);
-                        }
-                    }
-
-                    // 쿠키 기반 인증의 경우 토큰 없이도 성공
-                    const user = data.user || (data.data && data.data.user);
-                    if (user) {
-                        console.log('로그인한 사용자:', user);
-                    }
-
-                    // 서버에서 지정한 URL로 리다이렉트
-                    const redirectUrl = data.redirect_url || (data.data && data.data.redirect_url) || '/dashboard';
-                    window.location.href = redirectUrl;
-
-                } else {
-                    // 로그인 실패
-                    let errorMsg = '';
-
-                    if (data.errors) {
-                        // Laravel validation errors
-                        if (data.errors.email) {
-                            errorMsg = data.errors.email[0];
-                        } else if (data.errors.password) {
-                            errorMsg = data.errors.password[0];
-                        } else {
-                            errorMsg = Object.values(data.errors)[0][0] || '입력 정보를 확인해주세요.';
-                        }
+                // 중앙화된 로그인 함수 사용
+                if (typeof handleLogin === 'function') {
+                    const result = await handleLogin(email, password, formData.get('remember-me') ? true : false);
+                    
+                    if (result.success) {
+                        // 로그인 성공
+                        window.location.href = result.redirectUrl;
                     } else {
-                        errorMsg = data.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
+                        // 로그인 실패
+                        showError(result.message);
                     }
-
-                    showError(errorMsg);
+                } else {
+                    // handleLogin 함수가 없는 경우 fallback
+                    showError('로그인 처리 함수를 찾을 수 없습니다. 페이지를 새로고침해주세요.');
                 }
 
             } catch (error) {
-                console.error('로그인 AJAX 요청 중 오류:', error);
-
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    showError('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
-                } else {
-                    showError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-                }
+                console.error('로그인 처리 중 오류:', error);
+                showError('로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
             } finally {
                 // 버튼 다시 활성화
                 submitButton.disabled = false;

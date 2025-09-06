@@ -23,6 +23,8 @@
 
     {{-- 조직 모달 관리 시스템 --}}
     @include('300-page-service.306-page-organizations-list.403-js-modal-manager')
+    {{-- 인증 관련 공통 함수들 --}}
+    @include('300-page-service.300-common.002-auth-logout-handler')
     {{-- Alpine.js 초기화 --}}
     @include($common . '.900-alpine-init')
 </body>

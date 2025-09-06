@@ -9,5 +9,6 @@
         @include($common . '.900-layout-footer')
     </div>
     @include('300-page-service.300-common.000-auth-token-manager')
+    @include('300-page-service.300-common.001-auth-login-handler')
 </body>
 </html>

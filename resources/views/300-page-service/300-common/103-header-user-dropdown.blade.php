@@ -2,16 +2,17 @@
 <div x-data="{
     open: false,
     logout() {
-        fetch('/api/auth/logout', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-            },
-            credentials: 'include'
-        })
-        .then(response => {
+        // 중앙화된 로그아웃 함수 사용
+        if (typeof handleLogout === 'function') {
+            handleLogout('/login');
+        } else {
+            // 함수가 없는 경우 fallback
+            console.warn('handleLogout function not found, using fallback');
+            if (typeof removeAuthToken === 'function') {
+                removeAuthToken();
+            }
             window.location.href = '/login';
-        })
+        }
     }
 }" class="relative">
     <button @click="open = !open" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50">

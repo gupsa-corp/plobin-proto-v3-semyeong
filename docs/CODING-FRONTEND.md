@@ -1,7 +1,8 @@
 # Plobin Proto V3 - Blade 템플릿 구조
 
-1. Auth 처리는 300-common/000-auth-token-manager.blade.php 에서만 관리할 것
-2. /300-page-service 폴더가 최상단 html 구조. 벗어나지 말것
+/300-page-service 폴더가 최상단 html 구조. 벗어나지 말것
+- **300-common**: 인증/공통 기능 처리 (인증 토큰, 공통 AJAX 함수 등)
+- **30x 폴더**: 비즈니스 로직만 처리, 인증 관련 코드 금지 (300-common의 함수 활용)
 
 ## 실제 디렉토리 구조 (수정 X)
 

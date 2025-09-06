@@ -68,19 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 전역으로 노출
     window.loadOrganizations = async function loadOrganizations() {
         try {
-            const response = await fetch('/api/organizations', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('조직 목록 로드 실패');
-            }
-
-            const data = await response.json();
+            // 중앙화된 API 클라이언트 사용
+            const data = await window.apiClient.get('/organizations');
             const organizations = data.data || [];
 
             // 로딩 상태 숨기기
