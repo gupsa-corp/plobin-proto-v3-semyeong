@@ -1,0 +1,108 @@
+{
+  "project": {
+    "name": "프로젝트 대시보드 개발",
+    "startDate": "2025-01-01",
+    "endDate": "2025-03-31",
+    "description": "사용자 친화적인 프로젝트 대시보드 개발 프로젝트"
+  },
+  "tasks": [
+    {
+      "id": 1,
+      "name": "기획 및 설계",
+      "startDate": "2025-01-01",
+      "endDate": "2025-01-15",
+      "progress": 100,
+      "status": "completed",
+      "assignee": "기획팀",
+      "dependencies": [],
+      "color": "#10B981"
+    },
+    {
+      "id": 2,
+      "name": "UI/UX 디자인",
+      "startDate": "2025-01-10",
+      "endDate": "2025-01-31",
+      "progress": 85,
+      "status": "in-progress",
+      "assignee": "디자인팀",
+      "dependencies": [1],
+      "color": "#3B82F6"
+    },
+    {
+      "id": 3,
+      "name": "백엔드 API 개발",
+      "startDate": "2025-01-20",
+      "endDate": "2025-02-28",
+      "progress": 60,
+      "status": "in-progress",
+      "assignee": "백엔드팀",
+      "dependencies": [1],
+      "color": "#EF4444"
+    },
+    {
+      "id": 4,
+      "name": "프론트엔드 개발",
+      "startDate": "2025-02-01",
+      "endDate": "2025-03-15",
+      "progress": 40,
+      "status": "in-progress",
+      "assignee": "프론트엔드팀",
+      "dependencies": [2],
+      "color": "#F59E0B"
+    },
+    {
+      "id": 5,
+      "name": "테스트 및 QA",
+      "startDate": "2025-03-01",
+      "endDate": "2025-03-25",
+      "progress": 0,
+      "status": "pending",
+      "assignee": "QA팀",
+      "dependencies": [3, 4],
+      "color": "#8B5CF6"
+    },
+    {
+      "id": 6,
+      "name": "배포 및 런칭",
+      "startDate": "2025-03-26",
+      "endDate": "2025-03-31",
+      "progress": 0,
+      "status": "pending",
+      "assignee": "DevOps팀",
+      "dependencies": [5],
+      "color": "#EC4899"
+    }
+  ],
+  "milestones": [
+    {
+      "id": 1,
+      "name": "프로젝트 킥오프",
+      "date": "2025-01-01",
+      "completed": true
+    },
+    {
+      "id": 2,
+      "name": "디자인 완료",
+      "date": "2025-01-31",
+      "completed": false
+    },
+    {
+      "id": 3,
+      "name": "알파 버전 완료",
+      "date": "2025-02-28",
+      "completed": false
+    },
+    {
+      "id": 4,
+      "name": "베타 버전 완료",
+      "date": "2025-03-15",
+      "completed": false
+    },
+    {
+      "id": 5,
+      "name": "정식 런칭",
+      "date": "2025-03-31",
+      "completed": false
+    }
+  ]
+}
