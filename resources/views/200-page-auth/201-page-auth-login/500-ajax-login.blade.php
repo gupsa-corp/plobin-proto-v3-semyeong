@@ -119,6 +119,27 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('로그인 AJAX 스크립트 로드 완료');
 });
 
+// 글로벌 handleLogin 함수
+window.handleLogin = async function(email, password, remember = false) {
+    try {
+        // AuthManager의 login 메서드 사용
+        const result = await window.AuthManager.login(email, password, remember);
+        return result;
+    } catch (error) {
+        console.error('handleLogin 오류:', error);
+        return {
+            success: false,
+            message: error.message || '로그인 처리 중 오류가 발생했습니다.'
+        };
+    }
+};
+
+// 글로벌 validateLoginForm 함수
+window.validateLoginForm = function(email, password) {
+    // AuthManager의 validateLoginForm 메서드 사용
+    return window.AuthManager.validateLoginForm(email, password);
+};
+
 // AJAX 응답 상태 코드별 처리
 function handleAjaxError(xhr, status, error) {
     console.error('AJAX Error:', { xhr, status, error });

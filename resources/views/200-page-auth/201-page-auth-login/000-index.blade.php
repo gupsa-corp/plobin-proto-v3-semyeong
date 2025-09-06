@@ -8,7 +8,7 @@
         @include(getCurrentViewPath())
         @include($common . '.900-layout-footer')
     </div>
-    @include('300-page-service.300-common.005-auth-token-module')
+    @include('300-page-service.300-common.000-auth-manager')
     @include('200-page-auth.201-page-auth-login.500-ajax-login')
 </body>
 </html>
