@@ -44,7 +44,7 @@
         {{-- 조직 카드 그리드 --}}
         <div class="grid grid-cols-4 gap-6">
             @foreach($organizations as $org)
-                <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
+                <a href="/organizations/{{ $org->id }}/dashboard" class="block bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                     {{-- 카드 헤더 --}}
                     <div class="flex justify-between items-start mb-4">
                         {{-- 조직 아바타 --}}
@@ -55,7 +55,7 @@
                         </div>
                         
                         {{-- 옵션 버튼 --}}
-                        <button class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg">
+                        <button onclick="event.preventDefault(); event.stopPropagation();" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg">
                             <div class="flex flex-col gap-1">
                                 <div class="w-1 h-1 bg-gray-900 rounded-full"></div>
                                 <div class="w-1 h-1 bg-gray-900 rounded-full"></div>
@@ -81,7 +81,7 @@
                             <span class="text-base">{{ $org->description ?? '설명 없음' }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
     @endif
