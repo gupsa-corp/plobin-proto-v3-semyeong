@@ -1,9 +1,7 @@
 # Plobin Proto V3 - Blade 템플릿 구조
 
-## 개요
-
-이 문서는 Plobin Proto V3 프로젝트의 실제 Blade 템플릿 구조와 네이밍 컨벤션을 설명합니다.
-서비스는 **랜딩페이지(100)**, **인증(200)**, **서비스(300)** 3개 영역으로 구분됩니다.
+1. Auth 처리는 300-common/000-auth-token-manager.blade.php 에서만 관리할 것
+2. /300-page-service 폴더가 최상단 html 구조. 벗어나지 말것
 
 ## 실제 디렉토리 구조 (수정 X)
 
@@ -203,13 +201,6 @@ JavaScript 파일이 복잡할 경우, 다음과 같이 기능별로 분리하�
 ├── 407-js-form-validation.blade.php (폼 검증)
 └── 408-js-form-submit.blade.php (폼 제출)
 ```
-
-### CSS/JS 개발
-
-1. **개발 모드**: `npm run dev` 실행으로 실시간 빌드
-2. **프로덕션 빌드**: `npm run build`로 최적화된 빌드
-3. **파일 수정**: `resources/css/`, `resources/js/` 디렉토리에서 작업
-4. **자동 반영**: Vite가 변경사항을 자동으로 브라우저에 반영
 
 ## 주의사항
 

@@ -1,5 +1,5 @@
 @php
-    $sidebarData = include resource_path('views/300-page-service/306-page-organizations-list/600-data-sidebar.blade.php');
+    $sidebarData = include resource_path('views/300-page-service/300-common/600-data-sidebar.blade.php');
     $navItems = $sidebarData['navigation_items'];
 @endphp
 

@@ -65,12 +65,84 @@
 {{-- JavaScript --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 조직 목록 로드
-    loadOrganizations();
+    // 전역으로 노출
+    window.loadOrganizations = async function loadOrganizations() {
+        try {
+            const response = await fetch('/api/organizations', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            });
 
-    // 새 조직 생성 버튼 이벤트
-    document.getElementById('createNewOrganizationBtn').addEventListener('click', showCreateModal);
-    document.getElementById('createFirstOrganizationBtn').addEventListener('click', showCreateModal);
+            if (!response.ok) {
+                throw new Error('조직 목록 로드 실패');
+            }
+
+            const data = await response.json();
+            const organizations = data.data || [];
+
+            // 로딩 상태 숨기기
+            document.getElementById('loadingState').classList.add('hidden');
+
+            if (organizations.length === 0) {
+                // 빈 상태 표시
+                document.getElementById('emptyState').classList.remove('hidden');
+            } else {
+                // 조직 목록 표시
+                displayOrganizations(organizations);
+            }
+        } catch (error) {
+            console.error('조직 목록 로드 실패:', error);
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+    }
+
+    function displayOrganizations(organizations) {
+        const container = document.getElementById('organizationListContainer');
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
+        
+        // 상태 숨기기
+        emptyState.classList.add('hidden');
+        loadingState.classList.add('hidden');
+        
+        // 기존 조직 항목들 제거 (첫 번째와 두 번째 div는 로딩/빈 상태이므로 유지)
+        const existingItems = container.querySelectorAll('.organization-item');
+        existingItems.forEach(item => item.remove());
+        
+        // 새 조직 항목들 추가
+        organizations.forEach(org => {
+            const orgElement = createOrganizationItem(org);
+            container.appendChild(orgElement);
+        });
+    }
+
+    function createOrganizationItem(org) {
+        const div = document.createElement('div');
+        div.className = 'organization-item px-6 py-4 hover:bg-gray-50';
+        div.innerHTML = `
+            <div class="grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-4">
+                    <h3 class="font-medium text-gray-900">${org.name || '이름 없음'}</h3>
+                    <p class="text-sm text-gray-500">${org.description || '설명 없음'}</p>
+                </div>
+                <div class="col-span-3 text-sm text-gray-600">${org.members_count || 0}명</div>
+                <div class="col-span-2 text-sm text-gray-600">${org.created_at ? new Date(org.created_at).toLocaleDateString() : '-'}</div>
+                <div class="col-span-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${org.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                        ${org.status === 'active' ? '활성' : '비활성'}
+                    </span>
+                </div>
+                <div class="col-span-1">
+                    <button class="text-teal-600 hover:text-teal-900 text-sm font-medium">관리</button>
+                </div>
+            </div>
+        `;
+        return div;
+    }
 
     function showCreateModal() {
         const modal = document.getElementById('createOrganizationModal');
@@ -79,13 +151,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function loadOrganizations() {
-        // TODO: API를 통해 조직 목록 로드
-        // 현재는 빈 상태로 표시
-        setTimeout(() => {
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('emptyState').classList.remove('hidden');
-        }, 1000);
-    }
+    // 새 조직 생성 버튼 이벤트
+    document.getElementById('createNewOrganizationBtn').addEventListener('click', showCreateModal);
+    document.getElementById('createFirstOrganizationBtn').addEventListener('click', showCreateModal);
+
+    // 초기 조직 목록 로드
+    window.loadOrganizations();
 });
 </script>

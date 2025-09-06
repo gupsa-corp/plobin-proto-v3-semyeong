@@ -2,26 +2,18 @@
 <script>
 /**
  * 대시보드 초기화를 담당하는 Alpine.js 컴포넌트
- * 기능: 페이지 로드 시 조직 상태를 확인하고 적절한 화면 표시
+ * 기능: 페이지 로드 시 대시보드 초기화
  */
 function dashboardInit() {
     return {
         init() {
-            // 조직 상태 확인 후 적절한 화면 표시
-            this.checkOrganizationStatus();
+            // 대시보드 초기화
+            this.initializeDashboard();
         },
 
-        checkOrganizationStatus() {
-            const selectedOrg = localStorage.getItem('selectedOrg');
-            
-            if (!selectedOrg) {
-                // 조직이 없으면 조직 선택 화면 표시
-                window.organizationStatus?.showOrganizationSelection();
-            } else {
-                // 조직이 있으면 대시보드 표시
-                const orgData = JSON.parse(selectedOrg);
-                window.organizationStatus?.showDashboard(orgData);
-            }
+        initializeDashboard() {
+            console.log('대시보드 초기화 완료');
+            // TODO: 실제 구현 시 대시보드 관련 초기화 로직 추가
         }
     };
 }

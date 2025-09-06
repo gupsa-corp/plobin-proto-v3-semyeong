@@ -2,7 +2,7 @@
 <script>
 /**
  * API 호출을 담당하는 클라이언트 클래스
- * 기능: 인증 토큰 관리, HTTP 요청 처리, 에러 핸들링
+ * 기능: HTTP 요청 처리, 에러 핸들링, CSRF 보호
  */
 class ApiClient {
     constructor() {
@@ -12,11 +12,6 @@ class ApiClient {
         };
     }
 
-    // 인증 토큰 가져오기
-    getAuthToken() {
-        return localStorage.getItem('auth_token') || '';
-    }
-
     // CSRF 토큰 가져오기
     getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]')?.content || '';
@@ -24,19 +19,11 @@ class ApiClient {
 
     // 기본 헤더 생성
     getHeaders(customHeaders = {}) {
-        const token = this.getAuthToken();
         const headers = {
             ...this.defaultHeaders,
+            'X-CSRF-TOKEN': this.getCsrfToken(),
             ...customHeaders
         };
-
-        // Bearer 토큰이 있으면 Authorization 헤더 추가
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        } else {
-            // 토큰이 없으면 CSRF 토큰 사용 (웹 세션)
-            headers['X-CSRF-TOKEN'] = this.getCsrfToken();
-        }
 
         return headers;
     }

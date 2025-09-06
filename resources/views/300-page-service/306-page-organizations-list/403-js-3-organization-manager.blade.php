@@ -18,20 +18,14 @@ class OrganizationManager {
         }
 
         const trimmedName = name.trim();
-        
+
         if (trimmedName.length < 1) {
             return { isValid: false, message: '조직 이름을 입력해주세요.' };
         }
-        
+
         if (trimmedName.length > 25) {
             return { isValid: false, message: '조직 이름은 25자 이하여야 합니다.' };
         }
-
-        // 특수문자 검증 (필요시)
-        // const invalidChars = /[<>'"&]/;
-        // if (invalidChars.test(trimmedName)) {
-        //     return { isValid: false, message: '조직 이름에 특수문자는 사용할 수 없습니다.' };
-        // }
 
         return { isValid: true, name: trimmedName };
     }
@@ -47,7 +41,7 @@ class OrganizationManager {
     // 버튼 상태 업데이트
     updateSubmitButton(isLoading = false) {
         const { submitBtn } = this.getUIElements();
-        
+
         if (!submitBtn) return;
 
         if (isLoading) {
@@ -74,7 +68,7 @@ class OrganizationManager {
         alert(message);
         this.modal.hideCreateOrganizationModal();
         this.resetForm();
-        
+
         // 페이지 새로고침하여 조직 목록 업데이트
         setTimeout(() => {
             window.location.reload();
@@ -97,7 +91,7 @@ class OrganizationManager {
         }
 
         const { nameInput } = this.getUIElements();
-        
+
         if (!nameInput) {
             console.error('조직 이름 입력 필드를 찾을 수 없습니다.');
             return;

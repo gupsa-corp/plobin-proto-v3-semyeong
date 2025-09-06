@@ -9,7 +9,6 @@
             @include($common . '.100-header-main')
             @include(getCurrentViewPath())
         </div>
-        @include('301-service-dashboard.302-modal-organization-manager')
     </div>
 </body>
 </html>

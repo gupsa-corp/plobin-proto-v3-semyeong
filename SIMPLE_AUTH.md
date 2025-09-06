@@ -163,16 +163,4 @@ public function __invoke(Request $request)
 
 ### 🚀 확장성
 - **새로운 API**: 라우트에 `simple.auth` 미들웨어만 추가
-- **Rate Limit**: `rate.limit:횟수,시간` 으로 간단 설정
-- **예외 처리**: JSON/웹 자동 구분
-
-## 🏁 결론
-
-**복잡했던 인증 시스템을 완전히 단순화!**
-
-- ✅ **웹 세션** 인증 (브라우저)
-- ✅ **API 토큰** 인증 (Bearer token)  
-- ✅ **그것만** 지원!
-
-더 이상 복잡한 config, 여러 미들웨어, 설정 파일들을 관리할 필요 없습니다. 
-**SimpleAuth 미들웨어 하나가 모든 것을 처리**합니다! 🎉
+- **Rate Limit**: 호출 제한 회수 `rate.limit:횟수,시간` 으로 간단 설정 가능
