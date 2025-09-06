@@ -1,7 +1,5 @@
 {{-- CSS 임포트 --}}
 <!-- 서비스용 스타일 -->
-@include('300-service-style-common.301-sidebar-style')
-@include('300-service-style-common.302-modal-style')
 @include('000-common-javascript.301-modal-styles')
 @stack('styles')
 
