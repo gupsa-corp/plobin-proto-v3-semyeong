@@ -35,4 +35,9 @@ class Project extends Model
     {
         return $this->hasMany(Page::class)->whereNull('parent_id')->orderBy('sort_order');
     }
+
+    public function projectPages()
+    {
+        return $this->hasMany(ProjectPage::class)->where('is_active', true)->orderBy('sort_order');
+    }
 }

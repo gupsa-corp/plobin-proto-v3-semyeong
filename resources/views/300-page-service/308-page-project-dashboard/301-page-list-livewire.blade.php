@@ -1,55 +1,15 @@
 {{-- 페이지 목록 --}}
 <div style="display: flex; flex-direction: column; gap: 4px;">
-    {{-- 대시보드 홈 --}}
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: white; border-radius: 6px; cursor: pointer;"
-         wire:click="switchPage('dashboard-home')"
-         onmouseover="this.style.background='#F9FAFB'"
-         onmouseout="this.style.background='white'">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <svg style="width: 16px; height: 16px; color: #9CA3AF;" viewBox="0 0 16 16" fill="none">
-                <path d="M2 4C2 3.44772 2.44772 3 3 3H13C13.5523 3 14 3.44772 14 4V12C14 12.5523 13.5523 13 13 13H3C2.44772 13 2 12.5523 2 12V4Z" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M6 7H10M6 9H8" stroke="currentColor" stroke-width="1"/>
-            </svg>
-            <span style="font-size: 14px; font-weight: 500; color: #374151;">대시보드 홈</span>
-        </div>
-    </div>
-
     {{-- 동적 페이지 목록 --}}
-    <div style="margin-left: 16px; display: flex; flex-direction: column; gap: 4px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
         @if(count($pages) > 0)
             @foreach($pages as $page)
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: white; border-radius: 6px; cursor: pointer; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'background: #F0FDF4; border-left: 2px solid #10B981;' : '' }}"
-                     wire:click="switchPage({{ json_encode($page) }})"
-                     onmouseover="this.style.background='#F9FAFB'"
-                     onmouseout="this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <svg style="width: 16px; height: 16px; color: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#10B981' : '#9CA3AF' }};" viewBox="0 0 16 16" fill="none">
-                            <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M5 7H11M5 9H9" stroke="currentColor" stroke-width="1"/>
-                        </svg>
-                        <span style="font-size: 14px; color: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#10B981' : '#6B7280' }}; font-weight: {{ $currentPage && $currentPage['id'] == $page['id'] ? '500' : 'normal' }};">
-                            {{ $page['title'] }}
-                        </span>
-                    </div>
-                    <div style="display: flex; gap: 4px;">
-                        <span style="font-size: 10px; padding: 2px 6px; border-radius: 3px; 
-                              @if($page['status'] === 'published') 
-                                  background: #ECFDF5; color: #059669;
-                              @elseif($page['status'] === 'draft') 
-                                  background: #FEF3C7; color: #D97706;
-                              @else 
-                                  background: #F3F4F6; color: #6B7280;
-                              @endif">
-                            @if($page['status'] === 'published')
-                                공개
-                            @elseif($page['status'] === 'draft')
-                                임시
-                            @else
-                                보관
-                            @endif
-                        </span>
-                    </div>
-                </div>
+                @include('300-page-service.308-page-project-dashboard.302-page-tree-item', [
+                    'page' => $page, 
+                    'currentPage' => $currentPage, 
+                    'projectId' => $projectId, 
+                    'level' => 0
+                ])
             @endforeach
         @else
             {{-- 빈 상태 --}}

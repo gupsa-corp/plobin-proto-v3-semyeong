@@ -15,6 +15,7 @@ return [
     '/organizations/{id}/dashboard' => ['view' => '300-page-service.302-page-organization-dashboard.000-index', 'name' => 'organization.dashboard'],
     '/organizations/{id}/projects' => ['view' => '300-page-service.307-page-organization-projects.000-index', 'name' => 'organization.projects'],
     '/organizations/{id}/projects/{projectId}' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard'],
+    '/organizations/{id}/projects/{projectId}/dashboard' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard.full'],
     '/admin' => ['view' => '900-page-platform-admin.901-admin-dashboard', 'name' => 'admin.dashboard'],
     '/admin/users' => ['view' => '900-page-platform-admin.902-admin-users', 'name' => 'admin.users'],
     '/admin/settings' => ['view' => '900-page-platform-admin.903-admin-settings', 'name' => 'admin.settings'],

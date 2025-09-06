@@ -21,7 +21,10 @@
             @livewire('service.project-dashboard.create-page-modal-livewire', ['projectId' => request()->route('projectId') ?? 1])
         </div>
 
-        @livewire('service.project-dashboard.page-list-livewire', ['projectId' => request()->route('projectId') ?? 1])
+        @livewire('service.project-dashboard.page-list-livewire', [
+            'projectId' => request()->route('projectId') ?? 1,
+            'currentPageId' => $currentPageId ?? 'dashboard-home'
+        ])
     </div>
 
     {{-- 빠른 액션 섹션 (Livewire 컴포넌트) --}}

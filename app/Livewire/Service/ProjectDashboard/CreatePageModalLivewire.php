@@ -4,6 +4,7 @@ namespace App\Livewire\Service\ProjectDashboard;
 
 use App\Models\Page;
 use App\Models\Project;
+use App\Models\ProjectPage;
 use Livewire\Component;
 
 class CreatePageModalLivewire extends Component
@@ -56,12 +57,17 @@ class CreatePageModalLivewire extends Component
             // 같은 프로젝트에서 동일한 slug가 있는지 확인하여 유니크하게 만들기
             $originalSlug = $slug;
             $counter = 1;
-            while (Page::where('project_id', $this->projectId)->where('slug', $slug)->exists()) {
+            while (ProjectPage::where('project_id', $this->projectId)->where('slug', $slug)->exists()) {
                 $slug = $originalSlug . '-' . $counter;
                 $counter++;
             }
             
-            Page::create([
+            // sort_order 결정 (같은 레벨의 페이지 개수 + 1)
+            $sortOrder = ProjectPage::where('project_id', $this->projectId)
+                ->where('parent_id', $this->parent_id)
+                ->count();
+            
+            ProjectPage::create([
                 'title' => $this->title,
                 'slug' => $slug,
                 'content' => $this->content,
@@ -69,6 +75,7 @@ class CreatePageModalLivewire extends Component
                 'project_id' => $this->projectId,
                 'parent_id' => $this->parent_id,
                 'user_id' => auth()->id(),
+                'sort_order' => $sortOrder,
             ]);
 
             $this->resetCreateForm();

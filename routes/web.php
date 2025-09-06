@@ -26,21 +26,55 @@ foreach ($routes as $path => $config) {
         $route->name($routeName);
     }
 
-    // 보호된 페이지들에 auth 미들웨어 적용
-    $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
+    // 개발용 - 인증 미들웨어 제거
+    // $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
+    // $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
 
-    if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
-        $route->middleware('auth');
-    }
+    // if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
+    //     $route->middleware('auth');
+    // }
 }
 
-// 매개변수가 있는 특수 라우트들을 수동으로 등록
+// 매개변수가 있는 특수 라우트들을 수동으로 등록 (개발용 - 인증 제거)
 Route::get('/organizations/{id}/dashboard', function ($id) {
     return view('300-page-service.302-page-organization-dashboard.000-index');
-})->name('organization.dashboard')->middleware('auth');
+})->name('organization.dashboard');
 
-// 조직 관리자 페이지 라우트들 - 권한 300 이상인 조직만 표시
+// 프로젝트 대시보드 라우트들 - 첫 번째 페이지로 리다이렉트
+Route::get('/organizations/{id}/projects/{projectId}', function ($id, $projectId) {
+    // 첫 번째 프로젝트 페이지로 리다이렉트
+    $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
+        ->whereNull('parent_id')
+        ->orderBy('sort_order')
+        ->first();
+
+    if ($firstPage) {
+        return redirect()->route('project.dashboard.page', [
+            'id' => $id,
+            'projectId' => $projectId,
+            'pageId' => $firstPage->id
+        ]);
+    }
+
+    // 페이지가 없으면 기본 뷰 표시 (빈 상태)
+    return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => null]);
+})->name('project.dashboard');
+
+Route::get('/organizations/{id}/projects/{projectId}/dashboard', function ($id, $projectId) {
+    return redirect()->route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
+})->name('project.dashboard.full');
+
+// 동적 프로젝트 페이지 라우트들 (1뎁스)
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
+    return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => 'overview']);
+})->name('project.dashboard.page');
+
+// 동적 프로젝트 페이지의 탭들 (2뎁스)
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/{tab}', function ($id, $projectId, $pageId, $tab) {
+    return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => $tab]);
+})->name('project.dashboard.page.tab');
+
+// 조직 관리자 페이지 라우트들 (개발용 - 인증 제거) - 권한 300 이상인 조직만 표시
 Route::get('/organizations/{id}/admin', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
@@ -49,9 +83,9 @@ Route::get('/organizations/{id}/admin', function ($id) {
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-        
+
     return view('800-page-organization-admin.800-common.000-index', compact('organizations'));
-})->name('organization.admin')->middleware('auth');
+})->name('organization.admin');
 
 Route::get('/organizations/{id}/admin/members', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
@@ -61,9 +95,9 @@ Route::get('/organizations/{id}/admin/members', function ($id) {
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-        
+
     return view('800-page-organization-admin.801-page-members.000-index', compact('id', 'organizations'));
-})->name('organization.admin.members')->middleware('auth');
+})->name('organization.admin.members');
 
 Route::get('/organizations/{id}/admin/permissions', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
@@ -73,9 +107,9 @@ Route::get('/organizations/{id}/admin/permissions', function ($id) {
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-        
+
     return view('800-page-organization-admin.802-page-permissions.000-index', compact('organizations'));
-})->name('organization.admin.permissions')->middleware('auth');
+})->name('organization.admin.permissions');
 
 Route::get('/organizations/{id}/admin/billing', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
@@ -85,16 +119,16 @@ Route::get('/organizations/{id}/admin/billing', function ($id) {
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-        
+
     return view('800-page-organization-admin.803-page-billing.300-billing', compact('id', 'organizations'));
-})->name('organization.admin.billing')->middleware('auth');
+})->name('organization.admin.billing');
 
 Route::get('/organizations/{id}/admin/projects', function ($id) {
     $projects = \App\Models\Project::where('organization_id', $id)
         ->with(['user', 'organization'])
         ->orderBy('created_at', 'desc')
         ->get();
-    
+
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
@@ -102,9 +136,9 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
         ->where('organization_members.permission_level', '>=', 300) // ORGANIZATION_ADMIN 이상
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-        
+
     return view('800-page-organization-admin.804-page-projects.000-index', compact('projects', 'id', 'organizations'));
-})->name('organization.admin.projects')->middleware('auth');
+})->name('organization.admin.projects');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {

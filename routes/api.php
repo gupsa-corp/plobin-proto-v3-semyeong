@@ -104,13 +104,23 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
     });
 });
 
-// 프로젝트 페이지 관리 API
-Route::prefix('projects')->middleware(['auth.web-or-token'])->group(function () {
+// 프로젝트 페이지 관리 API (개발용 - 인증 제거)
+Route::prefix('projects')->group(function () {
     Route::get('/{project}/pages', GetPagesController::class);
     Route::post('/{project}/pages', CreatePageController::class);
     Route::get('/{project}/pages/{page}', GetPageController::class);
     Route::put('/{project}/pages/{page}', UpdatePageController::class);
     Route::delete('/{project}/pages/{page}', DeletePageController::class);
+});
+
+// 프로젝트 탭 페이지 관리 API (개발용 - 인증 제거)
+Route::prefix('projects')->group(function () {
+    Route::get('/{project}/tabs', [App\Http\Controllers\Api\ProjectPageController::class, 'index']);
+    Route::post('/{project}/tabs', [App\Http\Controllers\Api\ProjectPageController::class, 'store']);
+    Route::get('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'show']);
+    Route::put('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'update']);
+    Route::delete('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'destroy']);
+    Route::put('/{project}/tabs/order', [App\Http\Controllers\Api\ProjectPageController::class, 'updateOrder']);
 });
 
 // 테스트용 결제 API (인증 없음 - 개발용)
