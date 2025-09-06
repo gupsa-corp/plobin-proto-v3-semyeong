@@ -67,7 +67,7 @@
                         <!-- 생성 버튼 -->
                         <button type="submit"
                                 class="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold text-base rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                :disabled="!name.trim()">
+                                :disabled="!$wire.name || !$wire.name.trim()">
                             생성하기
                         </button>
                     </div>

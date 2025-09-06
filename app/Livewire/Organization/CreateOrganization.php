@@ -3,6 +3,8 @@
 namespace App\Livewire\Organization;
 
 use Livewire\Component;
+use App\Models\Organization;
+use Illuminate\Support\Facades\Auth;
 
 class CreateOrganization extends Component
 {
@@ -42,8 +44,15 @@ class CreateOrganization extends Component
     {
         $this->validate();
 
-        // TODO: 실제 조직 생성 로직 구현
-        // 현재는 성공 메시지만 표시
+        // 조직 생성
+        Organization::create([
+            'name' => $this->name,
+            'description' => $this->description,
+            'user_id' => Auth::id(),
+            'status' => 'active',
+            'members_count' => 1,
+        ]);
+
         session()->flash('message', '조직이 성공적으로 생성되었습니다.');
         
         $this->closeModal();

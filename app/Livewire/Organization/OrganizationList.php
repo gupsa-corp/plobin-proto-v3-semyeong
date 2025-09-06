@@ -3,6 +3,8 @@
 namespace App\Livewire\Organization;
 
 use Livewire\Component;
+use App\Models\Organization;
+use Illuminate\Support\Facades\Auth;
 
 class OrganizationList extends Component
 {
@@ -18,9 +20,10 @@ class OrganizationList extends Component
 
     public function loadOrganizations()
     {
-        // TODO: 실제 조직 데이터 로드 로직 구현
-        // 현재는 빈 배열로 설정
-        $this->organizations = [];
+        // 현재 사용자가 생성한 조직들을 로드
+        $this->organizations = Organization::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
         $this->isLoading = false;
     }
 
