@@ -7,10 +7,6 @@ use Illuminate\Support\Facades\Auth;
 $routes = config('routes-web');
 
 foreach ($routes as $path => $config) {
-    // 매개변수가 있는 라우트는 건너뛰기 (아래에서 별도 처리)
-    if (str_contains($path, '{')) {
-        continue;
-    }
 
     // 이전 버전 호환성 지원
     if (is_string($config)) {
@@ -32,15 +28,12 @@ foreach ($routes as $path => $config) {
 
     // 보호된 페이지들에 auth 미들웨어 적용
     $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    if (in_array($path, $protectedPages)) {
+    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects'];
+    
+    if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
         $route->middleware('auth');
     }
 }
-
-// 매개변수가 있는 특수 라우트들을 수동으로 등록
-Route::get('/organizations/{id}/dashboard', function ($id) {
-    return view('300-page-service.302-page-organization-dashboard.000-index');
-})->name('organization.dashboard')->middleware('auth');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
