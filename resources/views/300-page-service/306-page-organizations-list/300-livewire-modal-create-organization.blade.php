@@ -1,9 +1,4 @@
 <div>
-    <!-- 트리거 버튼 (기존 버튼을 대체) -->
-    <button wire:click="openModal" class="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold text-base rounded-lg">
-        새로운 조직 생성
-    </button>
-
     <!-- 모달 -->
     @if($showModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeModal">
@@ -38,8 +33,8 @@
                                 <div class="flex items-center pl-1 gap-2">
                                     <label for="orgName" class="text-sm text-gray-900">조직 이름</label>
                                 </div>
-                                <input type="text" 
-                                       id="orgName" 
+                                <input type="text"
+                                       id="orgName"
                                        wire:model="name"
                                        placeholder="국영문 대소문자 1~25자"
                                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
@@ -53,7 +48,7 @@
                                 <div class="flex items-center pl-1 gap-2">
                                     <label for="orgDescription" class="text-sm text-gray-900">조직 설명 (선택사항)</label>
                                 </div>
-                                <textarea id="orgDescription" 
+                                <textarea id="orgDescription"
                                           wire:model="description"
                                           rows="3"
                                           placeholder="조직에 대한 간단한 설명을 입력하세요"
@@ -76,7 +71,7 @@
                 </form>
 
                 <!-- 닫기 버튼 -->
-                <button type="button" 
+                <button type="button"
                         wire:click="closeModal"
                         class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
