@@ -3,8 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Organization;
+use App\Models\OrganizationMember;
+use App\Models\Project;
+use App\Enums\OrganizationPermission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,12 +17,62 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            UserSeeder::class,
-        ]);
+        // 테스트용 관리자 계정 생성
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@gupsa.com'],
+            [
+                'email' => 'admin@gupsa.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'country_code' => '+82',
+                'phone_number' => '01012345678',
+                'nickname' => 'admin',
+                'first_name' => '관리자',
+                'last_name' => '테스트',
+            ]
+        );
+
+        // 테스트용 조직 생성
+        $organization = Organization::updateOrCreate(
+            ['name' => '테스트 조직'],
+            [
+                'name' => '테스트 조직',
+                'description' => '개발 및 테스트용 조직입니다.',
+                'user_id' => $admin->id,
+                'status' => 'active',
+                'members_count' => 1
+            ]
+        );
+
+        // 조직 멤버 추가
+        OrganizationMember::updateOrCreate(
+            [
+                'organization_id' => $organization->id,
+                'user_id' => $admin->id,
+            ],
+            [
+                'permission_level' => OrganizationPermission::ORGANIZATION_OWNER->value,
+                'invitation_status' => 'accepted',
+                'joined_at' => now(),
+                'invited_at' => now(),
+            ]
+        );
+
+        // 테스트용 프로젝트 생성
+        Project::updateOrCreate(
+            ['name' => '테스트 프로젝트'],
+            [
+                'name' => '테스트 프로젝트',
+                'description' => '개발 및 테스트용 프로젝트입니다.',
+                'organization_id' => $organization->id,
+                'user_id' => $admin->id,
+            ]
+        );
 
         $this->command->info('🎉 데이터베이스 시딩 완료!');
         $this->command->info('로그인 테스트용 계정:');
         $this->command->info('👤 admin@gupsa.com / password');
+        $this->command->info('🏢 테스트 조직 생성됨');
+        $this->command->info('📁 테스트 프로젝트 생성됨');
     }
 }

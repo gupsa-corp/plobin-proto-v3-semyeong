@@ -58,7 +58,12 @@ Route::get('/organizations/{id}/admin/billing', function ($id) {
 })->name('organization.admin.billing')->middleware('auth');
 
 Route::get('/organizations/{id}/admin/projects', function ($id) {
-    return view('300-page-service.310-organization-admin.400-projects');
+    $projects = \App\Models\Project::where('organization_id', $id)
+        ->with(['user', 'organization'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+        
+    return view('300-page-service.310-organization-admin.400-projects', compact('projects', 'id'));
 })->name('organization.admin.projects')->middleware('auth');
 
 // 로그아웃 라우트 추가
