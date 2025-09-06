@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('phone_number', 20)->nullable();
             
             // 사용자 프로필 필드
+            $table->string('name', 100)->nullable(); // Filament 호환성을 위해 추가
             $table->string('nickname', 50)->unique()->nullable();
             $table->string('first_name', 50)->nullable();
             $table->string('last_name', 50)->nullable();

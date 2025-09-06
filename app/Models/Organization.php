@@ -9,13 +9,14 @@ class Organization extends Model
 {
     protected $fillable = [
         'name',
-        'user_id'
+        'description',
+        'user_id',
+        'status',
+        'members_count'
     ];
 
     protected $hidden = [
-        'user_id',
-        'created_at',
-        'updated_at'
+        'user_id'
     ];
 
     public function user(): BelongsTo

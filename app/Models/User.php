@@ -21,6 +21,7 @@ class User extends Authenticatable
         'nickname',
         'first_name',
         'last_name',
+        'name',
     ];
 
     protected $hidden = [
@@ -34,6 +35,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->attributes['name'] ?? $this->display_name;
     }
 
     public function getFullNameAttribute(): string
