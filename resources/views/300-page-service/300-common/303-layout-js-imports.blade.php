@@ -1,9 +1,10 @@
 {{-- JavaScript 임포트 --}}
 <!-- 중앙집중식 API 클라이언트 -->
-@include('300-page-service.300-common.000-api-client')
+@once
+    @include('300-page-service.300-common.000-api-client')
+@endonce
 
-<!-- Alpine.js 초기화 -->
-@include('300-page-service.300-common.900-alpine-init')
+{{-- Alpine.js는 Livewire에서 제공되므로 별도 로드하지 않음 --}}
 
 <!-- 공통 JavaScript 모듈 -->
 @include('000-common-javascript.100-index')

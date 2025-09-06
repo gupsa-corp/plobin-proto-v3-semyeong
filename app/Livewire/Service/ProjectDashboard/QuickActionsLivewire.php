@@ -20,6 +20,6 @@ class QuickActionsLivewire extends Component
 
     public function render()
     {
-        return view('service.project-dashboard.quick-actions-livewire');
+        return view('300-page-service.308-page-project-dashboard.302-quick-actions-livewire');
     }
 }

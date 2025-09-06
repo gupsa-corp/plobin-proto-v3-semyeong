@@ -22,3 +22,31 @@
         }
     }
 </script>
+
+<style>
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .transition {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .ease-out {
+        transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+    
+    .ease-in {
+        transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    }
+    
+    .duration-300 {
+        transition-duration: 300ms;
+    }
+    
+    .duration-200 {
+        transition-duration: 200ms;
+    }
+</style>

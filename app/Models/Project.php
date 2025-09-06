@@ -25,4 +25,14 @@ class Project extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function pages()
+    {
+        return $this->hasMany(Page::class);
+    }
+
+    public function rootPages()
+    {
+        return $this->hasMany(Page::class)->whereNull('parent_id')->orderBy('sort_order');
+    }
 }

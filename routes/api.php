@@ -22,6 +22,11 @@ use App\Http\Organization\GetOrganization\Controller as GetOrganizationControlle
 use App\Http\Organization\UpdateOrganization\Controller as UpdateOrganizationController;
 use App\Http\Organization\DeleteOrganization\Controller as DeleteOrganizationController;
 use App\Http\Organization\CheckUrlPath\Controller as CheckUrlPathController;
+use App\Http\ProjectPage\CreatePage\Controller as CreatePageController;
+use App\Http\ProjectPage\GetPages\Controller as GetPagesController;
+use App\Http\ProjectPage\GetPage\Controller as GetPageController;
+use App\Http\ProjectPage\UpdatePage\Controller as UpdatePageController;
+use App\Http\ProjectPage\DeletePage\Controller as DeletePageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -75,4 +80,13 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
     Route::get('/{organization}', GetOrganizationController::class);
     Route::put('/{organization}', UpdateOrganizationController::class);
     Route::delete('/{organization}', DeleteOrganizationController::class);
+});
+
+// 프로젝트 페이지 관리 API
+Route::prefix('projects')->middleware(['auth.web-or-token'])->group(function () {
+    Route::get('/{project}/pages', GetPagesController::class);
+    Route::post('/{project}/pages', CreatePageController::class);
+    Route::get('/{project}/pages/{page}', GetPageController::class);
+    Route::put('/{project}/pages/{page}', UpdatePageController::class);
+    Route::delete('/{project}/pages/{page}', DeletePageController::class);
 });
