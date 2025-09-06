@@ -13,7 +13,6 @@ function organizationModal() {
         
         // Form data
         newOrgName: '',
-        newOrgUrl: '',
         formErrors: {},
         
         // Success data
@@ -37,14 +36,10 @@ function organizationModal() {
 
         resetForm() {
             this.newOrgName = '';
-            this.newOrgUrl = '';
             this.formErrors = {};
         },
 
         // Form Handling
-        handleUrlInput() {
-            this.newOrgUrl = this.newOrgUrl.replace(/[^a-zA-Z]/g, '');
-        },
 
         async createOrganization() {
             if (!this.validateForm()) return;
@@ -54,8 +49,7 @@ function organizationModal() {
                 this.formErrors = {};
 
                 const data = await ApiClient.post('/api/organizations/create', {
-                    name: this.newOrgName,
-                    url_path: this.newOrgUrl
+                    name: this.newOrgName
                 });
 
                 this.createdOrg = data.data;
@@ -71,8 +65,8 @@ function organizationModal() {
         },
 
         validateForm() {
-            if (!this.newOrgName.trim() || !this.newOrgUrl.trim()) {
-                this.formErrors = { general: ['모든 필드를 입력해주세요.'] };
+            if (!this.newOrgName.trim()) {
+                this.formErrors = { general: ['조직명을 입력해주세요.'] };
                 return false;
             }
             return true;

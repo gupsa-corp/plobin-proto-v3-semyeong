@@ -51,7 +51,7 @@ function organizationListManager() {
             } else {
                 orgList.innerHTML = organizations.map(org => `
                     <div class="organization-card p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                         onclick="window.organizationList.selectOrganization('${org.id}', '${org.url_path}')">
+                         onclick="window.organizationList.selectOrganization('${org.id}')">
                         <div class="flex items-center mb-4">
                             <div class="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
                                 <span class="text-white font-bold text-lg">${org.name.charAt(0).toUpperCase()}</span>
@@ -69,8 +69,8 @@ function organizationListManager() {
             }
         },
 
-        selectOrganization(orgId, urlPath) {
-            const orgData = { id: orgId, url_path: urlPath };
+        selectOrganization(orgId) {
+            const orgData = { id: orgId };
             localStorage.setItem('selectedOrg', JSON.stringify(orgData));
             
             // 조직 대시보드로 이동

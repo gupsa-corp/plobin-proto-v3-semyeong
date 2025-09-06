@@ -8,7 +8,6 @@
 <!-- 대시보드 컴포넌트 등록 (head에서) -->
 @if(request()->is('dashboard') || request()->is('dashboard/*'))
     @include('300-page-service.301-page-dashboard.400-js-dashboard')
-    @include('300-page-service.301-page-dashboard.403-js-modal-manager')
 @endif
 
 @stack('scripts')

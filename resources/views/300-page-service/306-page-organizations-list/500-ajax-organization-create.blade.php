@@ -11,8 +11,7 @@ async function createOrganization() {
         this.formErrors = {};
 
         const data = await ajaxPost('/api/organizations/create', {
-            name: this.newOrgName,
-            url_path: this.newOrgUrl
+            name: this.newOrgName
         });
 
         this.createdOrg = data.data;

@@ -1,27 +1,22 @@
 <?php
+
 return [
-    [
-        'title' => '대시보드',
-        'url' => '#',
-        'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z',
-        'active' => request()->is('organizations/*/dashboard')
+    'navigation_items' => [
+        [
+            'title' => '대시보드',
+            'url' => '/dashboard',
+            'active' => request()->is('dashboard') || request()->is('dashboard/*'),
+            'icon' => '<svg width="20" height="20" viewBox="0 0 20 20">
+                        <path d="M3 4h4v4H3V4zM9 4h4v4H9V4zM3 10h4v4H3v-4zM9 10h4v4H9v-4z" fill="currentColor"/>
+                      </svg>'
+        ],
+        [
+            'title' => '조직 관리',
+            'url' => '/organizations',
+            'active' => request()->is('organizations') || request()->is('organizations/*'),
+            'icon' => '<svg width="20" height="20" viewBox="0 0 20 20">
+                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" fill="currentColor"/>
+                      </svg>'
+        ],
     ],
-    [
-        'title' => '멤버 관리',
-        'url' => '#',
-        'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
-        'active' => request()->is('organizations/*/members')
-    ],
-    [
-        'title' => '프로젝트',
-        'url' => '#',
-        'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
-        'active' => request()->is('organizations/*/projects')
-    ],
-    [
-        'title' => '설정',
-        'url' => '#',
-        'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
-        'active' => request()->is('organizations/*/settings')
-    ]
 ];

@@ -12,8 +12,17 @@
         </div>
     </div>
 
+    {{-- 조직 생성 모달 --}}
+    @include('300-page-service.306-page-organizations-list.300-modal-create-organization')
+    
+    {{-- 조직 생성 완료 모달 --}}
+    @include('300-page-service.306-page-organizations-list.301-modal-create-success')
+    
+    {{-- 조직 관리 모달 --}}
+    @include('300-page-service.306-page-organizations-list.302-modal-organization-manager')
+
     {{-- 조직 모달 관리 시스템 --}}
-    @include('300-page-service.301-page-dashboard.403-js-modal-manager')
+    @include('300-page-service.306-page-organizations-list.403-js-modal-manager')
     {{-- Alpine.js 초기화 --}}
     @include($common . '.900-alpine-init')
 </body>

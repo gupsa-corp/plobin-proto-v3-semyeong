@@ -50,11 +50,30 @@ function dashboardMain() {
         async loadOrganizations() {
             try {
                 this.isLoading = true;
-                // TODO: 실제 API 호출로 조직 목록 가져오기
-                const organizations = [];
+                
+                // 실제 API 호출로 조직 목록 가져오기
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/organizations/list', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const organizations = data.data?.organizations || [];
+                
+                console.log('조직 목록 로드됨:', organizations);
+                this.organizations = organizations;
                 this.renderOrganizations(organizations);
             } catch (error) {
                 console.error('조직 목록 로드 실패:', error);
+                this.renderOrganizations([]); // 실패 시 빈 목록으로 렌더링
             } finally {
                 this.isLoading = false;
             }
@@ -84,7 +103,7 @@ function dashboardMain() {
             } else {
                 orgList.innerHTML = organizations.map(org => `
                     <div class="organization-card p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                         onclick="this.selectOrganization('${org.id}', '${org.url_path}')">
+                         data-org-id="${org.id}">
                         <div class="flex items-center mb-4">
                             <div class="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mr-3">
                                 <span class="text-white font-bold text-lg">${org.name.charAt(0).toUpperCase()}</span>
@@ -99,12 +118,21 @@ function dashboardMain() {
                         </div>
                     </div>
                 `).join('');
+                
+                // 클릭 이벤트 리스너 추가
+                const orgCards = orgList.querySelectorAll('.organization-card');
+                orgCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const orgId = card.dataset.orgId;
+                        this.selectOrganization(orgId);
+                    });
+                });
             }
         },
 
         // 조직 선택 (from organizationList)
-        selectOrganization(orgId, urlPath) {
-            const orgData = { id: orgId, url_path: urlPath };
+        selectOrganization(orgId) {
+            const orgData = { id: orgId };
             localStorage.setItem('selectedOrg', JSON.stringify(orgData));
             window.location.href = `/organizations/${orgId}/dashboard`;
         },

@@ -16,7 +16,7 @@ function organizationSelectionView() {
         selectOrg(org) {
             // dashboardSidebar 컴포넌트의 함수 호출
             if (window.dashboardSidebar && typeof window.dashboardSidebar.selectOrganization === 'function') {
-                window.dashboardSidebar.selectOrganization(org.id, org.url || org.urlPath);
+                window.dashboardSidebar.selectOrganization(org.id);
             } else {
                 // 폴백: 직접 처리
                 localStorage.setItem('selectedOrg', JSON.stringify(org));
