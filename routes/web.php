@@ -28,7 +28,7 @@ foreach ($routes as $path => $config) {
 
     // 보호된 페이지들에 auth 미들웨어 적용
     $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects'];
+    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
 
     if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
         $route->middleware('auth');
