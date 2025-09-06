@@ -16,7 +16,7 @@
 }" class="relative">
     <button @click="open = !open" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50">
         <div class="h-8 w-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-            {{ substr(auth()->user()->first_name ?? auth()->user()->nickname ?? auth()->user()->email, 0, 1) }}
+            {{ mb_substr(auth()->user()->first_name ?? auth()->user()->nickname ?? auth()->user()->email, 0, 1) }}
         </div>
         <span class="hidden md:block text-sm font-medium text-gray-700">
             {{ auth()->user()->nickname ?? (auth()->user()->first_name . ' ' . auth()->user()->last_name) ?? auth()->user()->email }}

@@ -29,12 +29,18 @@ foreach ($routes as $path => $config) {
     if ($routeName) {
         $route->name($routeName);
     }
+
+    // 보호된 페이지들에 auth 미들웨어 적용
+    $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
+    if (in_array($path, $protectedPages)) {
+        $route->middleware('auth');
+    }
 }
 
 // 매개변수가 있는 특수 라우트들을 수동으로 등록
 Route::get('/organizations/{id}/dashboard', function ($id) {
     return view('300-page-service.302-page-organization-dashboard.000-index');
-})->name('organization.dashboard');
+})->name('organization.dashboard')->middleware('auth');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
