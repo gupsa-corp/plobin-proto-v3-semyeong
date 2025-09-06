@@ -4,7 +4,7 @@
 @include($common . '.301-layout-head')
 <body class="bg-gray-50 min-h-screen">
     <div class="min-h-screen flex flex-col">
-        @include($common . '.100-header-main')
+        @include('200-page-auth.200-common.100-header-main')
         @include(getCurrentViewPath())
         @include($common . '.900-layout-footer')
     </div>

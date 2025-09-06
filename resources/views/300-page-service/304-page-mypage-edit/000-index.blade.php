@@ -6,7 +6,7 @@
     <div class="min-h-screen" style="position: relative;">
         @include('300-page-service.303-page-mypage-profile.200-sidebar-main')
          <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
-            @include($common . '.100-header-main')
+            @include('300-page-service.304-page-mypage-edit.100-header-main')
             @include('300-page-service.304-page-mypage-edit.200-content-main')
         </div>
     </div>
