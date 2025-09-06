@@ -10,5 +10,6 @@
             @include(getCurrentViewPath())
         </div>
     </div>
+    @livewireScripts
 </body>
 </html>

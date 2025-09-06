@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // 웹 라우트 일괄 등록
 $routes = config('routes-web');
@@ -34,3 +35,11 @@ foreach ($routes as $path => $config) {
 Route::get('/organizations/{id}/dashboard', function ($id) {
     return view('300-page-service.302-page-organization-dashboard.000-index');
 })->name('organization.dashboard');
+
+// 로그아웃 라우트 추가
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');
