@@ -120,7 +120,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php
-                                            $requiredPermission = collect(OrganizationPermission::cases())
+                                            $requiredPermission = collect(\App\Enums\OrganizationPermission::cases())
                                                 ->first(function ($perm) use ($requirements) {
                                                     return $perm->value == $requirements[0];
                                                 });

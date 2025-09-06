@@ -8,6 +8,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use App\Services\PhoneNumberHelper;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -90,5 +92,17 @@ class User extends Authenticatable
     public function getPhoneTypeAttribute(): ?string
     {
         return PhoneNumberHelper::getPhoneType($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+    public function organizationMemberships(): HasMany
+    {
+        return $this->hasMany(OrganizationMember::class);
+    }
+
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'organization_members')
+                    ->withPivot(['permission_level', 'joined_at', 'invited_at', 'invitation_status'])
+                    ->withTimestamps();
     }
 }
