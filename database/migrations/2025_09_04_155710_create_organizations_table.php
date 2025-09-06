@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
             $table->string('name', 25); // 조직명 최대 25자
-            $table->string('url', 12)->unique(); // URL 3~12자 영문자만, 중복 불가
             $table->unsignedBigInteger('user_id'); // 조직 생성자 ID
             $table->timestamps();
             
