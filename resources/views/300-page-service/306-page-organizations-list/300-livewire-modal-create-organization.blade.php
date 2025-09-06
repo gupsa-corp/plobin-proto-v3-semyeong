@@ -66,9 +66,11 @@
 
                         <!-- 생성 버튼 -->
                         <button type="submit"
-                                class="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold text-base rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                :disabled="!$wire.name || !$wire.name.trim()">
-                            생성하기
+                                wire:loading.attr="disabled"
+                                wire:target="createOrganization"
+                                class="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold text-base rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span wire:loading.remove wire:target="createOrganization">생성하기</span>
+                            <span wire:loading wire:target="createOrganization">생성 중...</span>
                         </button>
                     </div>
                 </form>
