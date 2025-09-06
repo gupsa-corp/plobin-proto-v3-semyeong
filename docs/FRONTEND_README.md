@@ -77,12 +77,6 @@ JavaScript 파일이 복잡할 경우, 다음과 같이 기능별로 분리하�
 - `400-js-global-state.blade.php`: 전역 상태 변수들
 - `401-js-country-loader.blade.php`: 국가 목록 로드 기능
 - `402-js-name-validation.blade.php`: 이름 필드 검증 기능  
-- `403-js-nickname-validation.blade.php`: 닉네임 검증 기능
-- `404-js-phone-validation.blade.php`: 휴대폰 번호 검증 기능
-- `405-js-password-validation.blade.php`: 비밀번호 검증 기능
-- `406-js-email-handler.blade.php`: 이메일 중복확인 기능
-- `407-js-form-validation.blade.php`: 폼 유효성 검사 및 에러 처리
-- `408-js-form-submit.blade.php`: 폼 제출 처리 기능
 
 **JavaScript 분리 시 주의사항:**
 - 모든 JavaScript 관련 파일은 **반드시 400번대 사용**

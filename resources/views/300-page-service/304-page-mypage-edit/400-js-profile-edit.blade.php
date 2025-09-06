@@ -1,12 +1,39 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('profileEditPage', () => ({
+        loading: false,
+        profileLoading: false,
+        
         init() {
             this.loadProfile();
         },
 
         async loadProfile() {
-            // 프로필 정보 로드 로직
+            this.profileLoading = true;
+            try {
+                const response = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        // 폼에 사용자 정보 설정
+                        document.getElementById('name').value = result.data.name || '';
+                        document.getElementById('email').value = result.data.email || '';
+                        document.getElementById('phone').value = result.data.phone || '';
+                    }
+                }
+            } catch (error) {
+                console.error('프로필 로드 오류:', error);
+            } finally {
+                this.profileLoading = false;
+            }
         }
     }));
 });
@@ -17,19 +44,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordChangeForm = document.getElementById('password-change-form');
 
     // 개인정보 수정
-    profileEditForm.addEventListener('submit', function(e) {
+    profileEditForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const formData = new FormData(this);
-        // TODO: 개인정보 수정 AJAX 호출
-        console.log('개인정보 수정 요청', Object.fromEntries(formData));
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = '저장 중...';
 
-        // 성공 시 프로필 페이지로 리다이렉트
-        // window.location.href = '/profile';
+        try {
+            const formData = new FormData(this);
+            const response = await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    phone: formData.get('phone')
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('프로필이 성공적으로 업데이트되었습니다.');
+                window.location.href = '/mypage';
+            } else {
+                // 오류 메시지 표시
+                let errorMessage = result.message || '프로필 업데이트에 실패했습니다.';
+                if (result.errors) {
+                    const errors = Object.values(result.errors).flat();
+                    errorMessage = errors.join('\n');
+                }
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('프로필 수정 오류:', error);
+            alert('프로필 업데이트 중 오류가 발생했습니다.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
     });
 
     // 비밀번호 변경
-    passwordChangeForm.addEventListener('submit', function(e) {
+    passwordChangeForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const newPassword = document.getElementById('new-password').value;
@@ -48,13 +110,48 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const formData = new FormData(this);
-        // TODO: 비밀번호 변경 AJAX 호출
-        console.log('비밀번호 변경 요청');
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = '변경 중...';
 
-        // 성공 시 폼 초기화
-        // this.reset();
-        // alert('비밀번호가 성공적으로 변경되었습니다.');
+        try {
+            const formData = new FormData(this);
+            const response = await fetch('/api/user/password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    current_password: formData.get('current_password'),
+                    new_password: formData.get('new_password'),
+                    new_password_confirmation: formData.get('new_password_confirmation')
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('비밀번호가 성공적으로 변경되었습니다.');
+                this.reset();
+            } else {
+                // 오류 메시지 표시
+                let errorMessage = result.message || '비밀번호 변경에 실패했습니다.';
+                if (result.errors) {
+                    const errors = Object.values(result.errors).flat();
+                    errorMessage = errors.join('\n');
+                }
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('비밀번호 변경 오류:', error);
+            alert('비밀번호 변경 중 오류가 발생했습니다.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
     });
 
     // 실시간 비밀번호 확인 검증

@@ -56,6 +56,12 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+// 사용자 프로필 관리 API
+Route::prefix('user')->middleware(['auth.web-or-token'])->group(function () {
+    Route::put('/profile', App\Http\Controllers\UserController::class . '@updateProfile');
+    Route::put('/password', App\Http\Controllers\UserController::class . '@changePassword');
+});
+
 Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(function () {
     Route::get('/list', GetOrganizationsController::class);
     Route::post('/create', CreateOrganizationController::class);
