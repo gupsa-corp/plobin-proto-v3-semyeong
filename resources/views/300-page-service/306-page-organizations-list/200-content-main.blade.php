@@ -59,8 +59,8 @@
     </div>
 </div>
 
-{{-- 조직 생성 모달 (재사용) --}}
-@include('300-page-service.301-page-dashboard.300-modal-create-organization')
+{{-- 조직 생성 모달 --}}
+@include('300-page-service.306-page-organizations-list.300-modal-create-organization')
 
 {{-- JavaScript --}}
 <script>

@@ -5,13 +5,13 @@
 @include('300-page-service.300-common.500-ajax-post')
 
 {{-- 1. API 클라이언트 --}}
-@include('300-page-service.301-page-dashboard.403-js-1-api-client')
+@include('300-page-service.306-page-organizations-list.403-js-1-api-client')
 
 {{-- 2. 모달 UI 관리자 --}}
-@include('300-page-service.301-page-dashboard.403-js-2-modal-ui-manager')
+@include('300-page-service.306-page-organizations-list.403-js-2-modal-ui-manager')
 
 {{-- 3. 조직 관리자 --}}
-@include('300-page-service.301-page-dashboard.403-js-3-organization-manager')
+@include('300-page-service.306-page-organizations-list.403-js-3-organization-manager')
 
 {{-- 4. 이벤트 핸들러 --}}
-@include('300-page-service.301-page-dashboard.403-js-4-event-handler')
+@include('300-page-service.306-page-organizations-list.403-js-4-event-handler')
