@@ -27,7 +27,14 @@
 
 ## 참고 문서
 
-- [API 구조 가이드라인](../CHECKEMAIL-GUIDELINES.md)
+### 개발 가이드라인
+- [API 아키텍처](docs/API-ARCHITECTURE.md)
+- [API 예외 처리](docs/API-EXCEPTION.md) 
+- [주석 작성 규칙](docs/CODING-COMMENTING.md)
+- [코딩테스트 백엔드](docs/CODING-TEST-BACKEND.md)
+- [문서화 가이드라인](docs/DOCUMENTATION-GUIDELINES.md)
+- [E2E 테스트](docs/E2E-TESTS.md)
+- [프론트엔드 README](docs/FRONTEND_README.md)
 
 ## 문서 작성 금지사항
 
