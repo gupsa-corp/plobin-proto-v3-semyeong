@@ -46,7 +46,7 @@ Route::get('/organizations/{id}/admin', function ($id) {
 })->name('organization.admin')->middleware('auth');
 
 Route::get('/organizations/{id}/admin/members', function ($id) {
-    return view('300-page-service.310-organization-admin.100-members');
+    return view('300-page-service.310-organization-admin.100-members', compact('id'));
 })->name('organization.admin.members')->middleware('auth');
 
 Route::get('/organizations/{id}/admin/permissions', function ($id) {

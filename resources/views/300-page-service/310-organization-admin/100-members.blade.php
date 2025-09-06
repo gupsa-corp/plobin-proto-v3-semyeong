@@ -9,7 +9,9 @@
             @include('300-page-service.310-organization-admin.100-header-main')
             
             {{-- Livewire 멤버 관리 컴포넌트 --}}
-            <livewire:organization.admin.member-management :organizationId="1" />
+            @livewire('test-component')
+            <hr class="my-8">
+            @livewire('organization.admin.member-management', ['organizationId' => $id ?? 1])
         </div>
     </div>
 </body>

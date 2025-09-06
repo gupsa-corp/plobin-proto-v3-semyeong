@@ -9,7 +9,7 @@
                     <p class="text-gray-600 mt-1">조직 구성원을 관리하고 초대할 수 있습니다</p>
                 </div>
                 <div class="flex gap-3">
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                    <button wire:click="openInviteModal" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
                         + 멤버 초대
                     </button>
                 </div>
@@ -124,7 +124,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        @foreach($filteredMembers as $member)
+                        @forelse($filteredMembers as $member)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -141,14 +141,19 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $member['permission']->getBadgeColor() }}-100 text-{{ $member['permission']->getBadgeColor() }}-800">
-                                    {{ $member['permission']->getShortLabel() }}
-                                </span>
+                                <select wire:change="changePermission({{ $member['id'] }}, $event.target.value)" 
+                                        class="text-xs rounded-full border-0 bg-{{ $member['permission']['badge_color'] }}-100 text-{{ $member['permission']['badge_color'] }}-800 px-2.5 py-0.5 font-medium">
+                                    @foreach($permissionLevels as $level => $name)
+                                        <option value="{{ $level }}" {{ $member['permission']['value'] == $level ? 'selected' : '' }}>
+                                            {{ $name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <span class="text-sm text-gray-900 font-medium">{{ $member['permission']->value }}</span>
-                                    <span class="ml-2 text-xs text-gray-500">({{ $member['permission']->getLevelName() }})</span>
+                                    <span class="text-sm text-gray-900 font-medium">{{ $member['permission']['value'] }}</span>
+                                    <span class="ml-2 text-xs text-gray-500">({{ $member['permission']['level_name'] }})</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -174,7 +179,13 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                                멤버가 없습니다.
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -214,7 +225,7 @@
         {{-- 페이지네이션 --}}
         <div class="flex items-center justify-between mt-6">
             <div class="text-sm text-gray-500">
-                총 {{ $filteredMembers->count() }}명 표시
+                총 {{ count($filteredMembers) }}명 표시
             </div>
             <div class="flex gap-1">
                 <button class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-500">이전</button>
@@ -224,4 +235,89 @@
             </div>
         </div>
     </div>
+
+    {{-- 멤버 초대 모달 --}}
+    @if($showInviteModal)
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg max-w-md w-full">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">새 멤버 초대</h3>
+                        <button wire:click="closeInviteModal" class="text-gray-400 hover:text-gray-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form wire:submit.prevent="inviteMember">
+                        <div class="mb-4">
+                            <label for="inviteEmail" class="block text-sm font-medium text-gray-700 mb-1">
+                                이메일 주소
+                            </label>
+                            <input type="email" 
+                                   wire:model="inviteEmail" 
+                                   id="inviteEmail"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="user@example.com"
+                                   required>
+                            @error('inviteEmail') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="invitePermission" class="block text-sm font-medium text-gray-700 mb-1">
+                                권한 레벨
+                            </label>
+                            <select wire:model="invitePermission" 
+                                    id="invitePermission"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="100">사용자 (100)</option>
+                                <option value="200">서비스 매니저 (200)</option>
+                                <option value="300">조직 관리자 (300)</option>
+                                <option value="400">조직 소유자 (400)</option>
+                            </select>
+                            @error('invitePermission') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <div class="flex justify-end gap-3">
+                            <button type="button" 
+                                    wire:click="closeInviteModal"
+                                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                초대 전송
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
+
+<script>
+    // JavaScript 이벤트 리스너
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('permissionChanged', (event) => {
+            alert(`권한이 변경되었습니다: ${event.message || event[0].message}`);
+        });
+
+        Livewire.on('memberRemoved', (event) => {
+            alert(`멤버가 제거되었습니다: ${event.message || event[0].message}`);
+        });
+
+        Livewire.on('invitationResent', (event) => {
+            alert(`초대가 재전송되었습니다: ${event.message || event[0].message}`);
+        });
+
+        Livewire.on('memberInvited', (event) => {
+            alert(`멤버가 초대되었습니다: ${event.message || event[0].message}`);
+        });
+
+        Livewire.on('error', (event) => {
+            alert(`오류: ${event.message || event[0].message}`);
+        });
+    });
+</script>

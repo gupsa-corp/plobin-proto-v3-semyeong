@@ -27,6 +27,8 @@ use App\Http\ProjectPage\GetPages\Controller as GetPagesController;
 use App\Http\ProjectPage\GetPage\Controller as GetPageController;
 use App\Http\ProjectPage\UpdatePage\Controller as UpdatePageController;
 use App\Http\ProjectPage\DeletePage\Controller as DeletePageController;
+use App\Http\Organization\SearchMembers\Controller as SearchMembersController;
+use App\Http\Organization\InviteMembers\Controller as InviteMembersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,6 +82,12 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
     Route::get('/{organization}', GetOrganizationController::class);
     Route::put('/{organization}', UpdateOrganizationController::class);
     Route::delete('/{organization}', DeleteOrganizationController::class);
+
+    // 조직 멤버 관리 API
+    Route::prefix('{organization}/members')->group(function () {
+        Route::get('/search', SearchMembersController::class);
+        Route::post('/invite', InviteMembersController::class);
+    });
 });
 
 // 프로젝트 페이지 관리 API
