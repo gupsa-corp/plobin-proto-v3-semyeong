@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 유효성 검사 (중앙화된 함수 사용)
             if (typeof validateLoginForm === 'function') {
-                const validation = validateLoginForm(email, password);
+                const validation = await validateLoginForm(email, password);
                 if (!validation.valid) {
                     showError(validation.message);
                     return;
@@ -122,8 +122,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // 글로벌 handleLogin 함수
 window.handleLogin = async function(email, password, remember = false) {
     try {
-        // AuthManager의 login 메서드 사용
-        const result = await window.AuthManager.login(email, password, remember);
+        // AuthManager 초기화 대기
+        const authManager = await window.getAuthManager();
+        const result = await authManager.login(email, password, remember);
         return result;
     } catch (error) {
         console.error('handleLogin 오류:', error);
@@ -135,9 +136,18 @@ window.handleLogin = async function(email, password, remember = false) {
 };
 
 // 글로벌 validateLoginForm 함수
-window.validateLoginForm = function(email, password) {
-    // AuthManager의 validateLoginForm 메서드 사용
-    return window.AuthManager.validateLoginForm(email, password);
+window.validateLoginForm = async function(email, password) {
+    try {
+        // AuthManager 초기화 대기
+        const authManager = await window.getAuthManager();
+        return authManager.validateLoginForm(email, password);
+    } catch (error) {
+        console.error('validateLoginForm 오류:', error);
+        return {
+            valid: false,
+            message: '유효성 검사 중 오류가 발생했습니다.'
+        };
+    }
 };
 
 // AJAX 응답 상태 코드별 처리

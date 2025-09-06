@@ -113,8 +113,24 @@ class AuthManager {
     handleSessionExpired(message) { return this.utilityModule.handleSessionExpired(message); }
 }
 
-// 전역 AuthManager 인스턴스 생성
-window.AuthManager = new AuthManager();
+// 전역 AuthManager 인스턴스 생성 (DOM 로드 후)
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.AuthManager) {
+        window.AuthManager = new AuthManager();
+        console.log('중앙집중식 AuthManager 로드 완료');
+    }
+});
 
-console.log('중앙집중식 AuthManager 로드 완료');
+// 즉시 사용 가능하도록 하는 래퍼
+window.getAuthManager = function() {
+    return new Promise((resolve) => {
+        if (window.AuthManager) {
+            resolve(window.AuthManager);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                resolve(window.AuthManager);
+            });
+        }
+    });
+};
 </script>
