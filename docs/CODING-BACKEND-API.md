@@ -16,9 +16,11 @@
 ❌ `CreateUserRequest.php`  
 
 ### **올바른 예시**
-✅ `app/Http/User/Create/Controller.php`  
-✅ `app/Http/User/Create/Request.php`  
-✅ `app/Http/AuthUser/CheckEmail/Controller.php`  
-✅ `app/Http/AuthUser/CheckEmail/Request.php`  
+✅ `app/Http/CoreApi/User/Create/Controller.php`  
+✅ `app/Http/CoreApi/User/Create/Request.php`  
+✅ `app/Http/CoreApi/AuthUser/CheckEmail/Controller.php`  
+✅ `app/Http/CoreApi/AuthUser/CheckEmail/Request.php`  
+
+**중요**: 모든 API 컨트롤러는 `app/Http/CoreApi/` 하위에 위치해야 함. `Controllers`나 `Requests` 폴더는 사용하지 않음.
 
 **이유**: 네임스페이스로 기능을 구분하고, 파일명은 표준화하여 일관성 유지

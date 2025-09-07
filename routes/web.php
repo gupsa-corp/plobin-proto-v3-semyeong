@@ -204,7 +204,7 @@ Route::get('/platform/admin/organizations', function () {
 })->name('platform.admin.organizations');
 
 // 플랫폼 관리자 - 사용자 관리
-Route::get('/platform/admin/users', [\App\Http\Controllers\PlatformAdminController::class, 'users'])->name('platform.admin.users');
+Route::get('/platform/admin/users', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'users'])->name('platform.admin.users');
 
 // 플랫폼 관리자 - 시스템 설정
 Route::get('/platform/admin/system-settings', function () {
