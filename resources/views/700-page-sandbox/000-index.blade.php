@@ -1,0 +1,68 @@
+<?php $common = getCommonPath(); ?>
+<!DOCTYPE html>
+@include('000-common-layouts.001-html-lang')
+@include($common . '.301-layout-head', ['title' => 'AI 샌드박스'])
+<body class="bg-gray-100">
+    @include('700-page-sandbox.700-common.400-sandbox-header')
+    
+    <div class="min-h-screen sandbox-container">
+        <div class="sandbox-card">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">AI 샌드박스</h1>
+            <p class="text-gray-600 mb-8">개발 도구 및 유틸리티 모음</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="/sandbox/dashboard" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">대시보드</h3>
+                    <p class="text-gray-600">전체 시스템 현황 및 관리</p>
+                </a>
+                
+                <a href="/sandbox/sql-executor" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">SQL 실행기</h3>
+                    <p class="text-gray-600">데이터베이스 쿼리 실행</p>
+                </a>
+                
+                <a href="/sandbox/file-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">파일 목록</h3>
+                    <p class="text-gray-600">프로젝트 파일 탐색</p>
+                </a>
+                
+                <a href="/sandbox/file-editor" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">파일 에디터</h3>
+                    <p class="text-gray-600">코드 파일 편집</p>
+                </a>
+                
+                <a href="/sandbox/database-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">데이터베이스 매니저</h3>
+                    <p class="text-gray-600">데이터베이스 관리</p>
+                </a>
+                
+                <a href="/sandbox/git-version-control" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Git 버전 관리</h3>
+                    <p class="text-gray-600">로컬 Git 저장소 관리</p>
+                </a>
+                
+                <a href="/sandbox/api-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">API 생성기</h3>
+                    <p class="text-gray-600">API 엔드포인트 생성 및 테스트</p>
+                </a>
+                
+                <a href="/sandbox/api-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">API 목록</h3>
+                    <p class="text-gray-600">생성된 API 목록 관리</p>
+                </a>
+                
+                <a href="/sandbox/blade-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Blade 생성기</h3>
+                    <p class="text-gray-600">Blade 템플릿 생성 및 미리보기</p>
+                </a>
+                
+                <a href="/sandbox/blade-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Blade 목록</h3>
+                    <p class="text-gray-600">생성된 Blade 템플릿 목록 관리</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    @livewireScripts
+</body>
+</html>
