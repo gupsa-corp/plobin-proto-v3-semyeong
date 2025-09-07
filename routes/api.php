@@ -36,6 +36,7 @@ use App\Http\CoreApi\OrganizationBilling\CreateBusinessInfo\Controller as Create
 use App\Http\CoreApi\OrganizationBilling\BusinessLookup\Controller as BusinessLookupController;
 use App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller as DownloadReceiptController;
 use App\Http\CoreApi\User\SearchUsers\Controller as SearchUsersController;
+use App\Http\Sandbox\FileList\Controller as SandboxFileListController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -126,4 +127,9 @@ Route::prefix('test/organizations')->group(function () {
     Route::post('{organization}/billing/business-info', CreateBusinessInfoController::class);
     Route::post('{organization}/billing/business-lookup', BusinessLookupController::class);
     Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
+});
+
+// 샌드박스 API (개발용 - 인증 없음)
+Route::prefix('sandbox')->group(function () {
+    Route::get('/files', [SandboxFileListController::class, 'getFileList']);
 });

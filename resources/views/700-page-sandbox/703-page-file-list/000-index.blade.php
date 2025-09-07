@@ -10,9 +10,7 @@
             <h1 class="text-3xl font-bold text-gray-900 mb-6">파일 목록</h1>
             <p class="text-gray-600 mb-8">프로젝트 파일 탐색</p>
             
-            <div class="text-center py-20 text-gray-500">
-                구현필요
-            </div>
+            @livewire('sandbox.file-list')
         </div>
     </div>
     @livewireScripts
