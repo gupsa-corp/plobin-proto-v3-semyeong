@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use App\Services\PhoneNumberHelper;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, LogsActivity;
 
     protected $fillable = [
         'email',
@@ -168,5 +170,16 @@ class User extends Authenticatable
             'last_login' => $this->updated_at->format('Y-m-d H:i'),
             'created_at' => $this->created_at->format('Y-m-d H:i')
         ];
+    }
+
+    /**
+     * Activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'nickname'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

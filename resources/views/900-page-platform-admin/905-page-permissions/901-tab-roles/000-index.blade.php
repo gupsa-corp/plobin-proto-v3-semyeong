@@ -24,11 +24,10 @@
         </div>
     </div>
     
-    {{-- 모달 포함 --}}
-    @include('900-page-platform-admin.905-page-permissions.310-modal-create-role')
+    {{-- 기존 모달과 JavaScript는 Livewire 컴포넌트에서 처리하므로 제거 --}}
+    {{-- @include('900-page-platform-admin.905-page-permissions.310-modal-create-role') --}}
     
-    {{-- JavaScript --}}
-    @include('900-page-platform-admin.905-page-permissions.400-js-permissions')
+    {{-- @include('900-page-platform-admin.905-page-permissions.400-js-permissions') --}}
     
     @livewireScripts
 </body>

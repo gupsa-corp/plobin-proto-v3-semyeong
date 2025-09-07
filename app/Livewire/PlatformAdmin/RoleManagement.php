@@ -6,6 +6,7 @@ use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
+use Spatie\Activitylog\Models\Activity;
 
 class RoleManagement extends Component
 {
@@ -119,6 +120,20 @@ class RoleManagement extends Component
                 $role->syncPermissions($this->selectedPermissions);
             }
 
+            // 활동 로그 기록
+            activity('permission_management')
+                ->performedOn($role)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'action' => 'role_created',
+                    'role_name' => $this->name,
+                    'guard_name' => $this->guard_name,
+                    'permissions' => $this->selectedPermissions,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log("역할 '{$this->name}' 생성");
+
             $this->loadRoles();
             $this->resetForm();
             $this->showCreateModal = false;
@@ -152,12 +167,35 @@ class RoleManagement extends Component
         $this->validate();
 
         try {
+            $oldName = $this->editingRole->name;
+            $oldPermissions = $this->editingRole->permissions->pluck('name')->toArray();
+            
             $this->editingRole->update([
                 'name' => $this->name,
                 'guard_name' => $this->guard_name
             ]);
 
             $this->editingRole->syncPermissions($this->selectedPermissions);
+
+            // 활동 로그 기록
+            activity('permission_management')
+                ->performedOn($this->editingRole)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'action' => 'role_updated',
+                    'old' => [
+                        'name' => $oldName,
+                        'permissions' => $oldPermissions
+                    ],
+                    'attributes' => [
+                        'name' => $this->name,
+                        'guard_name' => $this->guard_name,
+                        'permissions' => $this->selectedPermissions
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log("역할 '{$oldName}' → '{$this->name}' 수정");
 
             $this->loadRoles();
             $this->resetForm();
@@ -182,6 +220,23 @@ class RoleManagement extends Component
 
         try {
             $roleName = $this->editingRole->name;
+            $rolePermissions = $this->editingRole->permissions->pluck('name')->toArray();
+
+            // 활동 로그 기록
+            activity('permission_management')
+                ->performedOn($this->editingRole)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'action' => 'role_deleted',
+                    'role_name' => $roleName,
+                    'guard_name' => $this->editingRole->guard_name,
+                    'permissions' => $rolePermissions,
+                    'users_count' => $this->editingRole->users()->count(),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log("역할 '{$roleName}' 삭제");
+
             $this->editingRole->delete();
 
             $this->loadRoles();
