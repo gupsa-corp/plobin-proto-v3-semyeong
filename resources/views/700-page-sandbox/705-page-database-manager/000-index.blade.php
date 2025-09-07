@@ -10,9 +10,7 @@
             <h1 class="text-3xl font-bold text-gray-900 mb-6">데이터베이스 매니저</h1>
             <p class="text-gray-600 mb-8">데이터베이스 관리 도구</p>
             
-            <div class="text-center py-20 text-gray-500">
-                구현필요
-            </div>
+            @livewire('sandbox.database-manager.component')
         </div>
     </div>
     @livewireScripts
