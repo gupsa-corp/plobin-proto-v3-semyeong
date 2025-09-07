@@ -1,7 +1,10 @@
 {{-- 권한 관리 모던 인터페이스 --}}
 <div class="permissions-management-container">
+    {{-- Livewire 스코프 선택 컴포넌트 --}}
+    @livewire('platform-admin.organization-selector')
+
     {{-- 상단 컨트롤 패널 --}}
-    <div class="mb-6 bg-white rounded-lg shadow p-4">
+    <div class="mb-6 bg-white rounded-lg shadow p-4" id="control-panel" style="display: none;">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             {{-- 검색 및 필터 --}}
             <div class="flex flex-1 space-x-4">
@@ -60,7 +63,7 @@
     </div>
 
     {{-- 권한 매트릭스 테이블 --}}
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-lg shadow overflow-hidden" id="permissions-matrix" style="display: none;">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">권한 매트릭스</h3>
             <p class="mt-1 text-sm text-gray-500">역할별 권한을 관리합니다. 체크박스를 클릭하여 권한을 할당하거나 제거할 수 있습니다.</p>
