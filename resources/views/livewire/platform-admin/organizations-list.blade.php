@@ -1,25 +1,4 @@
 <div class="organizations-content" style="padding: 24px;">
-    {{-- 성공 메시지 --}}
-    @if (session()->has('message'))
-        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <strong class="font-bold">성공!</strong>
-            <span class="block sm:inline">{{ session('message') }}</span>
-        </div>
-    @endif
-
-    {{-- 검색 필터 --}}
-    <div class="mb-4">
-        <div class="max-w-md">
-            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">조직 검색</label>
-            <input
-                type="text"
-                id="search"
-                wire:model.debounce.300ms="search"
-                placeholder="조직명 또는 URL로 검색..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-        </div>
-    </div>
 
     {{-- 조직 목록 테이블 --}}
     <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -40,7 +19,7 @@
                             조직 정보
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            소유자
+                            소유 관리자
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             멤버
