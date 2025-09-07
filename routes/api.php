@@ -198,3 +198,16 @@ Route::prefix('platform/admin/pricing')->group(function () {
     Route::put('/plans/{id}', [PlatformAdminPricingController::class, 'updatePlan']);
     Route::delete('/plans/{id}', [PlatformAdminPricingController::class, 'deletePlan']);
 });
+
+// 플랫폼 관리자 - 권한 관리 API (개발용 - 인증 없음)
+Route::prefix('platform/admin/permissions')->group(function () {
+    Route::get('/matrix', [\App\Http\CoreApi\PlatformAdmin\Permissions\PermissionMatrix\Controller::class, 'getMatrix']);
+    Route::get('/stats', [\App\Http\CoreApi\PlatformAdmin\Permissions\PermissionStats\Controller::class, 'getStats']);
+    Route::post('/roles/permissions', [\App\Http\CoreApi\PlatformAdmin\Permissions\RolePermissions\Controller::class, 'updateRolePermissions']);
+    Route::post('/', [\App\Http\CoreApi\PlatformAdmin\Permissions\CreatePermission\Controller::class, 'create']);
+    Route::get('/export', [\App\Http\CoreApi\PlatformAdmin\Permissions\ExportPermissions\Controller::class, 'export']);
+    Route::delete('/roles/{id}', [\App\Http\CoreApi\PlatformAdmin\Permissions\DeleteRole\Controller::class, 'delete']);
+});
+
+// 코어 권한 API (개발용 - 인증 없음)
+Route::get('/core/permissions', [\App\Http\CoreApi\Core\Permissions\Controller::class, 'getRoles']);
