@@ -1,14 +1,18 @@
-@extends('300-common.100-layout')
-
-@section('content')
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 2rem;">
-    <div style="max-width: 1200px; margin: 0 auto;">
-        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 1rem 2rem; border-radius: 10px; margin-bottom: 2rem;">
-            <h1 style="color: white; font-size: 1.5rem; margin: 0;">🎨 Form Publisher</h1>
-            <p style="color: rgba(255, 255, 255, 0.8); margin: 0.5rem 0 0 0;">샌드박스 폼 생성 및 관리 도구</p>
-        </div>
-        
-        <div style="background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+<?php $common = getCommonPath(); ?>
+<!DOCTYPE html>
+@include('000-common-layouts.001-html-lang')
+@include($common . '.301-layout-head', ['title' => 'Form Publisher - AI 샌드박스'])
+<body class="bg-gray-100">
+    @include('700-page-sandbox.700-common.400-sandbox-header')
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 1rem 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                <h1 style="color: white; font-size: 1.5rem; margin: 0;">🎨 Form Publisher</h1>
+                <p style="color: rgba(255, 255, 255, 0.8); margin: 0.5rem 0 0 0;">샌드박스 폼 생성 및 관리 도구</p>
+            </div>
+            
+            <div style="background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
             @php
                 // 샌드박스 경로 설정
                 $sandboxPath = storage_path('storage-sandbox-1/Frontend/Page');
@@ -108,28 +112,46 @@
                     </div>
                 </div>
             @endif
-        </div>
-        
-        <div style="text-align: center; margin-top: 2rem;">
-            <a href="{{ url('/sandbox') }}" 
-               style="color: white; text-decoration: none; background: rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 5px; backdrop-filter: blur(10px);">
-                🏠 샌드박스 홈으로 돌아가기
-            </a>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="{{ url('/sandbox') }}" 
+                   style="color: white; text-decoration: none; background: rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 5px; backdrop-filter: blur(10px);">
+                    🏠 샌드박스 홈으로 돌아가기
+                </a>
+            </div>
         </div>
     </div>
-</div>
-@endsection
 
-@section('scripts')
-<style>
-/* 샌드박스 내용과 충돌하지 않도록 스타일 격리 */
-.sandbox-content {
-    all: initial;
-}
+    <!-- Livewire Scripts -->
+    @livewireScripts
+    
+    <!-- Filament Scripts -->
+    @filamentScripts
 
-/* 필요한 경우 추가 스타일 오버라이드 */
-.sandbox-content * {
-    box-sizing: border-box;
-}
-</style>
-@endsection
+    <style>
+    /* 샌드박스 내용과 충돌하지 않도록 스타일 격리 */
+    .sandbox-content {
+        all: initial;
+    }
+
+    /* 필요한 경우 추가 스타일 오버라이드 */
+    .sandbox-content * {
+        box-sizing: border-box;
+    }
+    
+    .sandbox-container {
+        padding: 2rem;
+    }
+    
+    .sandbox-card {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    </style>
+</body>
+</html>

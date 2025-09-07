@@ -75,6 +75,11 @@
                     <h3 class="text-lg font-semibold text-green-900 mb-2">Form Creator</h3>
                     <p class="text-green-700">비주얼 폼 빌더 - 드래그 앤 드롭으로 폼 생성</p>
                 </a>
+                
+                <a href="/sandbox/form-publisher" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-purple-200 bg-purple-50">
+                    <h3 class="text-lg font-semibold text-purple-900 mb-2">Form Publisher</h3>
+                    <p class="text-purple-700">JSON 기반 폼 생성기 - 코드로 폼 구조 정의</p>
+                </a>
             </div>
         </div>
     </div>

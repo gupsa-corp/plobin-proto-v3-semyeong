@@ -51,4 +51,8 @@ return [
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
     '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],
     '/sandbox/form-creator' => ['view' => '700-page-sandbox.709-page-form-creator.000-index', 'name' => 'sandbox.form-creator'],
+    '/sandbox/form-publisher' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher'],
+    '/sandbox/form-publisher/editor' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.editor'],
+    '/sandbox/form-publisher/list' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.list'],
+    '/sandbox/form-publisher/preview/{id}' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.preview'],
 ];

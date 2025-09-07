@@ -307,6 +307,37 @@ Route::get('/sandbox/form-creator', function () {
     return view('700-page-sandbox.709-page-form-creator.000-index');
 })->name('sandbox.form-creator');
 
+// Form Publisher - 샌드박스 폼 생성 및 관리 도구
+Route::prefix('sandbox/form-publisher')->group(function () {
+    Route::get('/', function () {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
+    })->name('sandbox.form-publisher.list');
+    
+    Route::get('/editor', function () {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'editor']);
+    })->name('sandbox.form-publisher.editor');
+    
+    Route::post('/editor', function () {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'editor']);
+    })->name('sandbox.form-publisher.editor.post');
+    
+    Route::get('/preview/{id}', function ($id) {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'preview', 'id' => $id]);
+    })->name('sandbox.form-publisher.preview');
+    
+    Route::post('/preview/{id}', function ($id) {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'preview', 'id' => $id]);
+    })->name('sandbox.form-publisher.preview.post');
+    
+    Route::get('/list', function () {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
+    })->name('sandbox.form-publisher.list.full');
+    
+    Route::post('/list', function () {
+        return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
+    })->name('sandbox.form-publisher.list.post');
+});
+
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
     Auth::logout();

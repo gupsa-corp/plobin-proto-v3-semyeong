@@ -45,7 +45,7 @@ return [
 
         'ai_sandbox' => [
             'driver' => 'sqlite',
-            'database' => storage_path('ai-sandbox/db/ai.sqlite'),
+            'database' => storage_path('ai-sandbox/Backend/Databases/Release.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => true,
             'busy_timeout' => null,

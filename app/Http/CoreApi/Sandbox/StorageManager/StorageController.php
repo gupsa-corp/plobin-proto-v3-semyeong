@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
-class Controller extends  \App\Http\CoreApi\ApiController
+class StorageController extends  \App\Http\CoreApi\ApiController
 {
     private function getStoragePath()
     {
