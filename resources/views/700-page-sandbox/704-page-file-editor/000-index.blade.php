@@ -5,7 +5,7 @@
 <body class="bg-gray-100">
     @include('700-page-sandbox.700-common.400-sandbox-header')
     
-    <div class="min-h-screen sandbox-container p-4">
+    <div class="min-h-screen">
         @livewire('sandbox.file-editor')
     </div>
     <!-- Livewire Scripts -->

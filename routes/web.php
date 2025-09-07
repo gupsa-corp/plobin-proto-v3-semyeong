@@ -283,10 +283,10 @@ Route::get('/sandbox/file-manager', function () {
 })->name('sandbox.file-manager');
 
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
-Route::get('/sandbox/storage-manager', [App\Http\CoreApi\Sandbox\StorageManager\StorageController::class, 'index'])->name('sandbox.storage-manager');
-Route::post('/sandbox/storage-manager/create', [App\Http\CoreApi\Sandbox\StorageManager\StorageController::class, 'create'])->name('sandbox.storage.create');
-Route::post('/sandbox/storage-manager/select', [App\Http\CoreApi\Sandbox\StorageManager\StorageController::class, 'select'])->name('sandbox.storage.select');
-Route::delete('/sandbox/storage-manager/delete', [App\Http\CoreApi\Sandbox\StorageManager\StorageController::class, 'delete'])->name('sandbox.storage.delete');
+Route::get('/sandbox/storage-manager', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'index'])->name('sandbox.storage-manager');
+Route::post('/sandbox/storage-manager/create', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'create'])->name('sandbox.storage.create');
+Route::post('/sandbox/storage-manager/select', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
+Route::delete('/sandbox/storage-manager/delete', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {

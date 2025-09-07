@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
-class StorageController extends  \App\Http\CoreApi\ApiController
+class Controller extends  \App\Http\CoreApi\ApiController
 {
     private function getStoragePath()
     {
@@ -63,16 +63,33 @@ class StorageController extends  \App\Http\CoreApi\ApiController
     public function select(Request $request)
     {
         $request->validate([
-            'storage_name' => 'required|string',
+            'storage_name' => 'required|string|regex:/^[a-zA-Z0-9_-]+$/|max:50',
+        ], [
+            'storage_name.required' => '스토리지 이름이 필요합니다.',
+            'storage_name.regex' => '잘못된 스토리지 이름 형식입니다.',
+            'storage_name.max' => '스토리지 이름이 너무 깁니다.',
         ]);
 
         $storageName = $request->storage_name;
         $storagePath = $this->getStoragePath() . '/storage-sandbox-' . $storageName;
 
+        // 스토리지 존재 확인
         if (!File::exists($storagePath)) {
             return back()->with('error', '선택하려는 스토리지가 존재하지 않습니다.');
         }
 
+        // 데이터베이스 파일 존재 확인
+        $dbPath = $storagePath . '/db/ai.sqlite';
+        if (!File::exists($dbPath)) {
+            return back()->with('error', '선택하려는 스토리지에 데이터베이스 파일이 없습니다.');
+        }
+
+        // 데이터베이스 파일 접근 권한 확인
+        if (!is_readable($dbPath)) {
+            return back()->with('error', '데이터베이스 파일에 읽기 권한이 없습니다.');
+        }
+
+        // 세션에 저장
         Session::put('sandbox_storage', $storageName);
 
         return back()->with('success', "스토리지 '{$storageName}'이 선택되었습니다.");

@@ -42,10 +42,23 @@ class Component extends LivewireComponent
 
     private function getSandboxConnection()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/db/ai.sqlite");
+        try {
+            $selectedSandbox = Session::get('sandbox_storage', '1');
+            $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/db/ai.sqlite");
 
-        if (file_exists($sandboxDbPath)) {
+            // 파일 존재 확인
+            if (!file_exists($sandboxDbPath)) {
+                $this->addError('connection', "선택된 샌드박스({$selectedSandbox})의 데이터베이스 파일이 존재하지 않습니다.");
+                return null;
+            }
+            
+            // 파일 읽기 권한 확인
+            if (!is_readable($sandboxDbPath)) {
+                $this->addError('connection', "데이터베이스 파일에 읽기 권한이 없습니다.");
+                return null;
+            }
+
+            // 연결 설정
             Config::set('database.connections.sandbox_sqlite', [
                 'driver' => 'sqlite',
                 'database' => $sandboxDbPath,
@@ -53,21 +66,31 @@ class Component extends LivewireComponent
                 'foreign_key_constraints' => true,
             ]);
 
+            // 기존 연결 정리 후 새로 연결
             DB::purge('sandbox_sqlite');
-            return DB::connection('sandbox_sqlite');
+            $connection = DB::connection('sandbox_sqlite');
+            
+            // 연결 테스트
+            $connection->getPdo();
+            
+            return $connection;
+            
+        } catch (\Exception $e) {
+            $this->addError('connection', '데이터베이스 연결 실패: ' . $e->getMessage());
+            return null;
         }
-
-        return null;
     }
 
     public function executeSql()
     {
+        // 입력 검증
         if (empty(trim($this->sqlQuery))) {
-            session()->flash('error', 'SQL 쿼리를 입력해주세요.');
+            $this->addError('query', 'SQL 쿼리를 입력해주세요.');
             return;
         }
 
         $this->isExecuting = true;
+        $this->executionResult = null;
         $startTime = microtime(true);
         $selectedSandbox = Session::get('sandbox_storage', '1');
 
@@ -75,23 +98,37 @@ class Component extends LivewireComponent
             $connection = $this->getSandboxConnection();
 
             if (!$connection) {
-                throw new \Exception('선택된 샌드박스의 데이터베이스에 연결할 수 없습니다.');
+                $this->executionResult = [
+                    'status' => 'error',
+                    'error' => '데이터베이스 연결을 할 수 없습니다.',
+                    'execution_time' => 0,
+                    'query_type' => 'unknown'
+                ];
+                return;
             }
 
             $queryType = SandboxSqlExecution::getQueryType($this->sqlQuery);
+            $sanitizedQuery = trim($this->sqlQuery);
 
             // SQL 실행
-            if (strtoupper(trim($this->sqlQuery)) === 'SELECT' || stripos($this->sqlQuery, 'SELECT') === 0) {
-                // SELECT 쿼리
-                $results = $connection->select($this->sqlQuery);
+            if (stripos($sanitizedQuery, 'SELECT') === 0 || 
+                stripos($sanitizedQuery, 'PRAGMA') === 0 || 
+                stripos($sanitizedQuery, 'SHOW') === 0) {
+                // 조회 쿼리
+                $results = $connection->select($sanitizedQuery);
                 $affectedRows = count($results);
-                $resultData = array_map(function($row) {
-                    return (array) $row;
-                }, $results);
+                $resultData = [];
+                
+                foreach ($results as $row) {
+                    $resultData[] = (array) $row;
+                }
             } else {
-                // INSERT, UPDATE, DELETE 등
-                $affectedRows = $connection->statement($this->sqlQuery);
-                $resultData = ['message' => "쿼리가 성공적으로 실행되었습니다. 영향받은 행: {$affectedRows}"];
+                // 데이터 변경 쿼리
+                $affectedRows = $connection->statement($sanitizedQuery);
+                $resultData = [
+                    'message' => "쿼리가 성공적으로 실행되었습니다.",
+                    'affected_rows' => $affectedRows
+                ];
             }
 
             $executionTime = round((microtime(true) - $startTime) * 1000);
@@ -105,23 +142,27 @@ class Component extends LivewireComponent
                 'query_type' => $queryType
             ];
 
-            // 메인 DB에 실행 기록 저장
-            SandboxSqlExecution::logExecution(
-                "storage-sandbox-{$selectedSandbox}",
-                $this->sqlQuery,
-                $queryType,
-                'success',
-                $resultData,
-                null,
-                $affectedRows,
-                $executionTime
-            );
+            // 메인 DB에 실행 기록 저장 (try-catch로 래핑하여 로깅 실패가 주요 기능을 방해하지 않도록)
+            try {
+                SandboxSqlExecution::logExecution(
+                    "storage-sandbox-{$selectedSandbox}",
+                    $this->sqlQuery,
+                    $queryType,
+                    'success',
+                    $resultData,
+                    null,
+                    $affectedRows,
+                    $executionTime
+                );
+            } catch (\Exception $logError) {
+                // 로깅 실패는 무시하고 계속 진행
+            }
 
             session()->flash('success', "SQL 실행 완료! ({$executionTime}ms, {$affectedRows}행 영향)");
 
         } catch (\Exception $e) {
             $executionTime = round((microtime(true) - $startTime) * 1000);
-            $queryType = SandboxSqlExecution::getQueryType($this->sqlQuery);
+            $queryType = SandboxSqlExecution::getQueryType($this->sqlQuery ?? '');
 
             // 에러 결과 저장
             $this->executionResult = [
@@ -132,21 +173,25 @@ class Component extends LivewireComponent
             ];
 
             // 메인 DB에 에러 기록 저장
-            SandboxSqlExecution::logExecution(
-                "storage-sandbox-{$selectedSandbox}",
-                $this->sqlQuery,
-                $queryType,
-                'error',
-                null,
-                $e->getMessage(),
-                null,
-                $executionTime
-            );
+            try {
+                SandboxSqlExecution::logExecution(
+                    "storage-sandbox-{$selectedSandbox}",
+                    $this->sqlQuery,
+                    $queryType,
+                    'error',
+                    null,
+                    $e->getMessage(),
+                    null,
+                    $executionTime
+                );
+            } catch (\Exception $logError) {
+                // 로깅 실패는 무시하고 계속 진행
+            }
 
-            session()->flash('error', '실행 오류: ' . $e->getMessage());
+            $this->addError('execution', '실행 오류: ' . $e->getMessage());
+        } finally {
+            $this->isExecuting = false;
         }
-
-        $this->isExecuting = false;
     }
 
     public function clearQuery()
@@ -177,22 +222,38 @@ class Component extends LivewireComponent
 
     public function getExecutionHistory()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        
-        return SandboxSqlExecution::where('sandbox_name', "storage-sandbox-{$selectedSandbox}")
-            ->where('user_session_id', session()->getId())
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        try {
+            $selectedSandbox = Session::get('sandbox_storage', '1');
+            
+            return SandboxSqlExecution::where('sandbox_name', "storage-sandbox-{$selectedSandbox}")
+                ->where('user_session_id', session()->getId())
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+                
+        } catch (\Exception $e) {
+            $this->addError('history', '실행 기록 조회 실패: ' . $e->getMessage());
+            return collect([])->paginate(10);
+        }
     }
 
     public function render()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        $executionHistory = $this->showHistory ? $this->getExecutionHistory() : null;
+        try {
+            $selectedSandbox = Session::get('sandbox_storage', '1');
+            $executionHistory = $this->showHistory ? $this->getExecutionHistory() : null;
 
-        return view('700-page-sandbox.702-livewire-sql-executor', [
-            'selectedSandbox' => $selectedSandbox,
-            'executionHistory' => $executionHistory
-        ]);
+            return view('700-page-sandbox.702-livewire-sql-executor', [
+                'selectedSandbox' => $selectedSandbox ?? '1',
+                'executionHistory' => $executionHistory ?? collect([])->paginate(10)
+            ]);
+            
+        } catch (\Exception $e) {
+            $this->addError('render', '페이지 로드 실패: ' . $e->getMessage());
+            
+            return view('700-page-sandbox.702-livewire-sql-executor', [
+                'selectedSandbox' => Session::get('sandbox_storage', '1'),
+                'executionHistory' => collect([])->paginate(10)
+            ]);
+        }
     }
 }

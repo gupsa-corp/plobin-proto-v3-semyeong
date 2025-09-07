@@ -19,7 +19,7 @@
             }
         }
     }"
-    class="bg-white rounded-lg shadow-lg h-[85vh] flex overflow-hidden"
+    class="bg-white h-screen flex overflow-hidden"
 >
     {{-- 좌측: 파일 트리 --}}
     <div class="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">

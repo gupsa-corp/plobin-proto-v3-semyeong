@@ -86,15 +86,27 @@ class Component extends LivewireComponent
     
     public function render()
     {
-        $tables = $this->getDatabaseTables();
-        $paginatedData = $this->getPaginatedData();
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        
-        return view('700-page-sandbox.705-livewire-database-manager', [
-            'tables' => $tables,
-            'paginatedData' => $paginatedData,
-            'selectedSandbox' => $selectedSandbox
-        ]);
+        try {
+            $tables = $this->getDatabaseTables();
+            $paginatedData = $this->getPaginatedData();
+            $selectedSandbox = Session::get('sandbox_storage', '1');
+            
+            // 안전한 기본값 보장
+            return view('700-page-sandbox.705-livewire-database-manager', [
+                'tables' => $tables ?? [],
+                'paginatedData' => $paginatedData ?? collect([])->paginate($this->perPage),
+                'selectedSandbox' => $selectedSandbox ?? '1'
+            ]);
+            
+        } catch (\Exception $e) {
+            $this->addError('render', '페이지 로드 실패: ' . $e->getMessage());
+            
+            return view('700-page-sandbox.705-livewire-database-manager', [
+                'tables' => [],
+                'paginatedData' => collect([])->paginate($this->perPage),
+                'selectedSandbox' => Session::get('sandbox_storage', '1')
+            ]);
+        }
     }
     
     public function getDatabaseTables()
