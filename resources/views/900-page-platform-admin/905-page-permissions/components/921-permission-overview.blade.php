@@ -145,7 +145,10 @@
                     </template>
                 </div>
                 <div class="mt-4 pt-4 border-t border-gray-200">
-                    <a href="#" class="text-sm text-blue-600 hover:text-blue-500">모든 변경사항 보기</a>
+                    <div class="inline-flex items-center text-sm text-gray-500">
+                        <span>모든 변경사항 보기</span>
+                        <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">개발 필요</span>
+                    </div>
                 </div>
             </div>
         </div>
