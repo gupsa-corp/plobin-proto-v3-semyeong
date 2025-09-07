@@ -8,9 +8,8 @@
             <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 16 16" fill="none">
                 <path d="M2 3C2 2.44772 2.44772 2 3 2H6.58579C6.851 2 7.10536 2.10536 7.29289 2.29289L8.41421 3.41421C8.60174 3.60174 8.85609 3.70711 9.12132 3.70711H13C13.5523 3.70711 14 4.15482 14 4.70711V12C14 12.5523 13.5523 13 13 13H3C2.44772 13 2 12.5523 2 12V3Z" stroke="currentColor" stroke-width="1.5"/>
             </svg>
-            <h2 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">프로젝트명</h2>
+            <h2 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">프로젝트</h2>
         </div>
-        <p style="font-size: 12px; color: #6B7280; margin: 0;">프로젝트 대시보드</p>
     </div>
 
     {{-- 페이지 네비게이션 --}}
@@ -18,7 +17,6 @@
         {{-- 섹션 헤더 --}}
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
             <span style="font-size: 12px; font-weight: 500; color: #6B7280;">프로젝트 페이지</span>
-            @livewire('service.project-dashboard.create-page-modal-livewire', ['projectId' => request()->route('projectId') ?? 1])
         </div>
 
         @livewire('service.project-dashboard.page-list-livewire', [
