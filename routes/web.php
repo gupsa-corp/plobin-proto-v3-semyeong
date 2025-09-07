@@ -177,6 +177,13 @@ Route::get('/organizations/{id}/admin/billing', function ($id) {
     return view('800-page-organization-admin.803-page-billing.300-billing', compact('id', 'organizations'));
 })->name('organization.admin.billing');
 
+// 결제 내역 관련 라우트들
+Route::get('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history');
+Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}', [\App\Http\Billing\PaymentDetail\Controller::class, 'show'])->name('organization.admin.billing.payment-detail');
+Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/receipt', [\App\Http\Billing\DownloadReceipt\Controller::class, 'download'])->name('organization.admin.billing.download-receipt');
+Route::post('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/retry', [\App\Http\Billing\RetryPayment\Controller::class, 'retry'])->name('organization.admin.billing.retry-payment');
+Route::get('/organizations/{organization}/admin/billing/export', [\App\Http\Billing\ExportHistory\Controller::class, 'export'])->name('organization.admin.billing.export');
+
 Route::get('/organizations/{id}/admin/projects', function ($id) {
     $projects = \App\Models\Project::where('organization_id', $id)
         ->with(['user', 'organization'])

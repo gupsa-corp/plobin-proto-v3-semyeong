@@ -110,6 +110,22 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
         Route::post('/business-info', CreateBusinessInfoController::class);
         Route::post('/business-lookup', BusinessLookupController::class);
         Route::post('/receipt/download', DownloadReceiptController::class);
+        
+        // 결제 수단 관리 API
+        Route::get('/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'index']);
+        Route::post('/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'store']);
+        Route::put('/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'update']);
+        Route::delete('/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'destroy']);
+        Route::post('/payment-methods/{paymentMethodId}/set-default', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'setDefault']);
+        
+        // 결제 내역 API
+        Route::get('/payment-history', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'index']);
+        Route::get('/payment-history/{paymentId}', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'show']);
+        
+        // 라이센스 구매 API
+        Route::get('/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
+        Route::post('/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
+        Route::get('/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
     });
 });
 
@@ -131,6 +147,22 @@ Route::prefix('test/organizations')->group(function () {
     Route::post('{organization}/billing/business-info', CreateBusinessInfoController::class);
     Route::post('{organization}/billing/business-lookup', BusinessLookupController::class);
     Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
+    
+    // 테스트용 결제 수단 관리 API
+    Route::get('{organization}/billing/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'index']);
+    Route::post('{organization}/billing/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'store']);
+    Route::put('{organization}/billing/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'update']);
+    Route::delete('{organization}/billing/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'destroy']);
+    Route::post('{organization}/billing/payment-methods/{paymentMethodId}/set-default', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'setDefault']);
+    
+    // 테스트용 결제 내역 API
+    Route::get('{organization}/billing/payment-history', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'index']);
+    Route::get('{organization}/billing/payment-history/{paymentId}', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'show']);
+    
+    // 테스트용 라이센스 구매 API
+    Route::get('{organization}/billing/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
+    Route::post('{organization}/billing/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
+    Route::get('{organization}/billing/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
 });
 
 // 샌드박스 API (개발용 - 인증 없음)

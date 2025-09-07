@@ -160,107 +160,12 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    {{-- Starter 플랜 --}}
-                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 transition-colors cursor-pointer plan-option" data-plan="starter">
-                        <div class="text-center">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Starter</h4>
-                            <div class="text-3xl font-bold text-gray-900 mb-1">₩29,000</div>
-                            <div class="text-sm text-gray-500 mb-4">월간</div>
-                            <ul class="text-left space-y-2 text-sm text-gray-600">
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    최대 5명 멤버
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    10GB 스토리지
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    기본 지원
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {{-- Pro 플랜 --}}
-                    <div class="border-2 border-blue-500 rounded-lg p-6 relative cursor-pointer plan-option" data-plan="pro">
-                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">추천</span>
-                        </div>
-                        <div class="text-center">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Pro</h4>
-                            <div class="text-3xl font-bold text-gray-900 mb-1">₹99,000</div>
-                            <div class="text-sm text-gray-500 mb-4">월간</div>
-                            <ul class="text-left space-y-2 text-sm text-gray-600">
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    최대 50명 멤버
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    500GB 스토리지
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    우선 지원
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    고급 분석
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {{-- Enterprise 플랜 --}}
-                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 transition-colors cursor-pointer plan-option" data-plan="enterprise">
-                        <div class="text-center">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Enterprise</h4>
-                            <div class="text-3xl font-bold text-gray-900 mb-1">₩199,000</div>
-                            <div class="text-sm text-gray-500 mb-4">월간</div>
-                            <ul class="text-left space-y-2 text-sm text-gray-600">
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    무제한 멤버
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    무제한 스토리지
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    24/7 전용 지원
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    커스텀 통합
-                                </li>
-                            </ul>
-                        </div>
+                {{-- 동적으로 생성될 플랜 목록 컨테이너 --}}
+                <div id="plans-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    {{-- 로딩 상태 --}}
+                    <div id="plans-loading" class="col-span-full text-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p class="text-gray-600">요금제 정보를 불러오는 중...</p>
                     </div>
                 </div>
 
@@ -286,6 +191,150 @@
                             취소
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 결제 내역 상세 모달 --}}
+    <div id="billingDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900">결제 내역 상세</h3>
+                    <button id="closeBillingDetailModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="billingDetailContent">
+                    {{-- 기본 정보 --}}
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">결제 일시</label>
+                                <p id="detailDate" class="text-gray-900 font-medium">2024.03.15 14:30</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">결제 상태</label>
+                                <span id="detailStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">결제 완료</span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">결제 금액</label>
+                                <p id="detailAmount" class="text-gray-900 font-medium text-lg">₩99,000</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">결제 ID</label>
+                                <p id="detailPaymentId" class="text-gray-600 text-sm font-mono">pay_2024031514300001</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 플랜 정보 --}}
+                    <div class="border border-gray-200 rounded-lg p-4 mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">플랜 정보</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">플랜명</span>
+                                <span id="detailPlanName" class="font-medium">Pro 플랜</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">사용 기간</span>
+                                <span id="detailPeriod" class="font-medium">2024.03.15 - 2024.04.15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">결제 방식</span>
+                                <span id="detailBillingCycle" class="font-medium">월간 구독</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 결제 수단 정보 --}}
+                    <div class="border border-gray-200 rounded-lg p-4 mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">결제 수단</h4>
+                        <div class="flex items-center gap-3">
+                            <div id="detailCardIcon" class="w-12 h-8 bg-blue-600 rounded flex items-center justify-center">
+                                <span class="text-white text-xs font-bold">VISA</span>
+                            </div>
+                            <div>
+                                <p id="detailCardNumber" class="font-medium">**** **** **** 1234</p>
+                                <p id="detailCardInfo" class="text-sm text-gray-500">VISA · 만료일: 12/26</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 결제 상세 내역 --}}
+                    <div class="border border-gray-200 rounded-lg p-4 mb-6" id="billingBreakdown">
+                        <h4 class="font-medium text-gray-900 mb-3">결제 내역</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pro 플랜 (월간)</span>
+                                <span class="font-medium">₩99,000</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">VAT (10%)</span>
+                                <span>₩9,000</span>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex justify-between font-medium text-lg">
+                                <span>총 결제 금액</span>
+                                <span id="detailTotalAmount">₩108,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 실패 정보 (실패 시에만 표시) --}}
+                    <div id="failureInfo" class="border border-red-200 bg-red-50 rounded-lg p-4 mb-6 hidden">
+                        <h4 class="font-medium text-red-900 mb-3">결제 실패 정보</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-red-700">실패 사유</span>
+                                <span id="failureReason" class="font-medium text-red-900">한도 초과</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-red-700">실패 시간</span>
+                                <span id="failureTime" class="font-medium text-red-900">2024.03.10 15:45</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-red-700">에러 코드</span>
+                                <span id="errorCode" class="font-medium font-mono text-red-900">LIMIT_EXCEEDED</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 환불 정보 (환불 시에만 표시) --}}
+                    <div id="refundInfo" class="border border-purple-200 bg-purple-50 rounded-lg p-4 mb-6 hidden">
+                        <h4 class="font-medium text-purple-900 mb-3">환불 정보</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-purple-700">환불 사유</span>
+                                <span id="refundReason" class="font-medium text-purple-900">중도 해지</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-purple-700">환불 금액</span>
+                                <span id="refundAmount" class="font-medium text-purple-900">₩33,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-purple-700">환불 처리일</span>
+                                <span id="refundDate" class="font-medium text-purple-900">2024.01.25</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 액션 버튼 --}}
+                <div class="flex gap-3 mt-6">
+                    <button id="downloadReceiptBtn" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
+                        영수증 다운로드
+                    </button>
+                    <button id="retryPaymentBtn" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 hidden">
+                        결제 재시도
+                    </button>
+                    <button id="contactSupportBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                        고객지원
+                    </button>
                 </div>
             </div>
         </div>

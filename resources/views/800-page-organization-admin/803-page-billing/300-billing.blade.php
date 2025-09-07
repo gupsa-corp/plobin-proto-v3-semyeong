@@ -12,7 +12,6 @@
             <div class="p-6">
                 @include('800-page-organization-admin.803-page-billing.301-billing-header')
                 @include('800-page-organization-admin.803-page-billing.302-billing-subscription-status')
-                @include('800-page-organization-admin.803-page-billing.303-billing-usage-limits')
                 @include('800-page-organization-admin.803-page-billing.304-billing-payment-methods')
                 @include('800-page-organization-admin.803-page-billing.305-billing-payment-history')
             </div>

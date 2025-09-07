@@ -32,6 +32,7 @@ class PaymentMethodSeeder extends Seeder
                 'expiry_year' => '2026',
                 'is_default' => true,
                 'is_active' => true,
+                'priority' => 1,
                 'toss_response' => [
                     'mId' => 'tvivarepublic',
                     'customerKey' => 'customer_' . $organization->id,
@@ -67,6 +68,7 @@ class PaymentMethodSeeder extends Seeder
                 'expiry_year' => '2025',
                 'is_default' => true,
                 'is_active' => true,
+                'priority' => 1,
                 'toss_response' => [
                     'mId' => 'tvivarepublic',
                     'customerKey' => 'customer_' . $starterOrg->id,
@@ -100,6 +102,7 @@ class PaymentMethodSeeder extends Seeder
                 'expiry_year' => '2027',
                 'is_default' => true,
                 'is_active' => false, // 구독 취소로 인해 비활성화
+                'priority' => 1,
                 'toss_response' => [
                     'mId' => 'tvivarepublic',
                     'customerKey' => 'customer_' . $cancelledOrg->id,
@@ -148,6 +151,7 @@ class PaymentMethodSeeder extends Seeder
             'expiry_year' => '2025',
             'is_default' => false,
             'is_active' => true,
+            'priority' => 2,
             'toss_response' => [
                 'mId' => 'tvivarepublic',
                 'customerKey' => 'customer_' . $organization->id,
