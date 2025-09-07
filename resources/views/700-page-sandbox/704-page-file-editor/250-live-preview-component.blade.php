@@ -1,6 +1,6 @@
-<div class="live-preview-wrapper">
+<div class="live-preview-wrapper h-full">
     {{-- 메인 미리보기 영역 --}}
-    <div class="live-preview-component bg-gray-50 border-l border-gray-200 flex flex-col">
+    <div class="live-preview-component w-full h-full bg-gray-50 flex flex-col">
         {{-- 미리보기 헤더 --}}
         <div class="flex items-center px-4 py-2 bg-gray-100 border-b border-gray-200">
             <span class="text-sm font-medium text-gray-600">실시간 미리보기</span>

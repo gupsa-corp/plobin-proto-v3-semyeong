@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Models\SandboxSqlExecution;
 use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class Component extends LivewireComponent
 {
@@ -17,12 +19,15 @@ class Component extends LivewireComponent
     public $executionResult = null;
     public $isExecuting = false;
     public $showHistory = false;
+    public $tables = [];
+    public $selectedTable = null;
 
     protected $listeners = ['sqlExecuted'];
 
     public function mount()
     {
         $this->setupSandboxDatabase();
+        $this->loadTables();
     }
 
     private function setupSandboxDatabase()
@@ -38,6 +43,32 @@ class Component extends LivewireComponent
                 'foreign_key_constraints' => true,
             ]);
         }
+    }
+
+    private function loadTables()
+    {
+        try {
+            $connection = $this->getSandboxConnection();
+            if (!$connection) {
+                $this->tables = [];
+                return;
+            }
+
+            // SQLite에서 테이블 목록 조회
+            $tables = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+            $this->tables = array_map(function($table) {
+                return (array)$table;
+            }, $tables);
+        } catch (\Exception $e) {
+            $this->addError('tables', '테이블 목록 로드 실패: ' . $e->getMessage());
+            $this->tables = [];
+        }
+    }
+
+    public function selectTable($tableName)
+    {
+        $this->selectedTable = $tableName;
+        $this->sqlQuery = "SELECT * FROM {$tableName} LIMIT 100;";
     }
 
     private function getSandboxConnection()
@@ -232,7 +263,10 @@ class Component extends LivewireComponent
                 
         } catch (\Exception $e) {
             $this->addError('history', '실행 기록 조회 실패: ' . $e->getMessage());
-            return collect([])->paginate(10);
+            return new LengthAwarePaginator([], 0, 10, 1, [
+                'path' => request()->url(),
+                'pageName' => 'page'
+            ]);
         }
     }
 
@@ -240,11 +274,14 @@ class Component extends LivewireComponent
     {
         try {
             $selectedSandbox = Session::get('sandbox_storage', '1');
-            $executionHistory = $this->showHistory ? $this->getExecutionHistory() : null;
+            $executionHistory = $this->getExecutionHistory();
 
             return view('700-page-sandbox.702-livewire-sql-executor', [
                 'selectedSandbox' => $selectedSandbox ?? '1',
-                'executionHistory' => $executionHistory ?? collect([])->paginate(10)
+                'executionHistory' => $executionHistory ?? new LengthAwarePaginator([], 0, 10, 1, [
+                    'path' => request()->url(),
+                    'pageName' => 'page'
+                ])
             ]);
             
         } catch (\Exception $e) {
@@ -252,7 +289,10 @@ class Component extends LivewireComponent
             
             return view('700-page-sandbox.702-livewire-sql-executor', [
                 'selectedSandbox' => Session::get('sandbox_storage', '1'),
-                'executionHistory' => collect([])->paginate(10)
+                'executionHistory' => new LengthAwarePaginator([], 0, 10, 1, [
+                    'path' => request()->url(),
+                    'pageName' => 'page'
+                ])
             ]);
         }
     }

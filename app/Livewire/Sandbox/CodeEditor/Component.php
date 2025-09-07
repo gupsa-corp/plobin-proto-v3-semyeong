@@ -22,7 +22,7 @@ class Component extends LivewireComponent implements HasForms
     
     public ?array $data = [];
 
-    protected $listeners = ['openFile', 'closeTab', 'setActiveTab', 'file-selected'];
+    protected $listeners = ['openFile', 'closeTab', 'setActiveTab', 'file-selected', 'saveCurrentFile'];
 
     public function mount()
     {
