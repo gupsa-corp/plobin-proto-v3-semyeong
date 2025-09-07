@@ -234,13 +234,16 @@ Route::get('/platform/admin/permissions/permissions', function () {
     return view('900-page-platform-admin.905-page-permissions.902-tab-permissions.000-index');
 })->name('platform.admin.permissions.permissions');
 
-Route::get('/platform/admin/permissions/users', function () {
-    return view('900-page-platform-admin.905-page-permissions.903-tab-users.000-index');
-})->name('platform.admin.permissions.users');
+Route::get('/platform/admin/permissions/users', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'permissionsUsers'])->name('platform.admin.permissions.users');
 
 Route::get('/platform/admin/permissions/audit', function () {
     return view('900-page-platform-admin.905-page-permissions.904-tab-audit.000-index');
 })->name('platform.admin.permissions.audit');
+
+// 플랫폼 관리자 - 사용자 권한 관리 API
+Route::post('/platform/admin/permissions/users/change-role', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'changeUserRole'])->name('platform.admin.permissions.users.change-role');
+Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
+Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
 
 // AI 샌드박스 페이지들 - 실제 존재하는 파일들만 라우트 등록
 // 메인 인덱스

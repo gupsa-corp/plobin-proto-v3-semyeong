@@ -20,6 +20,10 @@
                     @include('900-page-platform-admin.905-page-permissions.903-tab-users.100-header')
                     @include('900-page-platform-admin.905-page-permissions.903-tab-users.200-content-main')
                 </div>
+                
+                {{-- 모달들 --}}
+                @include('900-page-platform-admin.905-page-permissions.903-tab-users.400-role-change-modal')
+                @include('900-page-platform-admin.905-page-permissions.903-tab-users.401-tenant-permission-modal')
             </div>
         </div>
     </div>
