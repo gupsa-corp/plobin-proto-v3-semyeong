@@ -10,10 +10,315 @@ class Component extends LivewireComponent
     public $apiCode = '';
     public $apiName = '';
     public $apiDescription = '';
+    public $selectedTemplate = '';
+    public $httpMethod = 'GET';
+    public $apiRoute = '';
+    public $generateController = false;
+
+    public function mount()
+    {
+        $this->apiRoute = 'api/' . strtolower(str_replace(' ', '-', $this->apiName));
+    }
 
     public function render()
     {
-        return view('700-page-sandbox.703-livewire-api-creator');
+        return view('700-page-sandbox.703-livewire-api-creator', [
+            'templates' => $this->getTemplates()
+        ]);
+    }
+
+    public function updatedApiName()
+    {
+        $this->apiRoute = 'api/' . strtolower(str_replace(' ', '-', $this->apiName));
+    }
+
+    public function loadTemplate()
+    {
+        if (empty($this->selectedTemplate)) {
+            return;
+        }
+
+        $templates = $this->getTemplates();
+        if (isset($templates[$this->selectedTemplate])) {
+            $this->apiCode = $templates[$this->selectedTemplate]['code'];
+            $this->apiDescription = $templates[$this->selectedTemplate]['description'];
+            $this->httpMethod = $templates[$this->selectedTemplate]['method'];
+            
+            session()->flash('message', "템플릿 '{$templates[$this->selectedTemplate]['name']}'이 로드되었습니다.");
+        }
+    }
+
+    private function getTemplates()
+    {
+        return [
+            'basic_get' => [
+                'name' => '기본 GET API',
+                'description' => '간단한 데이터 조회 API',
+                'method' => 'GET',
+                'code' => '<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ' . ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        // 데이터 조회 로직
+        $data = [
+            "message" => "Hello from ' . $this->apiName . ' API",
+            "timestamp" => now(),
+            "data" => []
+        ];
+        
+        return response()->json($data);
+    }
+}'
+            ],
+            'crud_resource' => [
+                'name' => 'CRUD 리소스 API',
+                'description' => '완전한 CRUD 작업을 지원하는 리소스 API',
+                'method' => 'RESOURCE',
+                'code' => '<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ' . ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return response()->json([
+            "data" => [],
+            "message" => "Success"
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            // 유효성 검사 규칙
+        ]);
+
+        // 생성 로직
+        
+        return response()->json([
+            "message" => "Resource created successfully",
+            "data" => []
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        // 단일 리소스 조회
+        
+        return response()->json([
+            "data" => [],
+            "message" => "Success"
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            // 유효성 검사 규칙
+        ]);
+
+        // 업데이트 로직
+        
+        return response()->json([
+            "message" => "Resource updated successfully",
+            "data" => []
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        // 삭제 로직
+        
+        return response()->json([
+            "message" => "Resource deleted successfully"
+        ]);
+    }
+}'
+            ],
+            'auth_api' => [
+                'name' => '인증 API',
+                'description' => '로그인/회원가입 등 인증 관련 API',
+                'method' => 'POST',
+                'code' => '<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
+class AuthController extends Controller
+{
+    /**
+     * User login
+     */
+    public function login(Request $request)
+    {
+        $request->validate([
+            "email" => "required|email",
+            "password" => "required"
+        ]);
+
+        if (Auth::attempt($request->only("email", "password"))) {
+            $user = Auth::user();
+            $token = $user->createToken("API Token")->plainTextToken;
+
+            return response()->json([
+                "message" => "Login successful",
+                "token" => $token,
+                "user" => $user
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Invalid credentials"
+        ], 401);
+    }
+
+    /**
+     * User registration
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            "name" => "required|string|max:255",
+            "email" => "required|string|email|max:255|unique:users",
+            "password" => "required|string|min:8|confirmed"
+        ]);
+
+        $user = User::create([
+            "name" => $request->name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password)
+        ]);
+
+        $token = $user->createToken("API Token")->plainTextToken;
+
+        return response()->json([
+            "message" => "Registration successful",
+            "token" => $token,
+            "user" => $user
+        ], 201);
+    }
+
+    /**
+     * User logout
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            "message" => "Logged out successfully"
+        ]);
+    }
+}'
+            ],
+            'file_upload' => [
+                'name' => '파일 업로드 API',
+                'description' => '파일 업로드를 처리하는 API',
+                'method' => 'POST',
+                'code' => '<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class FileUploadController extends Controller
+{
+    /**
+     * Handle file upload
+     */
+    public function upload(Request $request)
+    {
+        $request->validate([
+            "file" => "required|file|max:2048", // 2MB 제한
+            "folder" => "nullable|string"
+        ]);
+
+        try {
+            $file = $request->file("file");
+            $folder = $request->input("folder", "uploads");
+            
+            $filename = time() . "_" . $file->getClientOriginalName();
+            $path = $file->storeAs($folder, $filename, "public");
+
+            return response()->json([
+                "message" => "File uploaded successfully",
+                "data" => [
+                    "filename" => $filename,
+                    "path" => $path,
+                    "url" => Storage::url($path),
+                    "size" => $file->getSize(),
+                    "mime_type" => $file->getMimeType()
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "File upload failed",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete uploaded file
+     */
+    public function delete(Request $request)
+    {
+        $request->validate([
+            "path" => "required|string"
+        ]);
+
+        if (Storage::disk("public")->exists($request->path)) {
+            Storage::disk("public")->delete($request->path);
+            
+            return response()->json([
+                "message" => "File deleted successfully"
+            ]);
+        }
+
+        return response()->json([
+            "message" => "File not found"
+        ], 404);
+    }
+}'
+            ]
+        ];
     }
 
     public function saveApi()
@@ -33,25 +338,47 @@ class Component extends LivewireComponent
 
         try {
             $fileName = $this->sanitizeFileName($this->apiName);
-            $filePath = storage_path('sandbox/api/' . $fileName . '.php');
+            $results = [];
+
+            // 1. Sandbox 디렉토리에 저장 (기존 기능)
+            $sandboxPath = storage_path('sandbox/api/' . $fileName . '.php');
             
-            // 디렉토리 생성
-            if (!File::exists(dirname($filePath))) {
-                File::makeDirectory(dirname($filePath), 0755, true);
+            if (!File::exists(dirname($sandboxPath))) {
+                File::makeDirectory(dirname($sandboxPath), 0755, true);
             }
 
-            // 메타데이터와 함께 파일 저장
             $fileContent = "<?php\n\n";
             $fileContent .= "/**\n";
             $fileContent .= " * API Name: {$this->apiName}\n";
             $fileContent .= " * Description: {$this->apiDescription}\n";
+            $fileContent .= " * HTTP Method: {$this->httpMethod}\n";
+            $fileContent .= " * Route: {$this->apiRoute}\n";
             $fileContent .= " * Created: " . now()->format('Y-m-d H:i:s') . "\n";
             $fileContent .= " */\n\n";
             $fileContent .= $this->apiCode;
 
-            File::put($filePath, $fileContent);
+            File::put($sandboxPath, $fileContent);
+            $results[] = "샌드박스: {$sandboxPath}";
 
-            session()->flash('message', "API '{$this->apiName}'가 성공적으로 저장되었습니다. 경로: {$filePath}");
+            // 2. 실제 컨트롤러 생성 (선택사항)
+            if ($this->generateController) {
+                $controllerName = ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller';
+                $controllerPath = app_path('Http/Controllers/Api/' . $controllerName . '.php');
+                
+                if (!File::exists(dirname($controllerPath))) {
+                    File::makeDirectory(dirname($controllerPath), 0755, true);
+                }
+
+                File::put($controllerPath, $this->apiCode);
+                $results[] = "컨트롤러: {$controllerPath}";
+
+                // 3. 라우트 파일에 추가 제안
+                $routeContent = $this->generateRouteCode();
+                $results[] = "제안된 라우트:\n{$routeContent}";
+            }
+
+            $message = "API '{$this->apiName}'가 성공적으로 저장되었습니다.\n" . implode("\n", $results);
+            session()->flash('message', $message);
             
         } catch (\Exception $e) {
             session()->flash('error', 'API 저장 중 오류가 발생했습니다: ' . $e->getMessage());
@@ -101,5 +428,77 @@ class Component extends LivewireComponent
         unlink($tempFile);
         
         return $return_var === 0;
+    }
+
+    private function generateRouteCode()
+    {
+        $controllerName = ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller';
+        $route = $this->apiRoute;
+        
+        $routeCode = "// routes/api.php에 추가할 라우트 코드:\n";
+        
+        switch ($this->httpMethod) {
+            case 'GET':
+                $routeCode .= "Route::get('{$route}', [App\\Http\\Controllers\\Api\\{$controllerName}::class, 'index']);";
+                break;
+                
+            case 'POST':
+                $routeCode .= "Route::post('{$route}', [App\\Http\\Controllers\\Api\\{$controllerName}::class, 'store']);";
+                break;
+                
+            case 'RESOURCE':
+                $routeCode .= "Route::apiResource('{$route}', App\\Http\\Controllers\\Api\\{$controllerName}::class);";
+                break;
+                
+            default:
+                $routeCode .= "Route::{$this->httpMethod}('{$route}', [App\\Http\\Controllers\\Api\\{$controllerName}::class, 'handle']);";
+        }
+        
+        return $routeCode;
+    }
+
+    public function generateApiDoc()
+    {
+        if (empty($this->apiCode) || empty($this->apiName)) {
+            session()->flash('error', 'API 코드와 이름을 입력하세요.');
+            return;
+        }
+
+        $doc = "# {$this->apiName} API 문서\n\n";
+        $doc .= "## 설명\n{$this->apiDescription}\n\n";
+        $doc .= "## 엔드포인트\n";
+        $doc .= "- **URL**: `/{$this->apiRoute}`\n";
+        $doc .= "- **Method**: `{$this->httpMethod}`\n\n";
+        
+        if ($this->httpMethod === 'RESOURCE') {
+            $doc .= "### 사용 가능한 엔드포인트\n";
+            $doc .= "- `GET /{$this->apiRoute}` - 목록 조회\n";
+            $doc .= "- `POST /{$this->apiRoute}` - 새 리소스 생성\n";
+            $doc .= "- `GET /{$this->apiRoute}/{id}` - 단일 리소스 조회\n";
+            $doc .= "- `PUT /{$this->apiRoute}/{id}` - 리소스 업데이트\n";
+            $doc .= "- `DELETE /{$this->apiRoute}/{id}` - 리소스 삭제\n\n";
+        }
+        
+        $doc .= "## 응답 예시\n";
+        $doc .= "```json\n";
+        $doc .= "{\n";
+        $doc .= "  \"message\": \"Success\",\n";
+        $doc .= "  \"data\": []\n";
+        $doc .= "}\n";
+        $doc .= "```\n\n";
+        
+        $doc .= "## 생성일시\n" . now()->format('Y-m-d H:i:s') . "\n";
+
+        // 문서 저장
+        $fileName = $this->sanitizeFileName($this->apiName);
+        $docPath = storage_path('sandbox/api/docs/' . $fileName . '.md');
+        
+        if (!File::exists(dirname($docPath))) {
+            File::makeDirectory(dirname($docPath), 0755, true);
+        }
+        
+        File::put($docPath, $doc);
+        
+        session()->flash('message', "API 문서가 생성되었습니다: {$docPath}");
     }
 }

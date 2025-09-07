@@ -274,7 +274,7 @@ Route::get('/sandbox/database-manager', function () {
 
 // Git 버전 관리
 Route::get('/sandbox/git-version-control', function () {
-    return view('700-page-sandbox.705-local-git-version-contorl.000-index');
+    return view('700-page-sandbox.706-page-git-version-control.000-index');
 })->name('sandbox.git-version-control');
 
 // 파일 매니저 추가
