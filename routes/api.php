@@ -187,6 +187,11 @@ Route::prefix('sandbox')->group(function () {
         Route::get('/load/{filename}', \App\Http\Sandbox\FormCreator\Load\Controller::class);
         Route::delete('/delete/{filename}', \App\Http\Sandbox\FormCreator\Delete\Controller::class);
     });
+    
+    // Form Publisher API
+    Route::prefix('form-publisher')->group(function () {
+        Route::post('/save', \App\Http\Sandbox\FormPublisher\Save\Controller::class);
+    });
 });
 
 // 플랫폼 관리자 - 요금제 관리 API (개발용 - 인증 없음)

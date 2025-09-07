@@ -363,7 +363,7 @@ $defaultJson = json_encode([
     <header class="header">
         <h1>🎨 Form Publisher - 폼 에디터</h1>
         <nav class="nav-links">
-            <a href="form-publisher-list.php">📋 폼 목록</a>
+            <a href="/sandbox/form-publisher/list">📋 폼 목록</a>
             <a href="../index.php">🏠 홈</a>
         </nav>
     </header>
@@ -377,7 +377,7 @@ $defaultJson = json_encode([
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="">
+        <form id="formPublisherForm" onsubmit="return false;">
             <input type="hidden" name="action" value="save">
             
             <div class="form-info">
@@ -416,7 +416,7 @@ $defaultJson = json_encode([
             </div>
 
             <div class="actions">
-                <button type="submit" class="btn btn-primary">💾 폼 저장</button>
+                <button type="button" class="btn btn-primary" onclick="saveForm()">💾 폼 저장</button>
                 <button type="button" class="btn btn-secondary" onclick="loadTemplate()">📄 템플릿 불러오기</button>
                 <button type="button" class="btn btn-success" onclick="updatePreview()">🔄 미리보기 업데이트</button>
             </div>
@@ -467,6 +467,60 @@ $defaultJson = json_encode([
                 jsonTextarea.value = <?= json_encode($defaultJson) ?>;
                 updatePreview();
             }
+        }
+        
+        function saveForm() {
+            const title = document.querySelector('input[name="title"]').value;
+            const description = document.querySelector('input[name="description"]').value;
+            const formJson = jsonTextarea.value;
+            
+            if (!title.trim()) {
+                alert('폼 제목을 입력하세요.');
+                return;
+            }
+            
+            if (!formJson.trim()) {
+                alert('폼 JSON을 입력하세요.');
+                return;
+            }
+            
+            // 현재 페이지로 POST 요청
+            const formData = new FormData();
+            formData.append('action', 'save');
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('form_json', formJson);
+            
+            // 버튼 비활성화
+            const saveButton = document.querySelector('button[onclick="saveForm()"]');
+            const originalText = saveButton.textContent;
+            saveButton.textContent = '저장 중...';
+            saveButton.disabled = true;
+            
+            fetch('/api/sandbox/form-publisher/save', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('폼이 성공적으로 저장되었습니다! (ID: ' + data.form_id + ')');
+                    
+                    // 폼 목록 페이지로 이동
+                    setTimeout(() => {
+                        window.location.href = '/sandbox/form-publisher/list';
+                    }, 1000);
+                } else {
+                    alert('저장 실패: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('저장 중 오류가 발생했습니다: ' + error.message);
+            })
+            .finally(() => {
+                saveButton.textContent = originalText;
+                saveButton.disabled = false;
+            });
         }
         
         // 페이지 로드 시 초기 미리보기

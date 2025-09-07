@@ -363,7 +363,7 @@ $stats = $statsResult['success'] ? $statsResult['statistics'] : null;
     <header class="header">
         <h1>📋 Form Publisher - 폼 목록</h1>
         <nav class="nav-links">
-            <a href="form-publisher-editor.php">✏️ 새 폼 만들기</a>
+            <a href="/sandbox/form-publisher/editor">✏️ 새 폼 만들기</a>
             <a href="../index.php">🏠 홈</a>
         </nav>
     </header>
@@ -414,7 +414,7 @@ $stats = $statsResult['success'] ? $statsResult['statistics'] : null;
             <div class="forms-table">
                 <div class="table-header">
                     <h2>폼 목록 (총 <?= $total ?>개)</h2>
-                    <a href="form-publisher-editor.php" class="btn btn-success">➕ 새 폼 만들기</a>
+                    <a href="/sandbox/form-publisher/editor" class="btn btn-success">➕ 새 폼 만들기</a>
                 </div>
                 
                 <table class="table">
@@ -444,9 +444,9 @@ $stats = $statsResult['success'] ? $statsResult['statistics'] : null;
                                 <td class="text-muted"><?= date('m/d H:i', strtotime($form['updated_at'])) ?></td>
                                 <td>
                                     <div class="actions">
-                                        <a href="form-publisher-preview.php?id=<?= $form['id'] ?>" 
+                                        <a href="/sandbox/form-publisher/preview/<?= $form['id'] ?>" 
                                            class="btn btn-primary btn-sm" title="미리보기">👀</a>
-                                        <a href="form-publisher-editor.php?edit=<?= $form['id'] ?>" 
+                                        <a href="/sandbox/form-publisher/editor?edit=<?= $form['id'] ?>" 
                                            class="btn btn-warning btn-sm" title="편집">✏️</a>
                                         
                                         <form method="POST" style="display: inline;" 
@@ -500,7 +500,7 @@ $stats = $statsResult['success'] ? $statsResult['statistics'] : null;
                 <?php else: ?>
                     <h2>📝 아직 생성된 폼이 없습니다</h2>
                     <p>첫 번째 폼을 만들어보세요!</p>
-                    <a href="form-publisher-editor.php" class="btn btn-primary">➕ 새 폼 만들기</a>
+                    <a href="/sandbox/form-publisher/editor" class="btn btn-primary">➕ 새 폼 만들기</a>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

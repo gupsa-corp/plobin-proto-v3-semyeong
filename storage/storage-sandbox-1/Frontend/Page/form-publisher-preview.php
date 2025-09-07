@@ -16,7 +16,7 @@ $submissionResult = null;
 
 // 폼 ID가 없으면 목록으로 리다이렉트
 if (!$formId) {
-    header('Location: form-publisher-list.php');
+    header('Location: /sandbox/form-publisher/list');
     exit;
 }
 
@@ -322,8 +322,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $form) {
     <header class="header">
         <h1>👀 Form Publisher - 폼 미리보기</h1>
         <nav class="nav-links">
-            <a href="form-publisher-editor.php">✏️ 새 폼 만들기</a>
-            <a href="form-publisher-list.php">📋 폼 목록</a>
+            <a href="/sandbox/form-publisher/editor">✏️ 새 폼 만들기</a>
+            <a href="/sandbox/form-publisher/list">📋 폼 목록</a>
             <a href="../index.php">🏠 홈</a>
         </nav>
     </header>
@@ -365,8 +365,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $form) {
             <?php endif; ?>
 
             <div class="actions">
-                <a href="form-publisher-editor.php?edit=<?= $form['id'] ?>" class="btn btn-warning">✏️ 이 폼 편집</a>
-                <a href="form-publisher-list.php" class="btn btn-secondary">📋 폼 목록</a>
+                <a href="/sandbox/form-publisher/editor?edit=<?= $form['id'] ?>" class="btn btn-warning">✏️ 이 폼 편집</a>
+                <a href="/sandbox/form-publisher/list" class="btn btn-secondary">📋 폼 목록</a>
                 <?php if ($submissionResult && $submissionResult['success']): ?>
                     <a href="?id=<?= $formId ?>" class="btn btn-primary">🔄 다시 입력</a>
                 <?php endif; ?>
@@ -377,8 +377,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $form) {
                 <p>요청하신 폼을 찾을 수 없습니다. 폼이 삭제되었거나 존재하지 않는 ID입니다.</p>
                 
                 <div class="actions">
-                    <a href="form-publisher-list.php" class="btn btn-primary">📋 폼 목록으로 이동</a>
-                    <a href="form-publisher-editor.php" class="btn btn-secondary">✏️ 새 폼 만들기</a>
+                    <a href="/sandbox/form-publisher/list" class="btn btn-primary">📋 폼 목록으로 이동</a>
+                    <a href="/sandbox/form-publisher/editor" class="btn btn-secondary">✏️ 새 폼 만들기</a>
                 </div>
             </div>
         <?php endif; ?>

@@ -16,7 +16,18 @@
             @php
                 // 샌드박스 경로 설정
                 $sandboxPath = storage_path('storage-sandbox-1/Frontend/Page');
-                $page = $page ?? 'list';
+                
+                // URL에서 페이지 타입 결정
+                $currentPath = request()->path();
+                if (str_contains($currentPath, '/editor')) {
+                    $page = 'editor';
+                } elseif (str_contains($currentPath, '/preview')) {
+                    $page = 'preview';
+                } elseif (str_contains($currentPath, '/list')) {
+                    $page = 'list';
+                } else {
+                    $page = 'list'; // 기본값
+                }
                 
                 // 페이지별 파일 매핑
                 $pageFiles = [
