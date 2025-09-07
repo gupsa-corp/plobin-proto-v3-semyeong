@@ -14,7 +14,13 @@
         </div>
     </div>
     
-    @filemanagerScripts
+    <!-- Livewire Scripts -->
     @livewireScripts
+    
+    <!-- Filament Scripts -->
+    @filamentScripts
+    
+    <!-- Filemanager Scripts -->
+    @filemanagerScripts
 </body>
 </html>

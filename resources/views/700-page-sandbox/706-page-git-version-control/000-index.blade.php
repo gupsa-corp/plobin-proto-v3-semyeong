@@ -11,6 +11,10 @@
             @include('700-page-sandbox.706-page-git-version-control.200-content-main')
         </div>
     </div>
+    <!-- Livewire Scripts -->
     @livewireScripts
+    
+    <!-- Filament Scripts -->
+    @filamentScripts
 </body>
 </html>

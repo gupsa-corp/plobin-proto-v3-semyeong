@@ -14,8 +14,9 @@
     <!-- Filemanager 스타일 -->
     @filemanagerStyles
     
-    <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <!-- Filament Styles -->
+    @filamentStyles
+    
+    <!-- Livewire Styles -->
     @livewireStyles
 </head>

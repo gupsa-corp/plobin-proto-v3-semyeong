@@ -94,6 +94,13 @@
         });
     </script>
     
+    <!-- Filament Scripts -->
+    @filamentScripts
+    
+    <!-- Livewire Scripts -->
     @livewireScripts
+    
+    <!-- Filemanager Scripts -->
+    @filemanagerScripts
 </body>
 </html>

@@ -8,6 +8,10 @@
     <div class="min-h-screen sandbox-container p-4">
         @livewire('sandbox.file-editor')
     </div>
+    <!-- Livewire Scripts -->
     @livewireScripts
+    
+    <!-- Filament Scripts -->
+    @filamentScripts
 </body>
 </html>

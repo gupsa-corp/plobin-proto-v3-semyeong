@@ -13,6 +13,10 @@
             @livewire('sandbox.blade-list.component')
         </div>
     </div>
+    <!-- Livewire Scripts -->
     @livewireScripts
+    
+    <!-- Filament Scripts -->
+    @filamentScripts
 </body>
 </html>

@@ -45,7 +45,14 @@ class Component extends LivewireComponent
             $this->httpMethod = $templates[$this->selectedTemplate]['method'];
             
             session()->flash('message', "템플릿 '{$templates[$this->selectedTemplate]['name']}'이 로드되었습니다.");
+            $this->dispatch('template-loaded');
         }
+    }
+
+    public function refreshPreview()
+    {
+        // 실시간 미리보기 새로고침 - 현재는 클라이언트사이드에서 처리
+        session()->flash('message', '미리보기가 새로고침되었습니다.');
     }
 
     private function getTemplates()
@@ -55,43 +62,87 @@ class Component extends LivewireComponent
                 'name' => '기본 GET API',
                 'description' => '간단한 데이터 조회 API',
                 'method' => 'GET',
-                'code' => '<?php
-
-namespace App\Http\Controllers\Api;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-class ' . ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        // 데이터 조회 로직
-        $data = [
-            "message" => "Hello from ' . $this->apiName . ' API",
-            "timestamp" => now(),
-            "data" => []
-        ];
-        
-        return response()->json($data);
-    }
-}'
+                'category' => 'basic',
+                'code' => $this->generateBasicGetTemplate()
             ],
             'crud_resource' => [
                 'name' => 'CRUD 리소스 API',
                 'description' => '완전한 CRUD 작업을 지원하는 리소스 API',
                 'method' => 'RESOURCE',
-                'code' => '<?php
+                'category' => 'crud',
+                'code' => $this->generateCrudResourceTemplate()
+            ],
+            'auth_api' => [
+                'name' => '인증 API',
+                'description' => '로그인/회원가입 등 인증 관련 API',
+                'method' => 'POST',
+                'category' => 'auth',
+                'code' => $this->generateAuthApiTemplate()
+            ],
+            'file_upload' => [
+                'name' => '파일 업로드 API',
+                'description' => '파일 업로드를 처리하는 API',
+                'method' => 'POST',
+                'category' => 'file',
+                'code' => $this->generateFileUploadTemplate()
+            ],
+            'pagination_api' => [
+                'name' => '페이지네이션 API',
+                'description' => '페이지네이션이 포함된 목록 조회 API',
+                'method' => 'GET',
+                'category' => 'advanced',
+                'code' => $this->generatePaginationTemplate()
+            ],
+            'search_api' => [
+                'name' => '검색 API',
+                'description' => '키워드 검색 기능이 있는 API',
+                'method' => 'GET',
+                'category' => 'advanced',
+                'code' => $this->generateSearchTemplate()
+            ]
+        ];
+    }
 
-namespace App\Http\Controllers\Api;
+    private function generateBasicGetTemplate()
+    {
+        $className = ucfirst(str_replace(' ', '', $this->apiName ?: 'Example'));
+        return "<?php
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+namespace App\\Http\\Controllers\\Api;
 
-class ' . ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller extends Controller
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+
+class {$className}Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request \$request)
+    {
+        // 데이터 조회 로직
+        \$data = [
+            \"message\" => \"Hello from {$this->apiName} API\",
+            \"timestamp\" => now(),
+            \"data\" => []
+        ];
+        
+        return response()->json(\$data);
+    }
+}";
+    }
+
+    private function generateCrudResourceTemplate()
+    {
+        $className = ucfirst(str_replace(' ', '', $this->apiName ?: 'Example'));
+        return "<?php
+
+namespace App\\Http\\Controllers\\Api;
+
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+
+class {$className}Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -99,198 +150,196 @@ class ' . ucfirst(str_replace(' ', '', $this->apiName)) . 'Controller extends Co
     public function index()
     {
         return response()->json([
-            "data" => [],
-            "message" => "Success"
+            \"data\" => [],
+            \"message\" => \"Success\"
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request \$request)
     {
-        $request->validate([
+        \$request->validate([
             // 유효성 검사 규칙
         ]);
 
         // 생성 로직
         
         return response()->json([
-            "message" => "Resource created successfully",
-            "data" => []
+            \"message\" => \"Resource created successfully\",
+            \"data\" => []
         ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string \$id)
     {
         // 단일 리소스 조회
         
         return response()->json([
-            "data" => [],
-            "message" => "Success"
+            \"data\" => [],
+            \"message\" => \"Success\"
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request \$request, string \$id)
     {
-        $request->validate([
+        \$request->validate([
             // 유효성 검사 규칙
         ]);
 
         // 업데이트 로직
         
         return response()->json([
-            "message" => "Resource updated successfully",
-            "data" => []
+            \"message\" => \"Resource updated successfully\",
+            \"data\" => []
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string \$id)
     {
         // 삭제 로직
         
         return response()->json([
-            "message" => "Resource deleted successfully"
+            \"message\" => \"Resource deleted successfully\"
         ]);
     }
-}'
-            ],
-            'auth_api' => [
-                'name' => '인증 API',
-                'description' => '로그인/회원가입 등 인증 관련 API',
-                'method' => 'POST',
-                'code' => '<?php
+}";
+    }
 
-namespace App\Http\Controllers\Api;
+    private function generateAuthApiTemplate()
+    {
+        return "<?php
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+namespace App\\Http\\Controllers\\Api;
+
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+use Illuminate\\Support\\Facades\\Auth;
+use Illuminate\\Support\\Facades\\Hash;
+use App\\Models\\User;
 
 class AuthController extends Controller
 {
     /**
      * User login
      */
-    public function login(Request $request)
+    public function login(Request \$request)
     {
-        $request->validate([
-            "email" => "required|email",
-            "password" => "required"
+        \$request->validate([
+            \"email\" => \"required|email\",
+            \"password\" => \"required\"
         ]);
 
-        if (Auth::attempt($request->only("email", "password"))) {
-            $user = Auth::user();
-            $token = $user->createToken("API Token")->plainTextToken;
+        if (Auth::attempt(\$request->only(\"email\", \"password\"))) {
+            \$user = Auth::user();
+            \$token = \$user->createToken(\"API Token\")->plainTextToken;
 
             return response()->json([
-                "message" => "Login successful",
-                "token" => $token,
-                "user" => $user
+                \"message\" => \"Login successful\",
+                \"token\" => \$token,
+                \"user\" => \$user
             ]);
         }
 
         return response()->json([
-            "message" => "Invalid credentials"
+            \"message\" => \"Invalid credentials\"
         ], 401);
     }
 
     /**
      * User registration
      */
-    public function register(Request $request)
+    public function register(Request \$request)
     {
-        $request->validate([
-            "name" => "required|string|max:255",
-            "email" => "required|string|email|max:255|unique:users",
-            "password" => "required|string|min:8|confirmed"
+        \$request->validate([
+            \"name\" => \"required|string|max:255\",
+            \"email\" => \"required|string|email|max:255|unique:users\",
+            \"password\" => \"required|string|min:8|confirmed\"
         ]);
 
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => Hash::make($request->password)
+        \$user = User::create([
+            \"name\" => \$request->name,
+            \"email\" => \$request->email,
+            \"password\" => Hash::make(\$request->password)
         ]);
 
-        $token = $user->createToken("API Token")->plainTextToken;
+        \$token = \$user->createToken(\"API Token\")->plainTextToken;
 
         return response()->json([
-            "message" => "Registration successful",
-            "token" => $token,
-            "user" => $user
+            \"message\" => \"Registration successful\",
+            \"token\" => \$token,
+            \"user\" => \$user
         ], 201);
     }
 
     /**
      * User logout
      */
-    public function logout(Request $request)
+    public function logout(Request \$request)
     {
-        $request->user()->currentAccessToken()->delete();
+        \$request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            "message" => "Logged out successfully"
+            \"message\" => \"Logged out successfully\"
         ]);
     }
-}'
-            ],
-            'file_upload' => [
-                'name' => '파일 업로드 API',
-                'description' => '파일 업로드를 처리하는 API',
-                'method' => 'POST',
-                'code' => '<?php
+}";
+    }
 
-namespace App\Http\Controllers\Api;
+    private function generateFileUploadTemplate()
+    {
+        return "<?php
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+namespace App\\Http\\Controllers\\Api;
+
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+use Illuminate\\Support\\Facades\\Storage;
 
 class FileUploadController extends Controller
 {
     /**
      * Handle file upload
      */
-    public function upload(Request $request)
+    public function upload(Request \$request)
     {
-        $request->validate([
-            "file" => "required|file|max:2048", // 2MB 제한
-            "folder" => "nullable|string"
+        \$request->validate([
+            \"file\" => \"required|file|max:2048\", // 2MB 제한
+            \"folder\" => \"nullable|string\"
         ]);
 
         try {
-            $file = $request->file("file");
-            $folder = $request->input("folder", "uploads");
+            \$file = \$request->file(\"file\");
+            \$folder = \$request->input(\"folder\", \"uploads\");
             
-            $filename = time() . "_" . $file->getClientOriginalName();
-            $path = $file->storeAs($folder, $filename, "public");
+            \$filename = time() . \"_\" . \$file->getClientOriginalName();
+            \$path = \$file->storeAs(\$folder, \$filename, \"public\");
 
             return response()->json([
-                "message" => "File uploaded successfully",
-                "data" => [
-                    "filename" => $filename,
-                    "path" => $path,
-                    "url" => Storage::url($path),
-                    "size" => $file->getSize(),
-                    "mime_type" => $file->getMimeType()
+                \"message\" => \"File uploaded successfully\",
+                \"data\" => [
+                    \"filename\" => \$filename,
+                    \"path\" => \$path,
+                    \"url\" => Storage::url(\$path),
+                    \"size\" => \$file->getSize(),
+                    \"mime_type\" => \$file->getMimeType()
                 ]
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\\Exception \$e) {
             return response()->json([
-                "message" => "File upload failed",
-                "error" => $e->getMessage()
+                \"message\" => \"File upload failed\",
+                \"error\" => \$e->getMessage()
             ], 500);
         }
     }
@@ -298,27 +347,118 @@ class FileUploadController extends Controller
     /**
      * Delete uploaded file
      */
-    public function delete(Request $request)
+    public function delete(Request \$request)
     {
-        $request->validate([
-            "path" => "required|string"
+        \$request->validate([
+            \"path\" => \"required|string\"
         ]);
 
-        if (Storage::disk("public")->exists($request->path)) {
-            Storage::disk("public")->delete($request->path);
+        if (Storage::disk(\"public\")->exists(\$request->path)) {
+            Storage::disk(\"public\")->delete(\$request->path);
             
             return response()->json([
-                "message" => "File deleted successfully"
+                \"message\" => \"File deleted successfully\"
             ]);
         }
 
         return response()->json([
-            "message" => "File not found"
+            \"message\" => \"File not found\"
         ], 404);
     }
-}'
-            ]
+}";
+    }
+
+    private function generatePaginationTemplate()
+    {
+        $className = ucfirst(str_replace(' ', '', $this->apiName ?: 'Example'));
+        return "<?php
+
+namespace App\\Http\\Controllers\\Api;
+
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+
+class {$className}Controller extends Controller
+{
+    /**
+     * Display a paginated listing of the resource.
+     */
+    public function index(Request \$request)
+    {
+        \$perPage = \$request->input('per_page', 15);
+        \$page = \$request->input('page', 1);
+        
+        // 실제 데이터 조회 로직을 여기에 구현
+        // \$data = Model::paginate(\$perPage);
+        
+        \$mockData = [
+            'current_page' => \$page,
+            'data' => [],
+            'first_page_url' => url('api/{$this->apiRoute}?page=1'),
+            'from' => 1,
+            'last_page' => 1,
+            'last_page_url' => url('api/{$this->apiRoute}?page=1'),
+            'links' => [],
+            'next_page_url' => null,
+            'path' => url('api/{$this->apiRoute}'),
+            'per_page' => \$perPage,
+            'prev_page_url' => null,
+            'to' => 0,
+            'total' => 0
         ];
+        
+        return response()->json([
+            'message' => 'Success',
+            'data' => \$mockData
+        ]);
+    }
+}";
+    }
+
+    private function generateSearchTemplate()
+    {
+        $className = ucfirst(str_replace(' ', '', $this->apiName ?: 'Example'));
+        return "<?php
+
+namespace App\\Http\\Controllers\\Api;
+
+use App\\Http\\Controllers\\Controller;
+use Illuminate\\Http\\Request;
+
+class {$className}Controller extends Controller
+{
+    /**
+     * Search resources
+     */
+    public function search(Request \$request)
+    {
+        \$request->validate([
+            'query' => 'required|string|min:1',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:100'
+        ]);
+
+        \$query = \$request->input('query');
+        \$page = \$request->input('page', 1);
+        \$perPage = \$request->input('per_page', 15);
+        
+        // 실제 검색 로직을 여기에 구현
+        // \$results = Model::where('title', 'like', \"%{\$query}%\")
+        //                ->orWhere('description', 'like', \"%{\$query}%\")
+        //                ->paginate(\$perPage);
+        
+        return response()->json([
+            'message' => 'Search completed',
+            'query' => \$query,
+            'results' => [
+                'data' => [],
+                'total' => 0,
+                'per_page' => \$perPage,
+                'current_page' => \$page
+            ]
+        ]);
+    }
+}";
     }
 
     public function saveApi()

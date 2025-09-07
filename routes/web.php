@@ -284,7 +284,7 @@ Route::get('/sandbox/git-version-control', function () {
 
 // 파일 매니저 추가
 Route::get('/sandbox/file-manager', function () {
-    return view('700-page-sandbox.703-page-file-list.000-index');
+    return view('700-page-sandbox.707-page-file-manager.000-index');
 })->name('sandbox.file-manager');
 
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드

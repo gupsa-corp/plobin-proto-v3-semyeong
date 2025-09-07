@@ -3,6 +3,7 @@
 namespace App\Livewire\Sandbox;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class FileManager extends Component
@@ -30,7 +31,8 @@ class FileManager extends Component
 
     public function refreshList()
     {
-        $sandboxPath = 'ai-sandbox/' . $this->currentPath;
+        $selectedSandbox = Session::get('sandbox_storage', '1');
+        $sandboxPath = "storage-sandbox-{$selectedSandbox}/" . $this->currentPath;
         $disk = $this->getDisk();
 
         if (!$disk->exists($sandboxPath)) {
@@ -43,8 +45,8 @@ class FileManager extends Component
         ];
 
         // 경로를 상대경로로 변환
-        $this->list['dirs'] = array_map(fn($dir) => str_replace('ai-sandbox/', '', $dir), $this->list['dirs']);
-        $this->list['files'] = array_map(fn($file) => str_replace('ai-sandbox/', '', $file), $this->list['files']);
+        $this->list['dirs'] = array_map(fn($dir) => str_replace("storage-sandbox-{$selectedSandbox}/", '', $dir), $this->list['dirs']);
+        $this->list['files'] = array_map(fn($file) => str_replace("storage-sandbox-{$selectedSandbox}/", '', $file), $this->list['files']);
     }
 
     public function selectDirectory($dir)
@@ -57,8 +59,9 @@ class FileManager extends Component
 
     public function selectFile($file)
     {
+        $selectedSandbox = Session::get('sandbox_storage', '1');
         $this->fileName = basename($file);
-        $sandboxFile = 'ai-sandbox/' . $file;
+        $sandboxFile = "storage-sandbox-{$selectedSandbox}/" . $file;
         $disk = $this->getDisk();
 
         if ($disk->exists($sandboxFile)) {
@@ -75,8 +78,9 @@ class FileManager extends Component
             return;
         }
 
+        $selectedSandbox = Session::get('sandbox_storage', '1');
         $filePath = $this->currentPath . '/' . $this->fileName;
-        $sandboxFile = 'ai-sandbox/' . $filePath;
+        $sandboxFile = "storage-sandbox-{$selectedSandbox}/" . $filePath;
         $disk = $this->getDisk();
 
         // 디렉토리 생성
@@ -91,7 +95,8 @@ class FileManager extends Component
 
     public function deleteFile($file)
     {
-        $sandboxFile = 'ai-sandbox/' . $file;
+        $selectedSandbox = Session::get('sandbox_storage', '1');
+        $sandboxFile = "storage-sandbox-{$selectedSandbox}/" . $file;
         $disk = $this->getDisk();
 
         if ($disk->exists($sandboxFile)) {
@@ -105,6 +110,11 @@ class FileManager extends Component
                 $this->fileName = '';
             }
         }
+    }
+
+    public function togglePreview()
+    {
+        $this->previewMode = !$this->previewMode;
     }
 
     public function renderBladePreview()
