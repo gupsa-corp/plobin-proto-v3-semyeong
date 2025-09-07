@@ -22,6 +22,7 @@ class PermissionManagement extends Component
     public function mount($organizationId = 1)
     {
         $this->organizationId = $organizationId;
+        $this->activeTab = request('activeTab', 'overview');
         $this->loadData();
     }
 
@@ -150,7 +151,7 @@ class PermissionManagement extends Component
 
     public function render()
     {
-        return view('900-page-platform-admin.920-livewire-permission-management', [
+        return view('800-page-organization-admin.920-livewire-permission-management', [
             'roles' => $this->getRolesProperty(),
             'permissions' => $this->getPermissionsProperty(),
             'availableFeatures' => $this->getAvailableFeaturesForSelected(),

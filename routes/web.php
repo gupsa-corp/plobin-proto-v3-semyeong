@@ -99,7 +99,13 @@ Route::get('/organizations/{id}/admin/members', function ($id) {
     return view('800-page-organization-admin.801-page-members.000-index', compact('id', 'organizations'));
 })->name('organization.admin.members');
 
+// 권한 관리 기본 라우트 - 개요 탭으로 리다이렉트
 Route::get('/organizations/{id}/admin/permissions', function ($id) {
+    return redirect()->route('organization.admin.permissions.overview', ['id' => $id]);
+})->name('organization.admin.permissions');
+
+// 권한 개요 탭
+Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
@@ -108,8 +114,47 @@ Route::get('/organizations/{id}/admin/permissions', function ($id) {
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
-    return view('800-page-organization-admin.802-page-permissions.000-index', compact('organizations'));
-})->name('organization.admin.permissions');
+    return view('800-page-organization-admin.805-page-permissions-overview.000-index', compact('organizations'))->with('activeTab', 'overview');
+})->name('organization.admin.permissions.overview');
+
+// 역할 관리 탭
+Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
+    // 사용자가 권한 300 이상인 조직만 가져오기
+    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.permission_level', '>=', 300)
+        ->orderBy('organizations.created_at', 'desc')
+        ->get();
+
+    return view('800-page-organization-admin.806-page-permissions-roles.000-index', compact('organizations'))->with('activeTab', 'roles');
+})->name('organization.admin.permissions.roles');
+
+// 권한 관리 탭
+Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
+    // 사용자가 권한 300 이상인 조직만 가져오기
+    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.permission_level', '>=', 300)
+        ->orderBy('organizations.created_at', 'desc')
+        ->get();
+
+    return view('800-page-organization-admin.807-page-permissions-management.000-index', compact('organizations'))->with('activeTab', 'management');
+})->name('organization.admin.permissions.management');
+
+// 동적 규칙 탭
+Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
+    // 사용자가 권한 300 이상인 조직만 가져오기
+    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.permission_level', '>=', 300)
+        ->orderBy('organizations.created_at', 'desc')
+        ->get();
+
+    return view('800-page-organization-admin.808-page-permissions-rules.000-index', compact('organizations'))->with('activeTab', 'rules');
+})->name('organization.admin.permissions.rules');
 
 Route::get('/organizations/{id}/admin/billing', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
@@ -139,6 +184,39 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
 
     return view('800-page-organization-admin.804-page-projects.000-index', compact('projects', 'id', 'organizations'));
 })->name('organization.admin.projects');
+
+// 플랫폼 관리자 라우트들 (platform_admin 권한 필요) - 개발용으로 일시적으로 인증 제거
+// 추후 배포시 ->middleware(['auth', 'role:platform_admin']) 적용 예정
+
+// 플랫폼 관리자 메인 대시보드
+Route::get('/platform/admin', function () {
+    return view('900-page-platform-admin.901-page-dashboard.000-index');
+})->name('platform.admin.dashboard');
+
+// 플랫폼 관리자 대시보드 (명시적 경로)
+Route::get('/platform/admin/dashboard', function () {
+    return view('900-page-platform-admin.901-page-dashboard.000-index');
+})->name('platform.admin.dashboard.full');
+
+// 플랫폼 관리자 - 조직 관리
+Route::get('/platform/admin/organizations', function () {
+    return view('900-page-platform-admin.902-page-organizations.000-index');
+})->name('platform.admin.organizations');
+
+// 플랫폼 관리자 - 사용자 관리
+Route::get('/platform/admin/users', function () {
+    return view('900-page-platform-admin.903-page-users.000-index');
+})->name('platform.admin.users');
+
+// 플랫폼 관리자 - 시스템 설정
+Route::get('/platform/admin/system-settings', function () {
+    return view('900-page-platform-admin.904-page-system-settings.000-index');
+})->name('platform.admin.system-settings');
+
+// 플랫폼 관리자 - 권한 관리
+Route::get('/platform/admin/permissions', function () {
+    return view('900-page-platform-admin.905-page-permissions.000-index');
+})->name('platform.admin.permissions');
 
 // AI 샌드박스 페이지들 - 각 기능별 독립 라우트
 // 파일 매니저

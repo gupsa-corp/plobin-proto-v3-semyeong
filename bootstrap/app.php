@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.web-or-token' => \App\Http\Middleware\SimpleAuth::class,
             'rate.limit' => \App\Http\Middleware\ApiRateLimit::class,
+            'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

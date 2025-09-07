@@ -1,7 +1,7 @@
 <?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
-@include($common . '.301-layout-head', ['title' => '권한 관리'])
+@include($common . '.301-layout-head', ['title' => '권한 관리 - 개요'])
 <body class="bg-gray-100">
     <div class="min-h-screen" style="position: relative;">
         @include('800-page-organization-admin.800-common.200-sidebar-main')
@@ -9,7 +9,7 @@
             @include('800-page-organization-admin.800-common.100-header-main')
             
             {{-- 권한 관리 Livewire 컴포넌트 --}}
-            <livewire:organization.admin.permission-management :organizationId="1" />
+            <livewire:organization.admin.permission-management :organizationId="1" :activeTab="'overview'" />
         </div>
     </div>
 </body>
