@@ -25,7 +25,7 @@
                             class="text-left text-sm text-gray-900 hover:text-blue-600">
                         📄 {{ basename($file) }}
                     </button>
-                    <button wire:click="deleteFile('{{ $file }}')" 
+                    <button wire:click="deleteFile('{{ $file }}')"
                             wire:confirm="정말로 이 파일을 삭제하시겠습니까?"
                             class="text-red-500 hover:text-red-700 text-xs">
                         삭제

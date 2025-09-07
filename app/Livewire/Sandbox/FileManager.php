@@ -192,6 +192,6 @@ class FileManager extends Component
 
     public function render()
     {
-        return view('livewire.sandbox.file-manager');
+        return view('700-page-sandbox.livewire.700-file-manager');
     }
 }

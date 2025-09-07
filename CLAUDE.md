@@ -9,6 +9,7 @@
 10. 요청받지 않은 구현 필요한 영역은 어떤 css 도 div 도 없이 '구현필요' 라는 문자만 넣을 것
 11. README.md 파일을 새로 생성할 때는, /docs/checking/{폴더경로} 에 맞추어 만들 것
 12. **인증 시스템은 라라벨 기본 Auth + Livewire 사용**: 커스텀 AuthManager 제거됨, Auth::attempt() 등 표준 라라벨 인증 사용, Livewire 뷰는 300-livewire-form.blade.php로 배치
+13. **샌드박스 파일 구조 통합**: 모든 샌드박스 관련 파일은 `resources/views/700-page-sandbox` 디렉토리 하위에 배치됨. 기존 `resources/views/livewire/sandbox`와 `resources/views/sandbox` 디렉토리는 통합되어 제거됨
 
 ## ⚠️ 주의사항
 1. **하드코딩 금지**: 실제 데이터나 예시 텍스트를 하드코딩하지 말 것
@@ -19,7 +20,14 @@
 - 뷰 파일: `[숫자]-[설명].blade.php` (예: `301-layout-head.blade.php`)
 - 공통 컴포넌트: `[숫자]-[카테고리]-[설명].blade.php` (예: `200-sidebar-main.blade.php`)
 - 데이터 파일: `[숫자]-data-[설명].php` (예: `600-data-sidebar.php`)
-- **절대 금지**: 임의의 파일명 생성 (예: `head.blade.php`, `sidebar.blade.php`)
+- **절대 금지**: 숫자 접두사 없는 파일/폴더명 생성 (예: `head.blade.php`, `sidebar.blade.php`, `components/` 등)
+
+## 샌드박스 파일 구조 (700-page-sandbox)
+현재 모든 샌드박스 관련 파일들의 위치:
+- 메인 페이지들: `/700-page-sandbox/70x-page-[기능]/000-index.blade.php`
+- Livewire 컴포넌트: `/700-page-sandbox/livewire/`
+- 공통 파일들: `/700-page-sandbox/000-*.blade.php`
+- 기존 `resources/views/livewire/sandbox`와 `resources/views/sandbox`는 모두 통합됨
 
 ## 마이그레이션 규칙
 - **기존 마이그레이션 수정 우선**: 새로운 remove/alter 마이그레이션 생성 대신 기존 create 마이그레이션을 직접 수정할 것

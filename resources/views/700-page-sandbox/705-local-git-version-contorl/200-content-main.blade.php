@@ -13,9 +13,9 @@
                     <!-- Blade/PHP 파일 미리보기 -->
                     <div class="p-4">
                         @if($isBladeFile)
-                            <div class="mb-2 text-xs text-gray-500">Blade 템플릿 렌더링:</div>
+                            <div class="mb-2 text-xs text-gray-500">Blade 템플릿 소스:</div>
                             <div class="border rounded p-3 bg-white">
-                                {!! $this->renderBladePreview() !!}
+                                <pre class="font-mono text-sm bg-gray-800 text-green-400 p-4 rounded overflow-auto"><code>{{ $content }}</code></pre>
                             </div>
                         @else
                             <div class="mb-2 text-xs text-gray-500">PHP 코드:</div>
