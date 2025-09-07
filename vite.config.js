@@ -6,6 +6,9 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
+                // CSS
+                'resources/css/app.css',
+                
                 // Alpine.js
                 'resources/js/alpine.js',
 

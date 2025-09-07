@@ -7,24 +7,12 @@
 
     <!-- 샌드박스 페이지 전용 스타일 -->
     @include('700-page-sandbox.700-common.302-layout-css-imports')
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <!-- Vite CSS -->
+    @vite('resources/css/app.css')
+    
+    <!-- Filemanager 스타일 -->
+    @filemanagerStyles
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

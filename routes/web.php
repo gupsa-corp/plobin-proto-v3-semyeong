@@ -12,14 +12,23 @@ foreach ($routes as $path => $config) {
     if (is_string($config)) {
         $viewName = $config;
         $routeName = null;
+        $redirectTo = null;
     } else {
-        $viewName = $config['view'];
+        $viewName = $config['view'] ?? null;
         $routeName = $config['name'] ?? null;
+        $redirectTo = $config['redirect'] ?? null;
     }
 
-    $route = Route::get($path, function () use ($viewName) {
-        return view($viewName);
-    });
+    // 리다이렉트 처리
+    if ($redirectTo) {
+        $route = Route::get($path, function () use ($redirectTo) {
+            return redirect($redirectTo);
+        });
+    } else {
+        $route = Route::get($path, function () use ($viewName) {
+            return view($viewName);
+        });
+    }
 
     // 라우트명이 있으면 추가
     if ($routeName) {
@@ -249,10 +258,6 @@ Route::get('/sandbox/sql-executor', function () {
     return view('700-page-sandbox.702-page-sql-executor.000-index');
 })->name('sandbox.sql-executor');
 
-// 파일 목록
-Route::get('/sandbox/file-list', function () {
-    return view('700-page-sandbox.703-page-file-list.000-index');
-})->name('sandbox.file-list');
 
 // 파일 에디터
 Route::get('/sandbox/file-editor', function () {
@@ -268,6 +273,11 @@ Route::get('/sandbox/database-manager', function () {
 Route::get('/sandbox/git-version-control', function () {
     return view('700-page-sandbox.705-local-git-version-contorl.000-index');
 })->name('sandbox.git-version-control');
+
+// 파일 매니저 추가
+Route::get('/sandbox/file-manager', function () {
+    return view('700-page-sandbox.703-page-file-list.000-index');
+})->name('sandbox.file-manager');
 
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
 Route::get('/sandbox/storage-manager', [App\Http\CoreApi\Sandbox\StorageManager\StorageController::class, 'index'])->name('sandbox.storage-manager');

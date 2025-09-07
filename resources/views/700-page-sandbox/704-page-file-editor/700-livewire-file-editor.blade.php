@@ -2,14 +2,14 @@
     x-data="{ 
         createNewFile() {
             const fileName = prompt('파일명을 입력하세요:');
-            if (fileName && this.$wire) {
-                this.$wire.call('createFile', fileName);
+            if (fileName) {
+                $wire.call('createFile', fileName);
             }
         },
         createNewFolder() {
             const folderName = prompt('폴더명을 입력하세요:');
-            if (folderName && this.$wire) {
-                this.$wire.call('createFolder', folderName);
+            if (folderName) {
+                $wire.call('createFolder', folderName);
             }
         },
         refreshPreview() {
@@ -66,9 +66,9 @@
     <div class="flex-1 flex flex-col min-w-0">
         {{-- 탭 바 --}}
         @if(!empty($openTabs))
-        <div class="flex bg-gray-100 border-b border-gray-200 overflow-x-auto">
+        <div class="flex bg-gray-100 border-b border-gray-200 overflow-x-auto" wire:key="tab-bar">
             @foreach($openTabs as $tab)
-                <div class="flex items-center group {{ $activeTab === $tab ? 'bg-white border-b-2 border-blue-500' : 'hover:bg-gray-50' }}">
+                <div class="flex items-center group {{ $activeTab === $tab ? 'bg-white border-b-2 border-blue-500' : 'hover:bg-gray-50' }}" wire:key="tab-{{ $tab }}">
                     <button 
                         wire:click="setActiveTab('{{ $tab }}')"
                         class="px-3 py-2 text-sm whitespace-nowrap flex items-center space-x-2 min-w-0"
@@ -110,7 +110,7 @@
                     <div class="flex items-center px-4 py-2 bg-gray-50 border-b border-gray-200 text-sm">
                         <span class="text-gray-600">{{ $activeTab }}</span>
                         <div class="ml-auto flex items-center space-x-4 text-xs text-gray-500">
-                            <span>언어: {{ ucfirst($this->currentFileLanguage) }}</span>
+                            <span>파일 타입: {{ pathinfo($activeTab, PATHINFO_EXTENSION) ?: '텍스트' }}</span>
                         </div>
                     </div>
                     <div class="flex-1 relative p-4">
@@ -152,7 +152,7 @@
                     <iframe
                         id="preview-frame"
                         class="w-full h-full border-0"
-                        :srcdoc="$wire.compiled"
+                        srcdoc="{{ $this->compiled }}"
                         sandbox="allow-scripts allow-same-origin"
                     ></iframe>
                 </div>

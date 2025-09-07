@@ -40,7 +40,8 @@ return [
     '/sandbox' => ['view' => '700-page-sandbox.000-index', 'name' => 'sandbox.index'],
     '/sandbox/dashboard' => ['view' => '700-page-sandbox.701-page-dashboard.000-index', 'name' => 'sandbox.dashboard'],
     '/sandbox/sql-executor' => ['view' => '700-page-sandbox.702-page-sql-executor.000-index', 'name' => 'sandbox.sql-executor'],
-    '/sandbox/file-list' => ['view' => '700-page-sandbox.703-page-file-list.000-index', 'name' => 'sandbox.file-list'],
+    '/sandbox/file-list' => ['redirect' => '/sandbox/file-manager'],
+    '/sandbox/file-manager' => ['view' => '700-page-sandbox.703-page-file-list.000-index', 'name' => 'sandbox.file-manager'],
     '/sandbox/file-editor' => ['view' => '700-page-sandbox.704-page-file-editor.000-index', 'name' => 'sandbox.file-editor'],
     '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
     '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-local-git-version-contorl.000-index', 'name' => 'sandbox.git-version-control'],
@@ -49,4 +50,5 @@ return [
     '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
     '/sandbox/blade-list' => ['view' => '700-page-sandbox.706-page-blade-list.000-index', 'name' => 'sandbox.blade-list'],
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
+    '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],
 ];

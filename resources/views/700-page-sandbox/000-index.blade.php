@@ -60,6 +60,16 @@
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Blade 목록</h3>
                     <p class="text-gray-600">생성된 Blade 템플릿 목록 관리</p>
                 </a>
+                
+                <a href="/sandbox/file-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">파일 매니저</h3>
+                    <p class="text-gray-600">드래그 앤 드롭 파일 업로드 및 관리</p>
+                </a>
+                
+                <a href="/sandbox/file-editor-integrated" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-blue-200 bg-blue-50">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">통합 파일 에디터</h3>
+                    <p class="text-blue-700">파일 매니저 + Monaco 에디터 통합 개발환경</p>
+                </a>
             </div>
         </div>
     </div>

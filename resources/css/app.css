@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Livewire Filemanager styles */
+@source '../../vendor/livewire-filemanager/filemanager/resources/views/**/*.blade.php';
