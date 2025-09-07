@@ -115,6 +115,7 @@ Route::prefix('projects')->group(function () {
 });
 
 
+
 // 테스트용 결제 API (인증 없음 - 개발용)
 Route::prefix('test/organizations')->group(function () {
     Route::get('{organization}/billing/data', GetBillingDataController::class);
