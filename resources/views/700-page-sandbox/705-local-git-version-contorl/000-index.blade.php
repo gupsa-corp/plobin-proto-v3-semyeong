@@ -1,26 +1,17 @@
+<?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파일 미리보기 - 샌드박스</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    @livewireStyles
-</head>
+@include('000-common-layouts.001-html-lang')
+@include($common . '.301-layout-head', ['title' => 'Git 버전 관리'])
 <body class="bg-gray-100">
-    <div class="min-h-screen">
-        <h1 class="text-3xl font-bold py-6 text-center bg-white border-b">AI 샌드박스</h1>
-        
-        @include('700-page-sandbox.000-common-navigation')
-        
-        <div class="container mx-auto py-8">
-            <h2 class="text-2xl font-bold mb-6">파일 미리보기 컴포넌트</h2>
-        <div>
-            @php
-                $fileName = 'example.blade.php';
-                $content = '<div class="p-4">예시 블레이드 템플릿 내용</div>';
-            @endphp
-                @include('700-page-sandbox.705-page-file-preview.200-content-main')
+    @include('700-page-sandbox.700-common.400-sandbox-header')
+    
+    <div class="min-h-screen sandbox-container">
+        <div class="sandbox-card">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Git 버전 관리</h1>
+            <p class="text-gray-600 mb-8">로컬 Git 저장소 관리 도구</p>
+            
+            <div class="text-center py-20 text-gray-500">
+                구현필요
             </div>
         </div>
     </div>

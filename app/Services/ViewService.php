@@ -67,6 +67,11 @@ class ViewService
             return '800-page-organization-admin.800-common';
         }
         
+        // 700-page-sandbox 형식 지원
+        if (preg_match('/^(700-page-sandbox)\./', $folder)) {
+            return '700-page-sandbox.700-common';
+        }
+        
         // 새로운 형식: 100-page-landing.101-page-landing-home.000-index
         if (preg_match('/^(\d)00-([^\.]+)\./', $folder, $matches)) {
             return $matches[1] . '00-' . $matches[2] . '.' . $matches[1] . '00-common';

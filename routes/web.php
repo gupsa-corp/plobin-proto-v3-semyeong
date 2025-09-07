@@ -216,50 +216,47 @@ Route::get('/platform/admin/permissions', function () {
     return view('900-page-platform-admin.905-page-permissions.000-index');
 })->name('platform.admin.permissions');
 
-// AI 샌드박스 페이지들 - 각 기능별 독립 라우트
+// AI 샌드박스 페이지들 - 실제 존재하는 파일들만 라우트 등록
 // 메인 인덱스
 Route::get('/sandbox', function () {
     return view('700-page-sandbox.000-index');
 })->name('sandbox.index');
 
-// 파일 관리 관련 페이지들
-Route::get('/sandbox/file-manager', function () {
-    return view('700-page-sandbox.701-page-file-manager.000-index');
-})->name('sandbox.file-manager');
+// 대시보드
+Route::get('/sandbox/dashboard', function () {
+    return view('700-page-sandbox.701-page-dashboard.000-index');
+})->name('sandbox.dashboard');
 
-Route::get('/sandbox/file-list', function () {
-    return view('700-page-sandbox.703-page-file-list.000-index');
-})->name('sandbox.file-list');
-
-Route::get('/sandbox/file-editor', function () {
-    return view('700-page-sandbox.704-page-file-editor.000-index');
-})->name('sandbox.file-editor');
-
-Route::get('/sandbox/file-preview', function () {
-    return view('700-page-sandbox.705-page-file-preview.000-index');
-})->name('sandbox.file-preview');
-
-// 시스템 도구들
+// SQL 실행기
 Route::get('/sandbox/sql-executor', function () {
     return view('700-page-sandbox.702-page-sql-executor.000-index');
 })->name('sandbox.sql-executor');
 
-Route::get('/sandbox/table-manager', function () {
-    return view('700-page-sandbox.703-page-table-manager.000-index');
-})->name('sandbox.table-manager');
+// 파일 목록
+Route::get('/sandbox/file-list', function () {
+    return view('700-page-sandbox.703-page-file-list.000-index');
+})->name('sandbox.file-list');
 
-Route::get('/sandbox/code-executor', function () {
-    return view('700-page-sandbox.704-page-code-executor.000-index');
-})->name('sandbox.code-executor');
+// 파일 에디터
+Route::get('/sandbox/file-editor', function () {
+    return view('700-page-sandbox.704-page-file-editor.000-index');
+})->name('sandbox.file-editor');
 
-// 기타 페이지들
-Route::get('/sandbox/alert-messages', function () {
-    return view('700-page-sandbox.701-page-alert-messages.000-index');
-})->name('sandbox.alert-messages');
+// 데이터베이스 매니저
+Route::get('/sandbox/database-manager', function () {
+    return view('700-page-sandbox.705-page-database-manager.000-index');
+})->name('sandbox.database-manager');
 
-Route::get('/sandbox/directory-buttons', function () {
-    return view('700-page-sandbox.702-page-directory-buttons.000-index');
-})->name('sandbox.directory-buttons');
+// Git 버전 관리
+Route::get('/sandbox/git-version-control', function () {
+    return view('700-page-sandbox.705-local-git-version-contorl.000-index');
+})->name('sandbox.git-version-control');
+
+// 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
+Route::get('/sandbox/storage-manager', [App\Http\Sandbox\StorageManager\StorageController::class, 'index'])->name('sandbox.storage-manager');
+Route::post('/sandbox/storage-manager/create', [App\Http\Sandbox\StorageManager\StorageController::class, 'create'])->name('sandbox.storage.create');
+Route::post('/sandbox/storage-manager/select', [App\Http\Sandbox\StorageManager\StorageController::class, 'select'])->name('sandbox.storage.select');
+Route::delete('/sandbox/storage-manager/delete', [App\Http\Sandbox\StorageManager\StorageController::class, 'delete'])->name('sandbox.storage.delete');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {

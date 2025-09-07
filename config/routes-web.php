@@ -34,4 +34,15 @@ return [
     '/organizations/{id}/admin/projects' => ['view' => '800-page-organization-admin.804-page-projects.000-index', 'name' => 'organization.admin.projects'],
     // AI 샌드박스 라우트들
     '/sandbox' => ['view' => '700-page-sandbox.000-index', 'name' => 'sandbox.index'],
+    '/sandbox/dashboard' => ['view' => '700-page-sandbox.701-page-dashboard.000-index', 'name' => 'sandbox.dashboard'],
+    '/sandbox/sql-executor' => ['view' => '700-page-sandbox.702-page-sql-executor.000-index', 'name' => 'sandbox.sql-executor'],
+    '/sandbox/file-list' => ['view' => '700-page-sandbox.703-page-file-list.000-index', 'name' => 'sandbox.file-list'],
+    '/sandbox/file-editor' => ['view' => '700-page-sandbox.704-page-file-editor.000-index', 'name' => 'sandbox.file-editor'],
+    '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
+    '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-local-git-version-contorl.000-index', 'name' => 'sandbox.git-version-control'],
+    '/sandbox/api-creator' => ['view' => '700-page-sandbox.703-page-api-creator.000-index', 'name' => 'sandbox.api-creator'],
+    '/sandbox/api-list' => ['view' => '700-page-sandbox.704-page-api-list.000-index', 'name' => 'sandbox.api-list'],
+    '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
+    '/sandbox/blade-list' => ['view' => '700-page-sandbox.706-page-blade-list.000-index', 'name' => 'sandbox.blade-list'],
+    '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
 ];

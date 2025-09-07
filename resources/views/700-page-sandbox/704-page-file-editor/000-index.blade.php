@@ -1,29 +1,20 @@
-<!-- 편집 영역 -->
-<div>
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">파일명</label>
-        <input wire:model.live="fileName"
-               value="{{ $fileName }}"
-               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-               placeholder="파일명을 입력하세요">
+<?php $common = getCommonPath(); ?>
+<!DOCTYPE html>
+@include('000-common-layouts.001-html-lang')
+@include($common . '.301-layout-head', ['title' => '파일 에디터'])
+<body class="bg-gray-100">
+    @include('700-page-sandbox.700-common.400-sandbox-header')
+    
+    <div class="min-h-screen sandbox-container">
+        <div class="sandbox-card">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">파일 에디터</h1>
+            <p class="text-gray-600 mb-8">코드 파일 편집 도구</p>
+            
+            <div class="text-center py-20 text-gray-500">
+                구현필요
+            </div>
+        </div>
     </div>
-
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
-        <textarea wire:model="content"
-                  rows="20"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                  placeholder="파일 내용을 입력하세요">{{ $content }}</textarea>
-    </div>
-
-    <div class="flex space-x-3">
-        <button wire:click="saveFile"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            저장
-        </button>
-        <button wire:click="refreshList"
-                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-            새로고침
-        </button>
-    </div>
-</div>
+    @livewireScripts
+</body>
+</html>
