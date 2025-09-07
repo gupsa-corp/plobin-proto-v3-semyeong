@@ -4,6 +4,9 @@ namespace App\Livewire\PlatformAdmin\Dashboard;
 
 use Livewire\Component;
 use Carbon\Carbon;
+use App\Models\Organization;
+use App\Models\User;
+use App\Models\Project;
 
 class RecentActivity extends Component
 {
@@ -17,46 +20,75 @@ class RecentActivity extends Component
 
     public function loadActivities()
     {
-        // TODO: 실제 활동 로그 모델에서 데이터 로드
-        // 현재는 더미 데이터 사용
-        $this->activities = [
-            [
-                'id' => 1,
-                'type' => 'organization',
-                'icon_color' => 'bg-blue-500',
-                'title' => '새 조직이 생성되었습니다',
-                'description' => '테크스타트업코리아',
-                'time' => '2분 전',
-                'user' => null
-            ],
-            [
-                'id' => 2,
-                'type' => 'user',
-                'icon_color' => 'bg-green-500',
-                'title' => '사용자가 가입했습니다',
-                'description' => '김개발 (kim@example.com)',
-                'time' => '5분 전',
-                'user' => 'kim@example.com'
-            ],
-            [
-                'id' => 3,
-                'type' => 'project',
-                'icon_color' => 'bg-purple-500',
-                'title' => '새 프로젝트가 생성되었습니다',
-                'description' => 'AI 챗봇 프로젝트',
-                'time' => '10분 전',
-                'user' => null
-            ],
-            [
-                'id' => 4,
-                'type' => 'system',
-                'icon_color' => 'bg-yellow-500',
-                'title' => '시스템 업데이트 완료',
-                'description' => '버전 2.1.0',
-                'time' => '1시간 전',
-                'user' => null
-            ]
-        ];
+        try {
+            $activities = collect();
+
+            // 최근 생성된 조직들
+            $recentOrganizations = Organization::latest('created_at')
+                ->limit(2)
+                ->get()
+                ->map(function ($org) {
+                    return [
+                        'id' => $org->id,
+                        'type' => 'organization',
+                        'icon_color' => 'bg-blue-500',
+                        'title' => '새 조직이 생성되었습니다',
+                        'description' => $org->name,
+                        'time' => $this->getTimeAgo($org->created_at),
+                        'user' => null,
+                        'created_at' => $org->created_at
+                    ];
+                });
+
+            // 최근 가입한 사용자들
+            $recentUsers = User::latest('created_at')
+                ->limit(2)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'type' => 'user',
+                        'icon_color' => 'bg-green-500',
+                        'title' => '사용자가 가입했습니다',
+                        'description' => $user->name . ' (' . $user->email . ')',
+                        'time' => $this->getTimeAgo($user->created_at),
+                        'user' => $user->email,
+                        'created_at' => $user->created_at
+                    ];
+                });
+
+            // 최근 생성된 프로젝트들
+            $recentProjects = Project::latest('created_at')
+                ->limit(2)
+                ->get()
+                ->map(function ($project) {
+                    return [
+                        'id' => $project->id,
+                        'type' => 'project',
+                        'icon_color' => 'bg-purple-500',
+                        'title' => '새 프로젝트가 생성되었습니다',
+                        'description' => $project->name,
+                        'time' => $this->getTimeAgo($project->created_at),
+                        'user' => null,
+                        'created_at' => $project->created_at
+                    ];
+                });
+
+            // 모든 활동을 합치고 시간순으로 정렬
+            $activities = $activities
+                ->merge($recentOrganizations)
+                ->merge($recentUsers)
+                ->merge($recentProjects)
+                ->sortByDesc('created_at')
+                ->take($this->maxActivities)
+                ->values();
+
+            $this->activities = $activities->toArray();
+
+        } catch (\Exception $e) {
+            // 오류 발생시 빈 배열 반환
+            $this->activities = [];
+        }
     }
 
     public function refreshActivities()
@@ -65,10 +97,14 @@ class RecentActivity extends Component
         $this->dispatch('activities-updated');
     }
 
-    public function getTimeAgoAttribute($timestamp)
+    private function getTimeAgo($timestamp)
     {
-        // TODO: 실제 타임스탬프 처리
-        return $timestamp;
+        try {
+            $carbon = Carbon::parse($timestamp);
+            return $carbon->diffForHumans();
+        } catch (\Exception $e) {
+            return '알 수 없음';
+        }
     }
 
     public function render()

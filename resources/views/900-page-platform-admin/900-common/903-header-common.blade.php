@@ -9,17 +9,9 @@
                 <p class="text-sm text-gray-600 mt-1">{{ $pageDescription }}</p>
                 @endif
             </div>
-            
+
             {{-- 헤더 우측 메뉴 --}}
             <div class="flex items-center gap-4">
-                {{-- 플랫폼 관리자 표시 --}}
-                <div class="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    플랫폼 관리자
-                </div>
-                
                 {{-- 사용자 정보 --}}
                 <div class="flex items-center">
                     <div class="text-sm text-right mr-3">

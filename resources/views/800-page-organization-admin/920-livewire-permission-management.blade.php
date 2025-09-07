@@ -1,6 +1,6 @@
 {{-- 조직 관리자용 권한 관리 메인 컴포넌트 --}}
 <div class="permission-management-container" style="padding: 24px;" x-data="organizationPermissionManagement">
-    
+
     {{-- 탭 네비게이션 --}}
     <div class="mb-6">
         <div class="border-b border-gray-200">
@@ -31,13 +31,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                                </svg>
-                            </div>
-                        </div>
+
                         <div class="ml-4">
                             <div class="text-2xl font-bold text-gray-900" x-text="stats.totalMembers"></div>
                             <div class="text-sm text-gray-600">총 멤버</div>
@@ -47,13 +41,7 @@
 
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
+
                         <div class="ml-4">
                             <div class="text-2xl font-bold text-gray-900" x-text="stats.totalRoles"></div>
                             <div class="text-sm text-gray-600">활성 역할</div>
@@ -63,13 +51,7 @@
 
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                        </div>
+
                         <div class="ml-4">
                             <div class="text-2xl font-bold text-gray-900" x-text="stats.totalPermissions"></div>
                             <div class="text-sm text-gray-600">사용 가능한 권한</div>
@@ -138,7 +120,7 @@
         {{-- 역할 관리 탭 --}}
         <div x-show="activeTab === 'roles'">
             <div class="mb-6 flex justify-between items-center">
-                <button @click="showCreateRoleModal = true" 
+                <button @click="showCreateRoleModal = true"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     새 역할 추가
                 </button>
@@ -148,7 +130,7 @@
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">조직 역할 목록</h3>
                 </div>
-                
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -176,9 +158,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end gap-2">
-                                            <button @click="editRole(role.id)" 
+                                            <button @click="editRole(role.id)"
                                                     class="text-blue-600 hover:text-blue-900">편집</button>
-                                            <button @click="manageRolePermissions(role.id)" 
+                                            <button @click="manageRolePermissions(role.id)"
                                                     class="text-green-600 hover:text-green-900">권한</button>
                                         </div>
                                     </td>
@@ -196,7 +178,7 @@
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">멤버 권한 관리</h3>
                 </div>
-                
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -228,7 +210,7 @@
                                         <span x-text="member.joined_at"></span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button @click="changeMemberRole(member.id)" 
+                                        <button @click="changeMemberRole(member.id)"
                                                 class="text-blue-600 hover:text-blue-900">역할 변경</button>
                                     </td>
                                 </tr>
@@ -239,7 +221,7 @@
             </div>
         </div>
     </div>
-    
+
 </div>
 
 <script>

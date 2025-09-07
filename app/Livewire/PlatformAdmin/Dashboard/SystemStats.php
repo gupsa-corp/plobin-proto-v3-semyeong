@@ -22,18 +22,32 @@ class SystemStats extends Component
     public function loadStats()
     {
         try {
-            // TODO: 실제 모델이 존재하는지 확인 후 구현
-            // 현재는 더미 데이터 사용
-            $this->totalOrganizations = 12; // Organization::count();
-            $this->totalUsers = 147; // User::count();
-            $this->totalProjects = 89; // Project::count();
-            $this->systemStatus = '정상';
+            $this->totalOrganizations = Organization::count();
+            $this->totalUsers = User::count();
+            $this->totalProjects = Project::count();
+            
+            // 시스템 상태 체크 (간단한 헬스 체크)
+            $this->systemStatus = $this->checkSystemHealth();
         } catch (\Exception $e) {
-            // 모델이 없는 경우 더미 데이터 유지
-            $this->totalOrganizations = 12;
-            $this->totalUsers = 147;
-            $this->totalProjects = 89;
-            $this->systemStatus = '정상';
+            // 오류 발생시 0으로 설정
+            $this->totalOrganizations = 0;
+            $this->totalUsers = 0;
+            $this->totalProjects = 0;
+            $this->systemStatus = '오류';
+        }
+    }
+
+    private function checkSystemHealth()
+    {
+        try {
+            // 기본적인 DB 연결 및 모델 접근 테스트
+            Organization::exists();
+            User::exists();
+            Project::exists();
+            
+            return '정상';
+        } catch (\Exception $e) {
+            return '경고';
         }
     }
 
