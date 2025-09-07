@@ -1,0 +1,19 @@
+{
+    "name": "asdasd",
+    "description": "asdas",
+    "components": [
+        {
+            "id": "comp_8",
+            "type": "input",
+            "properties": {
+                "label": "Text Input",
+                "placeholder": "Enter text...",
+                "name": ""
+            }
+        }
+    ],
+    "settings": [],
+    "saved_at": "2025-09-07T16:53:59.685354Z",
+    "created_at": "2025-09-07T16:53:59.685501Z",
+    "modified_at": "2025-09-07T16:53:59.685526Z"
+}
