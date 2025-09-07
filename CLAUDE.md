@@ -38,9 +38,15 @@
 - [E2E 테스트](docs/CODING-TEST-E2E.md)
 - [문서화](docs/DOCUMENTATION.md)
 
-### 컴포넌트 사용법
-- [AuthManager 가이드](docs/AUTH-MANAGER-GUIDE.md)
+### 시스템 사용법
+- [AI 샌드박스 가이드](docs/AI-SANDBOX-GUIDE.md)
 - [ApiClient 가이드](docs/API-CLIENT-GUIDE.md)
+- [AuthManager 가이드](docs/AUTH-MANAGER-GUIDE.md)
+- [권한 시스템](docs/PERMISSION-SYSTEM.md)
+- [권한 Livewire 컴포넌트](docs/PERMISSION-LIVEWIRE-COMPONENTS.md)
+
+### 개발 규칙
+- [Blade 파일 제약사항](docs/BLADE_FILE_RESTRICTIONS.md)
 
 ## 문서 작성 규칙 (docs/DOCUMENTATION.md 준수)
 
