@@ -68,6 +68,8 @@ class Organization extends Model
             'user_id' => $user->id,
             'permission_level' => $permission->value,
             'invited_at' => now(),
+            'joined_at' => now(),
+            'invitation_status' => 'accepted',
         ]);
     }
 
@@ -197,7 +199,7 @@ class Organization extends Model
     {
         $currentMembers = $this->getCurrentUsage()['members'];
         $totalSeats = $this->getTotalLicenseQuantity('pro', 'seat') + $this->getTotalLicenseQuantity('enterprise', 'seat');
-        
+
         return ($currentMembers + $count) <= $totalSeats;
     }
 
@@ -205,7 +207,7 @@ class Organization extends Model
     {
         $currentMembers = $this->getCurrentUsage()['members'];
         $totalSeats = $this->getTotalLicenseQuantity('pro', 'seat') + $this->getTotalLicenseQuantity('enterprise', 'seat');
-        
+
         return max(0, $totalSeats - $currentMembers);
     }
 }

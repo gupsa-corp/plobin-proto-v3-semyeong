@@ -54,7 +54,7 @@ class CreateOrganization extends Component
         ]);
 
         session()->flash('message', '조직이 성공적으로 생성되었습니다.');
-        
+
         $this->closeModal();
         $this->dispatch('organizationCreated');
     }

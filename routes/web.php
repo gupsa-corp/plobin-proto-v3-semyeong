@@ -25,7 +25,19 @@ foreach ($routes as $path => $config) {
             return redirect($redirectTo);
         });
     } else {
-        $route = Route::get($path, function () use ($viewName) {
+        $route = Route::get($path, function () use ($viewName, $path) {
+            // 조직 관련 페이지들에 조직 데이터 전달
+            if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
+                $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+                    ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+                    ->where('organization_members.user_id', auth()->id())
+                    ->where('organization_members.invitation_status', 'accepted')
+                    ->orderBy('organizations.created_at', 'desc')
+                    ->get();
+
+                return view($viewName, compact('organizations'));
+            }
+
             return view($viewName);
         });
     }
@@ -312,27 +324,27 @@ Route::prefix('sandbox/form-publisher')->group(function () {
     Route::get('/', function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list');
-    
+
     Route::get('/editor', function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'editor']);
     })->name('sandbox.form-publisher.editor');
-    
+
     Route::post('/editor', function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'editor']);
     })->name('sandbox.form-publisher.editor.post');
-    
+
     Route::get('/preview/{id}', function ($id) {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'preview', 'id' => $id]);
     })->name('sandbox.form-publisher.preview');
-    
+
     Route::post('/preview/{id}', function ($id) {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'preview', 'id' => $id]);
     })->name('sandbox.form-publisher.preview.post');
-    
+
     Route::get('/list', function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list.full');
-    
+
     Route::post('/list', function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list.post');

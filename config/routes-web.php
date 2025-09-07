@@ -9,6 +9,7 @@ return [
     '/reset-password' => ['view' => '200-page-auth.204-page-auth-reset-password.000-index', 'name' => 'password.reset'],
     '/dashboard' => ['view' => '300-page-service.301-page-dashboard.000-index', 'name' => 'dashboard'],
     '/organizations' => ['view' => '300-page-service.306-page-organizations-list.000-index', 'name' => 'organizations.index'],
+    '/organizations/create' => ['view' => '300-page-service.306-page-organizations-list.000-index', 'name' => 'organizations.create'],
     '/mypage' => ['view' => '300-page-service.303-page-mypage-profile.000-index', 'name' => 'profile'],
     '/mypage/edit' => ['view' => '300-page-service.304-page-mypage-edit.000-index', 'name' => 'profile.edit'],
     '/mypage/delete' => ['view' => '300-page-service.305-page-mypage-delete.000-index', 'name' => 'account.delete'],
