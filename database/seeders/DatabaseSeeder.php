@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            PricingPlanSeeder::class,
         ]);
 
         // 테스트용 관리자 계정 생성
@@ -78,10 +79,18 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 구독 및 결제 관련 시딩
+        $this->call([
+            SubscriptionSeeder::class,
+            PaymentMethodSeeder::class,
+            BillingHistorySeeder::class,
+        ]);
+
         $this->command->info('🎉 데이터베이스 시딩 완료!');
         $this->command->info('로그인 테스트용 계정:');
         $this->command->info('👤 admin@gupsa.com / password (platform_admin 권한)');
         $this->command->info('🏢 테스트 조직 생성됨');
         $this->command->info('📁 테스트 프로젝트 생성됨');
+        $this->command->info('💳 결제 및 구독 데이터 생성됨');
     }
 }

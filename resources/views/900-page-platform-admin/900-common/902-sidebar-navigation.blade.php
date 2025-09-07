@@ -40,6 +40,15 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('platform.admin.pricing') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.pricing*') ? 'bg-blue-50 text-blue-700' : '' }}">
+                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                    </svg>
+                    요금제 관리
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('platform.admin.permissions') }}"
                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.permissions*') ? 'bg-blue-50 text-blue-700' : '' }}">
                     <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">

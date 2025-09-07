@@ -22,6 +22,7 @@ return [
     '/platform/admin/organizations' => ['view' => '900-page-platform-admin.902-page-organizations.000-index', 'name' => 'platform.admin.organizations'],
     '/platform/admin/users' => ['view' => '900-page-platform-admin.903-page-users.000-index', 'name' => 'platform.admin.users'],
     '/platform/admin/system-settings' => ['view' => '900-page-platform-admin.904-page-system-settings.000-index', 'name' => 'platform.admin.system-settings'],
+    '/platform/admin/pricing' => ['view' => '900-page-platform-admin.906-page-pricing.000-index', 'name' => 'platform.admin.pricing'],
     '/platform/admin/permissions' => ['view' => '900-page-platform-admin.905-page-permissions.000-index', 'name' => 'platform.admin.permissions'],
     '/platform/admin/permissions/roles' => ['view' => '900-page-platform-admin.905-page-permissions.901-tab-roles.000-index', 'name' => 'platform.admin.permissions.roles'],
     '/platform/admin/permissions/permissions' => ['view' => '900-page-platform-admin.905-page-permissions.902-tab-permissions.000-index', 'name' => 'platform.admin.permissions.permissions'],

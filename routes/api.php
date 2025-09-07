@@ -129,7 +129,47 @@ Route::prefix('test/organizations')->group(function () {
     Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
 });
 
+// 플랫폼 관리자 권한 관리 API (개발용 - 인증 없음)
+Route::prefix('platform/admin/permissions')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\PermissionsController::class, 'index']);
+    Route::get('/matrix', [\App\Http\Controllers\Api\PermissionsController::class, 'getPermissionMatrix']);
+    Route::get('/stats', [\App\Http\Controllers\Api\PermissionsController::class, 'getStats']);
+    Route::get('/search', [\App\Http\Controllers\Api\PermissionsController::class, 'search']);
+    Route::get('/export', [\App\Http\Controllers\Api\PermissionsController::class, 'export']);
+    
+    Route::post('/', [\App\Http\Controllers\Api\PermissionsController::class, 'store']);
+    Route::put('/{permission}', [\App\Http\Controllers\Api\PermissionsController::class, 'update']);
+    Route::delete('/{permission}', [\App\Http\Controllers\Api\PermissionsController::class, 'destroy']);
+    
+    Route::post('/roles/permissions', [\App\Http\Controllers\Api\PermissionsController::class, 'updateRolePermissions']);
+    Route::post('/users/permissions', [\App\Http\Controllers\Api\PermissionsController::class, 'updateUserPermissions']);
+});
+
+// 플랫폼 관리자 역할 계층 관리 API (개발용 - 인증 없음)
+Route::prefix('platform/admin/roles')->group(function () {
+    Route::get('/hierarchy', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getHierarchy']);
+    Route::get('/assignable', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getAssignableRoles']);
+    Route::get('/stats', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getRoleStats']);
+    Route::get('/permissions', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getRolePermissions']);
+    Route::get('/capabilities', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getUserManagementCapabilities']);
+    
+    Route::post('/validate-assignment', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'validateAssignment']);
+    Route::post('/assign', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'assignRole']);
+    Route::post('/suggest', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'suggestRole']);
+});
+
 // 샌드박스 API (개발용 - 인증 없음)
 Route::prefix('sandbox')->group(function () {
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
+});
+
+// 플랫폼 관리자 요금제 관리 API (개발용 - 인증 없음)
+Route::prefix('platform/admin/pricing')->group(function () {
+    Route::get('/plans', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'index']);
+    Route::post('/plans', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'store']);
+    Route::get('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'show']);
+    Route::put('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'update']);
+    Route::delete('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'destroy']);
+    Route::get('/statistics', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'getStatistics']);
+    Route::post('/subscriptions/{id}/cancel', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'cancelSubscription']);
 });
