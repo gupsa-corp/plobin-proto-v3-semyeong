@@ -22,8 +22,12 @@ class Controller extends BaseController
             // 스코프에 따라 가드명 결정
             $guardNames = $scope === 'platform' ? ['platform', 'web'] : ['web'];
 
-            // 권한 쿼리
+            // 권한 쿼리 - scope_level 컬럼이 없으므로 guard_name으로만 필터링
             $permissionQuery = Permission::whereIn('guard_name', $guardNames);
+            
+            // scope_level 컬럼이 존재하지 않으므로 주석 처리
+            // TODO: scope_level 컬럼 추가 후 아래 로직 활성화 필요
+            /*
             if ($scope === 'organization') {
                 $permissionQuery->where(function($query) {
                     $query->where('scope_level', 'organization')
@@ -37,6 +41,7 @@ class Controller extends BaseController
                           ->orWhereNull('scope_level');
                 });
             }
+            */
 
             // 역할 쿼리
             $roleQuery = Role::whereIn('guard_name', $guardNames);
