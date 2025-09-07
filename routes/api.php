@@ -22,11 +22,12 @@ use App\Http\Organization\GetOrganization\Controller as GetOrganizationControlle
 use App\Http\Organization\UpdateOrganization\Controller as UpdateOrganizationController;
 use App\Http\Organization\DeleteOrganization\Controller as DeleteOrganizationController;
 use App\Http\Organization\CheckUrlPath\Controller as CheckUrlPathController;
-use App\Http\ProjectPage\CreatePage\Controller as CreatePageController;
-use App\Http\ProjectPage\GetPages\Controller as GetPagesController;
-use App\Http\ProjectPage\GetPage\Controller as GetPageController;
-use App\Http\ProjectPage\UpdatePage\Controller as UpdatePageController;
-use App\Http\ProjectPage\DeletePage\Controller as DeletePageController;
+use App\Http\ProjectPage\Index\Controller as ProjectPageIndexController;
+use App\Http\ProjectPage\Store\Controller as ProjectPageStoreController;
+use App\Http\ProjectPage\Show\Controller as ProjectPageShowController;
+use App\Http\ProjectPage\Update\Controller as ProjectPageUpdateController;
+use App\Http\ProjectPage\Destroy\Controller as ProjectPageDestroyController;
+use App\Http\ProjectPage\UpdateOrder\Controller as ProjectPageUpdateOrderController;
 use App\Http\Organization\SearchMembers\Controller as SearchMembersController;
 use App\Http\Organization\InviteMembers\Controller as InviteMembersController;
 use App\Http\OrganizationBilling\GetBillingData\Controller as GetBillingDataController;
@@ -106,22 +107,13 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
 
 // 프로젝트 페이지 관리 API (개발용 - 인증 제거)
 Route::prefix('projects')->group(function () {
-    Route::get('/{project}/pages', GetPagesController::class);
-    Route::post('/{project}/pages', CreatePageController::class);
-    Route::get('/{project}/pages/{page}', GetPageController::class);
-    Route::put('/{project}/pages/{page}', UpdatePageController::class);
-    Route::delete('/{project}/pages/{page}', DeletePageController::class);
+    Route::get('/{project}/pages', ProjectPageIndexController::class);
+    Route::post('/{project}/pages', ProjectPageStoreController::class);
+    Route::get('/{project}/pages/{page}', ProjectPageShowController::class);
+    Route::put('/{project}/pages/{page}', ProjectPageUpdateController::class);
+    Route::delete('/{project}/pages/{page}', ProjectPageDestroyController::class);
 });
 
-// 프로젝트 탭 페이지 관리 API (개발용 - 인증 제거)
-Route::prefix('projects')->group(function () {
-    Route::get('/{project}/tabs', [App\Http\Controllers\Api\ProjectPageController::class, 'index']);
-    Route::post('/{project}/tabs', [App\Http\Controllers\Api\ProjectPageController::class, 'store']);
-    Route::get('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'show']);
-    Route::put('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'update']);
-    Route::delete('/{project}/tabs/{page}', [App\Http\Controllers\Api\ProjectPageController::class, 'destroy']);
-    Route::put('/{project}/tabs/order', [App\Http\Controllers\Api\ProjectPageController::class, 'updateOrder']);
-});
 
 // 테스트용 결제 API (인증 없음 - 개발용)
 Route::prefix('test/organizations')->group(function () {

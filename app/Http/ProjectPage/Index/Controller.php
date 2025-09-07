@@ -1,15 +1,25 @@
 <?php
 
-namespace App\Http\ProjectPage\GetPages;
+namespace App\Http\ProjectPage\Index;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Controller as BaseController;
+use App\Models\ProjectPage;
 use App\Models\Project;
+use App\Exceptions\ApiException;
 use Illuminate\Http\Request;
 
-class Controller extends ApiController
+class Controller extends BaseController
 {
-    public function __invoke(Request $request, Project $project)
+    /**
+     * 프로젝트의 페이지 목록 조회
+     */
+    public function __invoke(Request $request, $projectId)
     {
+        $project = Project::find($projectId);
+        if (!$project) {
+            throw ApiException::notFound('프로젝트를 찾을 수 없습니다.');
+        }
+
         $parentId = $request->query('parent_id');
         
         // parent_id가 'null' 문자열이나 빈 문자열인 경우 null로 처리
@@ -20,19 +30,18 @@ class Controller extends ApiController
             $parentId = (int) $parentId;
         }
         
+        $query = ProjectPage::where('project_id', $projectId);
+        
         if ($parentId === null) {
-            // parent_id가 null인 경우: 최상위 페이지들
-            $pages = $project->rootPages()->with(['children', 'user'])->get();
+            $query->whereNull('parent_id');
         } else {
-            // parent_id가 특정 값인 경우: 해당 부모의 하위 페이지들
-            $pages = $project->pages()
-                ->where('parent_id', $parentId)
-                ->with(['children', 'user'])
-                ->orderBy('sort_order')
-                ->get();
+            $query->where('parent_id', $parentId);
         }
         
-        return $this->success([
+        $pages = $query->orderBy('sort_order')->get();
+
+        return response()->json([
+            'success' => true,
             'data' => $pages,
             'debug' => [
                 'parent_id_param' => $request->query('parent_id'),

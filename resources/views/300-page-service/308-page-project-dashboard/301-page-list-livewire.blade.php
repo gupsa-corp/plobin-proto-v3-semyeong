@@ -7,6 +7,7 @@
                 @include('300-page-service.308-page-project-dashboard.302-page-tree-item', [
                     'page' => $page, 
                     'currentPage' => $currentPage, 
+                    'orgId' => $orgId,
                     'projectId' => $projectId, 
                     'level' => 0
                 ])

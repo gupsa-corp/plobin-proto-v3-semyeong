@@ -10,15 +10,20 @@ use Livewire\Attributes\On;
 
 class PageListLivewire extends Component
 {
+    public $orgId;
     public $projectId;
     public $pages = [];
     public $currentPage = null;
     public $isLoading = false;
 
-    protected $listeners = ['pageCreated' => 'loadPages'];
+    protected $listeners = [
+        'pageCreated' => 'loadPages',
+        'add-parent-page' => 'addParentPage'
+    ];
 
-    public function mount($projectId, $currentPageId = null)
+    public function mount($orgId, $projectId, $currentPageId = null)
     {
+        $this->orgId = $orgId;
         $this->projectId = $projectId;
         $this->loadPages();
         $this->setCurrentPageFromUrl($currentPageId);
@@ -56,22 +61,37 @@ class PageListLivewire extends Component
         $this->isLoading = true;
 
         try {
-            // ProjectPage 모델 사용하여 계층 구조 로드
-            $topLevelPages = ProjectPage::where('project_id', $this->projectId)
-                ->whereNull('parent_id')
-                ->with(['children' => function($query) {
-                    $query->orderBy('sort_order');
-                }])
+            // 모든 페이지를 가져와서 계층 구조 직접 구성
+            $allPages = ProjectPage::where('project_id', $this->projectId)
                 ->orderBy('sort_order')
-                ->get();
+                ->get()
+                ->toArray();
             
-            $this->pages = $this->buildHierarchy($topLevelPages->toArray());
+            $this->pages = $this->buildCompleteHierarchy($allPages);
             
         } catch (\Exception $e) {
             $this->pages = [];
         } finally {
             $this->isLoading = false;
         }
+    }
+
+    private function buildCompleteHierarchy($allPages, $parentId = null)
+    {
+        $result = [];
+        
+        foreach ($allPages as $page) {
+            if ($page['parent_id'] == $parentId) {
+                $pageArray = $page;
+                $children = $this->buildCompleteHierarchy($allPages, $page['id']);
+                if (count($children) > 0) {
+                    $pageArray['children'] = $children;
+                }
+                $result[] = $pageArray;
+            }
+        }
+        
+        return $result;
     }
 
     private function buildHierarchy($pages)
@@ -103,6 +123,31 @@ class PageListLivewire extends Component
         ];
         
         $this->dispatch('pageChanged', $this->currentPage);
+    }
+
+    /**
+     * 부모 페이지 추가 (최상위 페이지)
+     */
+    public function addParentPage()
+    {
+        // 최상위 페이지 개수를 기반으로 순서 결정
+        $parentCount = ProjectPage::where('project_id', $this->projectId)
+            ->whereNull('parent_id')
+            ->count();
+        
+        $parentPage = ProjectPage::create([
+            'title' => '새 페이지 ' . ($parentCount + 1),
+            'slug' => 'parent-page-' . uniqid(),
+            'content' => '',
+            'status' => 'draft',
+            'project_id' => $this->projectId,
+            'parent_id' => null,
+            'user_id' => auth()->id() ?: 1,
+            'sort_order' => $parentCount
+        ]);
+        
+        $this->loadPages();
+        $this->dispatch('pageCreated', $parentPage->id);
     }
 
     /**

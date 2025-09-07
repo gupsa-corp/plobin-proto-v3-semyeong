@@ -17,9 +17,19 @@
         {{-- 섹션 헤더 --}}
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
             <span style="font-size: 12px; font-weight: 500; color: #6B7280;">프로젝트 페이지</span>
+            <button 
+                x-data
+                @click="$dispatch('add-parent-page')"
+                style="width: 24px; height: 24px; border: none; border-radius: 4px; background: #F3F4F6; color: #6B7280; font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.background='#E5E7EB'"
+                onmouseout="this.style.background='#F3F4F6'"
+                title="새 페이지 추가">
+                +
+            </button>
         </div>
 
         @livewire('service.project-dashboard.page-list-livewire', [
+            'orgId' => request()->route('id'),
             'projectId' => request()->route('projectId') ?? 1,
             'currentPageId' => $currentPageId ?? 'dashboard-home'
         ])

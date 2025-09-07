@@ -1,6 +1,6 @@
 {{-- 재귀적 페이지 트리 아이템 --}}
 <div style="margin-left: {{ $level * 16 }}px;">
-    <a href="{{ route('project.dashboard.page', ['id' => request()->route('id'), 'projectId' => $projectId, 'pageId' => $page['id']]) }}"
+    <a href="{{ route('project.dashboard.page', ['id' => $orgId, 'projectId' => $projectId, 'pageId' => $page['id']]) }}"
        style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: pointer; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }}"
          onmouseover="this.style.background='#F9FAFB'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='flex';"
          onmouseout="this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='none';">
@@ -8,7 +8,7 @@
             @if($level > 0)
                 <div style="width: 16px; height: 1px; background: #E5E7EB; margin-right: -8px;"></div>
             @endif
-            
+
             <svg style="width: 16px; height: 16px; color: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#10B981' : '#9CA3AF' }};" viewBox="0 0 16 16" fill="none">
                 @if(isset($page['children']) && count($page['children']) > 0)
                     {{-- 폴더 아이콘 (자식이 있는 경우) --}}
@@ -25,7 +25,7 @@
         </div>
         <div style="display: flex; gap: 4px; align-items: center;">
             {{-- 하위 페이지 추가 버튼 --}}
-            <button wire:click="addChildPage({{ $page['id'] }})" 
+            <button wire:click="addChildPage({{ $page['id'] }})"
                     style="display: none; width: 20px; height: 20px; border: none; border-radius: 3px; background: #F3F4F6; color: #6B7280; font-size: 12px; line-height: 1; cursor: pointer; align-items: center; justify-content: center;"
                     onmouseover="this.style.background='#E5E7EB'"
                     onmouseout="this.style.background='#F3F4F6'"
@@ -33,26 +33,9 @@
                     class="add-child-btn-{{ $page['id'] }}">
                 +
             </button>
-            
-            <span style="font-size: 10px; padding: 2px 6px; border-radius: 3px; 
-                  @if($page['status'] === 'published') 
-                      background: #ECFDF5; color: #059669;
-                  @elseif($page['status'] === 'draft') 
-                      background: #FEF3C7; color: #D97706;
-                  @else 
-                      background: #F3F4F6; color: #6B7280;
-                  @endif">
-                @if($page['status'] === 'published')
-                    공개
-                @elseif($page['status'] === 'draft')
-                    임시
-                @else
-                    보관
-                @endif
-            </span>
         </div>
     </a>
-    
+
     {{-- 자식 페이지들 재귀적으로 표시 --}}
     @if(isset($page['children']) && count($page['children']) > 0)
         <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
@@ -60,6 +43,7 @@
                 @include('300-page-service.308-page-project-dashboard.302-page-tree-item', [
                     'page' => $childPage,
                     'currentPage' => $currentPage,
+                    'orgId' => $orgId,
                     'projectId' => $projectId,
                     'level' => $level + 1
                 ])
