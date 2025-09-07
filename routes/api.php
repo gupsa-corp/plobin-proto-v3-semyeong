@@ -35,6 +35,7 @@ use App\Http\OrganizationBilling\ProcessPayment\Controller as ProcessPaymentCont
 use App\Http\OrganizationBilling\CreateBusinessInfo\Controller as CreateBusinessInfoController;
 use App\Http\OrganizationBilling\BusinessLookup\Controller as BusinessLookupController;
 use App\Http\OrganizationBilling\DownloadReceipt\Controller as DownloadReceiptController;
+use App\Http\Controllers\Api\User\SearchUsers\Controller as SearchUsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,6 +81,9 @@ Route::prefix('user')->middleware(['auth.web-or-token'])->group(function () {
     Route::put('/profile', UpdateProfileController::class);
     Route::put('/password', ChangePasswordController::class);
 });
+
+// 사용자 검색 API (플랫폼 관리자용 - 개발용으로 인증 제거)
+Route::get('/users/search', SearchUsersController::class);
 
 Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(function () {
     Route::get('/list', GetOrganizationsController::class);

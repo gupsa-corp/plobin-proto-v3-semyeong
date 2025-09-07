@@ -13,6 +13,7 @@ class Organization extends Model
 {
     protected $fillable = [
         'name',
+        'url',
         'description',
         'user_id',
         'status',
@@ -24,6 +25,11 @@ class Organization extends Model
     ];
 
     public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
