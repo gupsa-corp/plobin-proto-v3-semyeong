@@ -168,6 +168,14 @@ Route::prefix('test/organizations')->group(function () {
 // 샌드박스 API (개발용 - 인증 없음)
 Route::prefix('sandbox')->group(function () {
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
+    
+    // Form Creator API
+    Route::prefix('form-creator')->group(function () {
+        Route::post('/save', \App\Http\Sandbox\FormCreator\Save\Controller::class);
+        Route::get('/list', \App\Http\Sandbox\FormCreator\List\Controller::class);
+        Route::get('/load/{filename}', \App\Http\Sandbox\FormCreator\Load\Controller::class);
+        Route::delete('/delete/{filename}', \App\Http\Sandbox\FormCreator\Delete\Controller::class);
+    });
 });
 
 // 플랫폼 관리자 - 요금제 관리 API (개발용 - 인증 없음)

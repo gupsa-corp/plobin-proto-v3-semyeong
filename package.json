@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "alpinejs": "^3.15.0",
+        "formiojs": "^4.21.7",
         "libphonenumber-js": "^1.12.15"
     }
 }

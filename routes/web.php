@@ -295,6 +295,11 @@ Route::post('/sandbox/storage-manager/create', [App\Http\CoreApi\Sandbox\Storage
 Route::post('/sandbox/storage-manager/select', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
 Route::delete('/sandbox/storage-manager/delete', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
 
+// Form Creator
+Route::get('/sandbox/form-creator', function () {
+    return view('700-page-sandbox.709-page-form-creator.000-index');
+})->name('sandbox.form-creator');
+
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
     Auth::logout();

@@ -70,6 +70,11 @@
                     <h3 class="text-lg font-semibold text-blue-900 mb-2">통합 파일 에디터</h3>
                     <p class="text-blue-700">파일 매니저 + Monaco 에디터 통합 개발환경</p>
                 </a>
+                
+                <a href="/sandbox/form-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-green-200 bg-green-50">
+                    <h3 class="text-lg font-semibold text-green-900 mb-2">Form Creator</h3>
+                    <p class="text-green-700">비주얼 폼 빌더 - 드래그 앤 드롭으로 폼 생성</p>
+                </a>
             </div>
         </div>
     </div>

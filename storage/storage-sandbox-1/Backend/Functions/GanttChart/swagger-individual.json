@@ -1,0 +1,954 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "GanttChart API - Individual Endpoints",
+        "version": "1.0.0",
+        "description": "Comprehensive project and task management system with individual endpoints for each API function. Each endpoint is a separate PHP file providing focused functionality.",
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:9004/projects/gogo/Backend",
+            "description": "Local development server"
+        },
+        {
+            "url": "/Backend",
+            "description": "Production server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "API Information",
+            "description": "API information and documentation endpoints"
+        },
+        {
+            "name": "Projects",
+            "description": "Project management operations"
+        },
+        {
+            "name": "Tasks",
+            "description": "Task management operations"
+        },
+        {
+            "name": "Gantt Data",
+            "description": "Gantt chart data operations"
+        },
+        {
+            "name": "Task Progress",
+            "description": "Task progress tracking operations"
+        }
+    ],
+    "paths": {
+        "/api/info": {
+            "get": {
+                "tags": [
+                    "API Information"
+                ],
+                "summary": "Get comprehensive API information",
+                "description": "Returns detailed information about all available API endpoints",
+                "responses": {
+                    "200": {
+                        "description": "API information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/info/functions": {
+            "get": {
+                "tags": [
+                    "API Information"
+                ],
+                "summary": "Get list of all available functions",
+                "description": "Returns a simplified list of all available API functions",
+                "responses": {
+                    "200": {
+                        "description": "Functions list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get all projects",
+                "description": "Retrieves all projects with basic information ordered by creation date",
+                "responses": {
+                    "200": {
+                        "description": "Projects retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/projects/details": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get specific project with statistics",
+                "description": "Retrieves a specific project with detailed statistics",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID to retrieve"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/projects/overview": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project overview with timeline",
+                "description": "Retrieves comprehensive project overview including timeline information",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID to get overview for"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project overview retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tasks": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get project tasks",
+                "description": "Get all tasks for a specific project",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID to get tasks for"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tasks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing project ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tasks/details": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get specific task with dependencies",
+                "description": "Get specific task with detailed information including dependencies",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Task ID to retrieve"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Task not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tasks/by-status": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get tasks filtered by status",
+                "description": "Get tasks for a project filtered by specific status",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "in_progress",
+                                "completed",
+                                "cancelled",
+                                "on_hold"
+                            ],
+                            "example": "pending"
+                        },
+                        "description": "Task status to filter by"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filtered tasks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tasks/by-priority": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get tasks filtered by priority",
+                "description": "Get tasks for a project filtered by specific priority",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID"
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "medium",
+                                "high",
+                                "critical"
+                            ],
+                            "example": "high"
+                        },
+                        "description": "Task priority to filter by"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filtered tasks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/gantt/complete": {
+            "get": {
+                "tags": [
+                    "Gantt Data"
+                ],
+                "summary": "Get complete Gantt chart data",
+                "description": "Get complete Gantt chart data including timeline, milestones, and resources",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID for Gantt chart"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Complete Gantt data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing project ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/gantt/optimized": {
+            "get": {
+                "tags": [
+                    "Gantt Data"
+                ],
+                "summary": "Get optimized Gantt chart data",
+                "description": "Get performance-optimized Gantt chart data with essential fields only",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID for optimized Gantt chart"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Optimized Gantt data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing project ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/gantt/critical-path": {
+            "get": {
+                "tags": [
+                    "Gantt Data"
+                ],
+                "summary": "Get Gantt data with critical path analysis",
+                "description": "Get Gantt chart data with critical path analysis and task priority identification",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Project ID for critical path analysis"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gantt data with critical path retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing project ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/progress/update": {
+            "post": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Update task progress",
+                "description": "Update task progress with automatic status adjustment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "description": "Task ID to update"
+                                    },
+                                    "progress": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "maximum": 100,
+                                        "example": 50,
+                                        "description": "Progress percentage"
+                                    }
+                                },
+                                "required": [
+                                    "task_id",
+                                    "progress"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task progress updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/progress/batch-update": {
+            "post": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Batch update task progress",
+                "description": "Update multiple tasks progress in batch operation",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "updates": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "task_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "progress": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "maximum": 100,
+                                                    "example": 50
+                                                }
+                                            },
+                                            "required": [
+                                                "task_id",
+                                                "progress"
+                                            ]
+                                        },
+                                        "description": "Array of task updates"
+                                    }
+                                },
+                                "required": [
+                                    "updates"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Batch update completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/progress/update-status": {
+            "post": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Update task status",
+                "description": "Update task status directly with automatic progress adjustment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "description": "Task ID to update"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "in_progress",
+                                            "completed",
+                                            "cancelled",
+                                            "on_hold"
+                                        ],
+                                        "example": "completed",
+                                        "description": "New task status"
+                                    }
+                                },
+                                "required": [
+                                    "task_id",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/progress/history": {
+            "get": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Get task progress history",
+                "description": "Get complete progress change history for a specific task",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "Task ID to get history for"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task progress history retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing task ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ApiResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Operation success status"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Operation completed successfully",
+                        "description": "Success or error message"
+                    },
+                    "data": {
+                        "description": "Response data when success=true"
+                    }
+                },
+                "required": [
+                    "success"
+                ]
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Operation success status"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Error message description",
+                        "description": "Error description"
+                    }
+                },
+                "required": [
+                    "success",
+                    "message"
+                ]
+            },
+            "Project": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Project ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Sample Project",
+                        "description": "Project name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Project description",
+                        "description": "Project description"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-01-01",
+                        "description": "Project start date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-12-31",
+                        "description": "Project end date"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active",
+                        "description": "Project status"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime",
+                        "description": "Creation timestamp"
+                    }
+                }
+            },
+            "Task": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Task ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Task Name",
+                        "description": "Task name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Task description",
+                        "description": "Task description"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-01-01",
+                        "description": "Task start date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-01-15",
+                        "description": "Task end date"
+                    },
+                    "duration": {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Task duration in days"
+                    },
+                    "progress": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "example": 75,
+                        "description": "Task progress percentage"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "in_progress",
+                            "completed",
+                            "cancelled",
+                            "on_hold"
+                        ],
+                        "example": "in_progress",
+                        "description": "Task status"
+                    },
+                    "priority": {
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "critical"
+                        ],
+                        "example": "high",
+                        "description": "Task priority"
+                    },
+                    "assigned_to": {
+                        "type": "string",
+                        "example": "John Doe",
+                        "description": "Assigned team member"
+                    },
+                    "dependencies": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "example": [
+                            2,
+                            3
+                        ],
+                        "description": "Task dependency IDs"
+                    },
+                    "is_overdue": {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Whether task is overdue"
+                    },
+                    "days_remaining": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5.5,
+                        "description": "Days remaining to completion"
+                    }
+                }
+            }
+        }
+    }
+}
