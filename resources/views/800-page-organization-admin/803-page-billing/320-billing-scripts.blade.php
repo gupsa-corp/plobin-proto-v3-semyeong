@@ -114,13 +114,11 @@
 
                     const planNameEl = document.getElementById('plan-name');
                     const planStatusEl = document.getElementById('plan-status');
-                    const monthlyPriceEl = document.getElementById('monthly-price');
                     const nextBillingDateEl = document.getElementById('next-billing-date');
                     const currentMembersEl = document.getElementById('current-members');
 
                     if (planNameEl) planNameEl.textContent = data.subscription.plan_name + ' 플랜';
                     if (planStatusEl) planStatusEl.textContent = data.subscription.is_active ? '활성' : '비활성';
-                    if (monthlyPriceEl) monthlyPriceEl.textContent = '₩' + data.subscription.monthly_price.toLocaleString();
                     if (nextBillingDateEl) nextBillingDateEl.textContent = data.subscription.next_billing_date;
                     if (currentMembersEl) currentMembersEl.textContent = `${data.usage.members} / ${data.subscription.max_members || '무제한'}`;
 
@@ -828,6 +826,7 @@
                 }
                 
                 // 플랜 선택 UI 업데이트
+                const planOptions = document.querySelectorAll('.plan-option');
                 planOptions.forEach(option => {
                     option.classList.remove('border-blue-500', 'bg-blue-50');
                     option.classList.add('border-gray-200');

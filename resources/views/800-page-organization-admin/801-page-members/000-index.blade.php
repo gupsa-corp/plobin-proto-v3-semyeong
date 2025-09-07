@@ -7,10 +7,7 @@
         @include('800-page-organization-admin.800-common.200-sidebar-main')
         <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
             @include('800-page-organization-admin.800-common.100-header-main')
-            
-            {{-- Livewire 멤버 관리 컴포넌트 --}}
-            @livewire('test-component')
-            <hr class="my-8">
+
             @livewire('organization.admin.member-management', ['organizationId' => $id ?? 1])
         </div>
     </div>

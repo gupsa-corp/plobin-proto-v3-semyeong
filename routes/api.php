@@ -126,6 +126,10 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
         Route::get('/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
         Route::post('/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
         Route::get('/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
+        
+        // 토스페이먼츠 결제 검증 API
+        Route::post('/verify-payment', [\App\Http\CoreApi\OrganizationBilling\VerifyPayment\VerifyPaymentController::class, 'verify']);
+        Route::post('/download-receipt', [\App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller::class, 'download']);
     });
 });
 
@@ -163,6 +167,13 @@ Route::prefix('test/organizations')->group(function () {
     Route::get('{organization}/billing/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
     Route::post('{organization}/billing/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
     Route::get('{organization}/billing/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
+    
+    // 플랜 변경 API
+    Route::post('{organization}/billing/change-plan', [\App\Http\CoreApi\OrganizationBilling\ChangePlan\Controller::class, 'changePlan']);
+    
+    // 토스페이먼츠 결제 검증 API (테스트용이므로 주석 처리 - 메인 인증 API 사용)
+    // Route::post('{organization}/billing/verify-payment', [\App\Http\CoreApi\OrganizationBilling\VerifyPayment\Controller::class, 'verify']);
+    // Route::post('{organization}/billing/download-receipt', [\App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller::class, 'download']);
 });
 
 // 샌드박스 API (개발용 - 인증 없음)

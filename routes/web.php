@@ -165,17 +165,21 @@ Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
     return view('800-page-organization-admin.808-page-permissions-rules.000-index', compact('organizations'))->with('activeTab', 'rules');
 })->name('organization.admin.permissions.rules');
 
-Route::get('/organizations/{id}/admin/billing', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
-        ->where('organization_members.permission_level', '>=', 300)
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
+Route::get('/organizations/{organization}/admin/billing', [\App\Http\Billing\PaymentHistory\Controller::class, 'billing'])->name('organization.admin.billing');
 
-    return view('800-page-organization-admin.803-page-billing.300-billing', compact('id', 'organizations'));
-})->name('organization.admin.billing');
+// 플랜 계산기
+Route::get('/organizations/{organization}/admin/billing/plan-calculator', function ($organization) {
+    return view('800-page-organization-admin.803-page-billing.350-plan-calculator', compact('organization'));
+})->name('organization.admin.billing.plan-calculator');
+
+// 결제 성공/실패 페이지
+Route::get('/organizations/{organization}/admin/billing/payment-success', function ($organization) {
+    return view('800-page-organization-admin.803-page-billing.370-payment-success', compact('organization'));
+})->name('organization.admin.billing.payment-success');
+
+Route::get('/organizations/{organization}/admin/billing/payment-fail', function ($organization) {
+    return view('800-page-organization-admin.803-page-billing.375-payment-fail', compact('organization'));
+})->name('organization.admin.billing.payment-fail');
 
 // 결제 내역 관련 라우트들
 Route::get('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history');
@@ -183,6 +187,9 @@ Route::get('/organizations/{organization}/admin/billing/payment-history/{billing
 Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/receipt', [\App\Http\Billing\DownloadReceipt\Controller::class, 'download'])->name('organization.admin.billing.download-receipt');
 Route::post('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/retry', [\App\Http\Billing\RetryPayment\Controller::class, 'retry'])->name('organization.admin.billing.retry-payment');
 Route::get('/organizations/{organization}/admin/billing/export', [\App\Http\Billing\ExportHistory\Controller::class, 'export'])->name('organization.admin.billing.export');
+
+// AJAX 엔드포인트 (동일한 컨트롤러, AJAX 요청 처리)
+Route::post('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history.ajax');
 
 Route::get('/organizations/{id}/admin/projects', function ($id) {
     $projects = \App\Models\Project::where('organization_id', $id)

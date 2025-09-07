@@ -7,11 +7,7 @@
                 <span id="plan-status" class="px-2.5 py-0.5 bg-blue-500 rounded-full text-xs font-medium"></span>
             </div>
             <p class="text-blue-100 mb-4">팀 협업을 위한 플랜</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <p class="text-blue-100 text-sm">월 요금</p>
-                    <p id="monthly-price" class="text-2xl font-bold"></p>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <p class="text-blue-100 text-sm">다음 결제일</p>
                     <p id="next-billing-date" class="text-lg font-medium"></p>
@@ -20,6 +16,15 @@
                     <p class="text-blue-100 text-sm">사용 중인 멤버</p>
                     <p id="current-members" class="text-lg font-medium"></p>
                 </div>
+            </div>
+            <div class="mt-4">
+                <a href="/organizations/{{ request()->route('organizationId') ?? request()->route('organization')->id ?? 1 }}/admin/billing/plan-calculator" 
+                   class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                    요금제 변경
+                </a>
             </div>
         </div>
         <div class="hidden md:block">
@@ -41,7 +46,11 @@
     </div>
     <h3 class="text-lg font-medium text-gray-900 mb-2">활성 구독이 없습니다</h3>
     <p class="text-gray-600 mb-4">플랜을 선택하여 서비스를 시작하세요</p>
-    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
-        플랜 선택하기
-    </button>
+    <a href="/organizations/{{ request()->route('organizationId') ?? request()->route('organization')->id ?? 1 }}/admin/billing/plan-calculator" 
+       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+        </svg>
+        요금제 선택
+    </a>
 </div>

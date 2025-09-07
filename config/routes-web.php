@@ -34,7 +34,6 @@ return [
     '/organizations/{id}/admin/permissions/roles' => ['view' => '800-page-organization-admin.806-page-permissions-roles.000-index', 'name' => 'organization.admin.permissions.roles'],
     '/organizations/{id}/admin/permissions/management' => ['view' => '800-page-organization-admin.807-page-permissions-management.000-index', 'name' => 'organization.admin.permissions.management'],
     '/organizations/{id}/admin/permissions/rules' => ['view' => '800-page-organization-admin.808-page-permissions-rules.000-index', 'name' => 'organization.admin.permissions.rules'],
-    '/organizations/{id}/admin/billing' => ['view' => '800-page-organization-admin.803-page-billing.300-billing', 'name' => 'organization.admin.billing'],
     '/organizations/{id}/admin/projects' => ['view' => '800-page-organization-admin.804-page-projects.000-index', 'name' => 'organization.admin.projects'],
     // AI 샌드박스 라우트들
     '/sandbox' => ['view' => '700-page-sandbox.000-index', 'name' => 'sandbox.index'],

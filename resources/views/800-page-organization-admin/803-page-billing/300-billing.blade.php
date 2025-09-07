@@ -1,4 +1,4 @@
-<?php $common = getCommonPath(); ?>
+<?php $common = '800-page-organization-admin.800-common'; ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
 @include($common . '.301-layout-head', ['title' => '결제 관리'])
