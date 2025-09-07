@@ -43,6 +43,17 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        'ai_sandbox' => [
+            'driver' => 'sqlite',
+            'database' => storage_path('ai-sandbox/db/ai.sqlite'),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => null,
+            'journal_mode' => null,
+            'synchronous' => null,
+            'transaction_mode' => 'DEFERRED',
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

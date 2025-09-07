@@ -140,6 +140,29 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
     return view('800-page-organization-admin.804-page-projects.000-index', compact('projects', 'id', 'organizations'));
 })->name('organization.admin.projects');
 
+// AI 샌드박스 페이지들 - 각 기능별 독립 라우트
+// 파일 매니저
+Route::get('/sandbox', function () {
+    return view('700-page-sandbox.701-page-file-manager.000-index');
+})->name('sandbox.file-manager');
+
+Route::get('/sandbox/file-manager', function () {
+    return view('700-page-sandbox.701-page-file-manager.000-index');
+})->name('sandbox.file-manager');
+// SQL 실행기
+Route::get('/sandbox/sql-executor', function () {
+    return view('700-page-sandbox.702-page-sql-executor.000-index');
+})->name('sandbox.sql-executor');
+
+// 테이블 매니저
+Route::get('/sandbox/table-manager', function () {
+    return view('700-page-sandbox.703-page-table-manager.000-index');
+})->name('sandbox.table-manager');
+// 코드 실행기
+Route::get('/sandbox/code-executor', function () {
+    return view('700-page-sandbox.704-page-code-executor.000-index');
+})->name('sandbox.code-executor');
+
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
     Auth::logout();
