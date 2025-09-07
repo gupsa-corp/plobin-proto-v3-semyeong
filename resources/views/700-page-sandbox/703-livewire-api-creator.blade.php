@@ -235,7 +235,7 @@
         
         require(['vs/editor/editor.main'], function() {
             editor = monaco.editor.create(document.getElementById('editor'), {
-                value: document.getElementById('hidden-textarea').value || '<?php\n\n// API 코드를 작성하세요',
+                value: document.getElementById('hidden-textarea').value || '// API 코드를 작성하세요',
                 language: 'php',
                 theme: 'vs-dark',
                 automaticLayout: true,
@@ -255,7 +255,8 @@
             
             // Listen for Livewire updates
             window.addEventListener('template-loaded', function() {
-                editor.setValue(@this.get('apiCode') || '<?php\n\n// API 코드를 작성하세요');
+                const apiCode = {!! json_encode($apiCode ?? '') !!};
+                editor.setValue(apiCode || '// API 코드를 작성하세요');
             });
         });
     });

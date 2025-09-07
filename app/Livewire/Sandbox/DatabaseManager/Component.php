@@ -45,11 +45,23 @@ class Component extends LivewireComponent
     
     private function getSandboxConnection()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/db/ai.sqlite");
-        
-        if (file_exists($sandboxDbPath)) {
-            // 매번 연결 설정을 새로 생성
+        try {
+            $selectedSandbox = Session::get('sandbox_storage', '1');
+            $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/db/ai.sqlite");
+            
+            // 파일 존재 확인
+            if (!file_exists($sandboxDbPath)) {
+                $this->addError('connection', "선택된 샌드박스({$selectedSandbox})의 데이터베이스 파일이 존재하지 않습니다.");
+                return null;
+            }
+            
+            // 파일 읽기 권한 확인
+            if (!is_readable($sandboxDbPath)) {
+                $this->addError('connection', "데이터베이스 파일에 읽기 권한이 없습니다.");
+                return null;
+            }
+            
+            // 연결 설정
             Config::set('database.connections.sandbox_sqlite', [
                 'driver' => 'sqlite',
                 'database' => $sandboxDbPath,
@@ -57,13 +69,19 @@ class Component extends LivewireComponent
                 'foreign_key_constraints' => true,
             ]);
             
-            // DB 매니저 재설정
+            // 기존 연결 정리 후 새로 연결
             DB::purge('sandbox_sqlite');
+            $connection = DB::connection('sandbox_sqlite');
             
-            return DB::connection('sandbox_sqlite');
+            // 연결 테스트
+            $connection->getPdo();
+            
+            return $connection;
+            
+        } catch (\Exception $e) {
+            $this->addError('connection', '데이터베이스 연결 실패: ' . $e->getMessage());
+            return null;
         }
-        
-        return null;
     }
     
     public function render()
@@ -85,19 +103,19 @@ class Component extends LivewireComponent
             $connection = $this->getSandboxConnection();
             
             if (!$connection) {
-                session()->flash('error', '선택된 샌드박스의 데이터베이스에 연결할 수 없습니다.');
                 return [];
             }
             
             $driver = $connection->getDriverName();
-            
             $tableNames = [];
             
             switch ($driver) {
                 case 'sqlite':
-                    $tables = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                    $tables = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
                     foreach ($tables as $table) {
-                        $tableNames[] = $table->name;
+                        if (isset($table->name)) {
+                            $tableNames[] = $table->name;
+                        }
                     }
                     break;
                     
@@ -107,30 +125,35 @@ class Component extends LivewireComponent
                         $tableName = $table->Tables_in_plobin_proto_v3 ?? 
                                     $table->{'Tables_in_' . config('database.connections.mysql.database')} ?? 
                                     array_values((array) $table)[0];
-                        $tableNames[] = $tableName;
+                        if ($tableName) {
+                            $tableNames[] = $tableName;
+                        }
                     }
                     break;
                     
                 case 'pgsql':
-                    $tables = $connection->select("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+                    $tables = $connection->select("SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename");
                     foreach ($tables as $table) {
-                        $tableNames[] = $table->tablename;
+                        if (isset($table->tablename)) {
+                            $tableNames[] = $table->tablename;
+                        }
                     }
                     break;
                     
                 default:
-                    // 기본적으로 information_schema 사용
-                    $tables = $connection->select("SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()");
+                    $tables = $connection->select("SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY table_name");
                     foreach ($tables as $table) {
-                        $tableNames[] = $table->table_name;
+                        if (isset($table->table_name)) {
+                            $tableNames[] = $table->table_name;
+                        }
                     }
                     break;
             }
             
-            return collect($tableNames)->sort()->values()->all();
+            return array_values(array_unique($tableNames));
             
         } catch (\Exception $e) {
-            session()->flash('error', '테이블 목록 조회 실패: ' . $e->getMessage());
+            $this->addError('tables', '테이블 목록 조회 실패: ' . $e->getMessage());
             return [];
         }
     }
@@ -148,6 +171,7 @@ class Component extends LivewireComponent
     public function loadTableData()
     {
         if (!$this->selectedTable) {
+            $this->columns = [];
             return;
         }
         
@@ -156,54 +180,81 @@ class Component extends LivewireComponent
             
             if (!$connection) {
                 $this->columns = [];
-                session()->flash('error', '선택된 샌드박스의 데이터베이스에 연결할 수 없습니다.');
+                return;
+            }
+            
+            // 테이블 존재 확인
+            $tableExists = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name = ?", [$this->selectedTable]);
+            if (empty($tableExists)) {
+                $this->columns = [];
+                $this->addError('table', '선택한 테이블이 존재하지 않습니다.');
                 return;
             }
             
             // 테이블 컬럼 정보 가져오기
             $this->columns = Schema::connection('sandbox_sqlite')->getColumnListing($this->selectedTable);
+            
+            // 컬럼이 없는 경우 처리
+            if (empty($this->columns)) {
+                $this->addError('columns', '테이블 컬럼 정보를 가져올 수 없습니다.');
+            }
                 
         } catch (\Exception $e) {
             $this->columns = [];
-            session()->flash('error', '테이블 데이터 로드 실패: ' . $e->getMessage());
+            $this->addError('table_data', '테이블 데이터 로드 실패: ' . $e->getMessage());
         }
     }
     
     public function getPaginatedData()
     {
+        // 기본값 초기화
         if (!$this->selectedTable || empty($this->columns)) {
-            return null;
+            return collect([])->paginate($this->perPage);
         }
         
         try {
             $connection = $this->getSandboxConnection();
             
             if (!$connection) {
-                session()->flash('error', '선택된 샌드박스의 데이터베이스에 연결할 수 없습니다.');
-                return null;
+                return collect([])->paginate($this->perPage);
+            }
+            
+            // 테이블 존재 재확인
+            $tableExists = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name = ?", [$this->selectedTable]);
+            if (empty($tableExists)) {
+                return collect([])->paginate($this->perPage);
             }
             
             $query = $connection->table($this->selectedTable);
             
             // 검색 기능
-            if (!empty($this->search)) {
-                $query->where(function($q) {
-                    foreach ($this->columns as $column) {
-                        $q->orWhere($column, 'LIKE', '%' . $this->search . '%');
-                    }
-                });
+            if (!empty($this->search) && is_array($this->columns)) {
+                $searchTerm = trim($this->search);
+                if (strlen($searchTerm) > 0) {
+                    $query->where(function($q) use ($searchTerm) {
+                        foreach ($this->columns as $column) {
+                            if (!empty($column)) {
+                                $q->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+                            }
+                        }
+                    });
+                }
             }
             
             // 정렬 기능
-            if (!empty($this->sortField) && in_array($this->sortField, $this->columns)) {
+            if (!empty($this->sortField) && 
+                !empty($this->columns) && 
+                in_array($this->sortField, $this->columns) &&
+                in_array(strtolower($this->sortDirection), ['asc', 'desc'])) {
                 $query->orderBy($this->sortField, $this->sortDirection);
             }
             
-            return $query->paginate($this->perPage);
+            // 페이지네이션
+            return $query->paginate(max(1, min(100, $this->perPage)));
             
         } catch (\Exception $e) {
-            session()->flash('error', '데이터 조회 실패: ' . $e->getMessage());
-            return null;
+            $this->addError('pagination', '데이터 조회 실패: ' . $e->getMessage());
+            return collect([])->paginate($this->perPage);
         }
     }
     
