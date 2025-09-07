@@ -17,9 +17,8 @@ class DatabaseManager
         $formPublisherDir = dirname($currentFile);  // FormPublisher 폴더
         $functionsDir = dirname($formPublisherDir);  // Functions 폴더
         $backendDir = dirname($functionsDir);  // Backend 폴더
-        $sandboxDir = dirname($backendDir);  // storage-sandbox-1 폴더
 
-        $this->dbPath = $sandboxDir . 'storage/storage-sandbox-1/Backend/Databases/Release.sqlite';
+        $this->dbPath = $backendDir . '/Databases/Release.sqlite';
 
         // 디버그용 경로 확인
         if (!file_exists($this->dbPath)) {
