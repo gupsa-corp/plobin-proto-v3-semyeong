@@ -1,6 +1,48 @@
 {{-- 사용자 관리 메인 콘텐츠 --}}
 <div class="users-content" style="padding: 24px;" x-data="usersManagement">
 
+    {{-- 검색 및 필터 --}}
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {{-- 검색 --}}
+            <div class="md:col-span-2">
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">검색</label>
+                <input type="text" 
+                       id="search"
+                       x-model="searchTerm"
+                       @input="filterUsers()"
+                       placeholder="이름 또는 이메일로 검색..."
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            {{-- 상태 필터 --}}
+            <div>
+                <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+                <select x-model="statusFilter" 
+                        @change="filterUsers()"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">전체</option>
+                    <option value="active">활성</option>
+                    <option value="suspended">일시중단</option>
+                    <option value="inactive">비활성</option>
+                </select>
+            </div>
+            
+        </div>
+        
+        {{-- 필터 리셋 버튼 --}}
+        <div class="mt-4 flex justify-between items-center">
+            <button @click="resetFilters()" 
+                    class="text-sm text-gray-600 hover:text-gray-800">
+                필터 초기화
+            </button>
+            <button @click="refreshData()" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm">
+                새로고침
+            </button>
+        </div>
+    </div>
+
     {{-- 사용자 목록 테이블 --}}
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -16,9 +58,6 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             조직 소속
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            역할
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             상태
@@ -52,17 +91,6 @@
                                     <span x-text="user.organizations_count || '0'"></span>개 조직
                                 </div>
                                 <div class="text-sm text-gray-500" x-text="user.primary_organization || '소속없음'"></div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full"
-                                      :class="{
-                                          'bg-red-100 text-red-800': user.role === 'platform_admin',
-                                          'bg-blue-100 text-blue-800': user.role === 'org_admin',
-                                          'bg-gray-100 text-gray-800': user.role === 'member'
-                                      }">
-                                    <span x-text="user.role === 'platform_admin' ? '플랫폼 관리자' :
-                                                user.role === 'org_admin' ? '조직 관리자' : '일반 멤버'"></span>
-                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs font-medium rounded-full"
@@ -117,59 +145,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('usersManagement', () => ({
         searchTerm: '',
         statusFilter: '',
-        roleFilter: '',
-        users: [
-            {
-                id: 1,
-                name: '김철수',
-                email: 'kim@techstartup.co.kr',
-                organizations_count: 2,
-                primary_organization: '테크스타트업코리아',
-                role: 'platform_admin',
-                status: 'active',
-                last_login: '2024-09-07 10:30'
-            },
-            {
-                id: 2,
-                name: '이영희',
-                email: 'lee@aidev.com',
-                organizations_count: 1,
-                primary_organization: 'AI개발연구소',
-                role: 'org_admin',
-                status: 'active',
-                last_login: '2024-09-06 15:20'
-            },
-            {
-                id: 3,
-                name: '박민수',
-                email: 'park@digitalsol.co.kr',
-                organizations_count: 1,
-                primary_organization: '디지털솔루션',
-                role: 'member',
-                status: 'suspended',
-                last_login: '2024-09-01 09:15'
-            },
-            {
-                id: 4,
-                name: '최지원',
-                email: 'choi@mobileapp.studio',
-                organizations_count: 1,
-                primary_organization: '모바일앱스튜디오',
-                role: 'org_admin',
-                status: 'active',
-                last_login: '2024-09-07 08:45'
-            },
-            {
-                id: 5,
-                name: '정수현',
-                email: 'jung@example.com',
-                organizations_count: 0,
-                primary_organization: '소속없음',
-                role: 'member',
-                status: 'inactive',
-                last_login: '2024-08-15 14:20'
-            }
-        ],
+        users: @json($users ?? []),
         filteredUsers: [],
 
         init() {
@@ -184,15 +160,21 @@ document.addEventListener('alpine:init', () => {
                     user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
 
                 const matchesStatus = !this.statusFilter || user.status === this.statusFilter;
-                const matchesRole = !this.roleFilter || user.role === this.roleFilter;
 
-                return matchesSearch && matchesStatus && matchesRole;
+                return matchesSearch && matchesStatus;
             });
+        },
+
+        resetFilters() {
+            this.searchTerm = '';
+            this.statusFilter = '';
+            this.filteredUsers = this.users;
         },
 
         refreshData() {
             console.log('Refreshing users data...');
-            // 실제 구현시 API 호출
+            // 실제 구현시 API 호출로 페이지 새로고침 또는 AJAX 요청
+            window.location.reload();
         },
 
         viewUser(userId) {

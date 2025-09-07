@@ -140,4 +140,33 @@ class User extends Authenticatable
         return app(\App\Services\DynamicPermissionService::class)
             ->getUserPermissionSummary($this);
     }
+
+    /**
+     * 플랫폼 관리자 페이지용 사용자 목록 조회
+     */
+    public static function getUsersWithRoles()
+    {
+        return static::with(['organizations'])
+            ->withCount('organizations')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(fn($user) => $user->toArrayWithRole());
+    }
+
+    /**
+     * 사용자 정보를 배열로 변환
+     */
+    public function toArrayWithRole(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'organizations_count' => $this->organizations_count,
+            'primary_organization' => $this->organizations->first()?->name ?? '소속없음',
+            'status' => 'active', // 기본값, 실제 구현시 사용자 상태 필드 추가
+            'last_login' => $this->updated_at->format('Y-m-d H:i'),
+            'created_at' => $this->created_at->format('Y-m-d H:i')
+        ];
+    }
 }
