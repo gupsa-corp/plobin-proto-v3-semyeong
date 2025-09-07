@@ -6,8 +6,8 @@ use Livewire\Component;
 use App\Models\User;
 use App\Models\Organization;
 use App\Models\OrganizationMember;
-use App\Enums\OrganizationPermission;
-use App\Services\PermissionService;
+use App\Services\DynamicPermissionService;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
@@ -24,7 +24,7 @@ class MemberManagement extends Component
     // 새 멤버 초대 관련 속성
     public $showInviteModal = false;
     public $inviteEmail = '';
-    public $invitePermission = 100; // USER 권한
+    public $inviteRole = 'user'; // 기본 사용자 역할
 
     public function mount($organizationId = 1)
     {
@@ -64,7 +64,11 @@ class MemberManagement extends Component
 
             return $members->map(function ($member) {
                 try {
-                    $permission = OrganizationPermission::from($member->permission_level);
+                    // 사용자의 역할 정보 가져오기
+                    $userRoles = $member->user->getRoleNames();
+                    $primaryRole = $userRoles->first() ?? 'user';
+                    $role = Role::findByName($primaryRole);
+                    
                     $statusName = match($member->invitation_status) {
                         'pending' => '대기 중',
                         'accepted' => '활성',
@@ -76,25 +80,30 @@ class MemberManagement extends Component
                         ($member->joined_at ? $member->joined_at->diffForHumans() : '알 수 없음') : 
                         '-';
 
+                    // 역할 기반 권한 정보 구성
+                    $roleInfo = $this->getRoleDisplayInfo($primaryRole);
+
                     return [
                         'id' => $member->id,
                         'user_id' => $member->user->id,
                         'name' => $member->user->name ?? $member->user->email,
                         'email' => $member->user->email,
+                        'role' => $primaryRole,
                         'permission' => [
-                            'value' => $permission->value,
-                            'label' => $permission->getLabel(),
-                            'short_label' => $permission->getShortLabel(),
-                            'badge_color' => $permission->getBadgeColor(),
-                            'level' => $permission->getLevel(),
-                            'level_name' => $permission->getLevelName()
+                            'role' => $primaryRole,
+                            'label' => $roleInfo['label'],
+                            'short_label' => $roleInfo['short_label'],
+                            'badge_color' => $roleInfo['badge_color'],
+                            'level' => $roleInfo['level'],
+                            'level_name' => $roleInfo['level_name'],
+                            'permissions' => $member->user->getAllPermissions()->pluck('name')->toArray()
                         ],
                         'status' => $member->invitation_status,
                         'status_name' => $statusName,
                         'joined_at' => $member->joined_at ? $member->joined_at->format('Y.m.d') : 
                                       ($member->invited_at ? $member->invited_at->format('Y.m.d') : '-'),
                         'last_active' => $lastActive,
-                        'avatar_color' => $permission->getBadgeColor(),
+                        'avatar_color' => $roleInfo['badge_color'],
                         'avatar_initial' => substr($member->user->name ?? $member->user->email, 0, 1)
                     ];
                 } catch (\Exception $e) {
@@ -119,7 +128,7 @@ class MemberManagement extends Component
         $activeMembers = count(array_filter($this->members, fn($member) => $member['status'] === 'active'));
         $pendingMembers = count(array_filter($this->members, fn($member) => $member['status'] === 'pending'));
         $adminMembers = count(array_filter($this->members, fn($member) => 
-            $member['permission']['value'] >= OrganizationPermission::ORGANIZATION_ADMIN->value
+            in_array($member['role'], ['organization_admin', 'organization_owner', 'platform_admin'])
         ));
 
         $this->stats = [
@@ -160,37 +169,46 @@ class MemberManagement extends Component
         return $members;
     }
 
-    public function changePermission($memberId, $newPermissionValue)
+    public function changeRole($memberId, $newRoleName)
     {
         try {
             $member = OrganizationMember::findOrFail($memberId);
+            $user = $member->user;
             
             // 조직 소유자의 권한을 낮추려고 하는 경우 방지
-            if ($member->permission_level >= OrganizationPermission::ORGANIZATION_OWNER->value && 
-                $newPermissionValue < OrganizationPermission::ORGANIZATION_OWNER->value) {
+            if ($user->hasRole('organization_owner') && $newRoleName !== 'organization_owner') {
                 $this->dispatch('error', [
                     'message' => '조직 소유자의 권한은 낮출 수 없습니다. 소유자 권한은 보호됩니다.'
                 ]);
                 return;
             }
             
-            // 권한 확인 - 현재 사용자가 멤버 관리 권한이 있는지 체크 (실제로는 인증 로직 필요)
-            $member->update([
-                'permission_level' => $newPermissionValue
-            ]);
+            // 현재 사용자가 멤버 관리 권한이 있는지 체크
+            if (!auth()->user()->can('manage members')) {
+                $this->dispatch('error', [
+                    'message' => '멤버 관리 권한이 없습니다.'
+                ]);
+                return;
+            }
+
+            // 기존 역할 제거 후 새 역할 할당
+            $user->syncRoles([$newRoleName]);
+            
+            // 동적 권한 서비스를 통한 기본 권한 할당
+            app(DynamicPermissionService::class)->assignBasicPermissions($user, $newRoleName);
 
             $this->loadData(); // 데이터 새로고침
             
-            $permission = OrganizationPermission::from($newPermissionValue);
+            $roleInfo = $this->getRoleDisplayInfo($newRoleName);
             $this->dispatch('permissionChanged', [
                 'memberId' => $memberId,
-                'newPermission' => $permission->getLabel(),
-                'message' => '권한이 성공적으로 변경되었습니다.'
+                'newPermission' => $roleInfo['label'],
+                'message' => '역할이 성공적으로 변경되었습니다.'
             ]);
             
         } catch (\Exception $e) {
             $this->dispatch('error', [
-                'message' => '권한 변경 중 오류가 발생했습니다: ' . $e->getMessage()
+                'message' => '역할 변경 중 오류가 발생했습니다: ' . $e->getMessage()
             ]);
         }
     }
@@ -202,7 +220,7 @@ class MemberManagement extends Component
             $userName = $member->user->name ?? $member->user->email;
             
             // 조직 소유자는 삭제할 수 없도록 보호
-            if ($member->permission_level >= OrganizationPermission::ORGANIZATION_OWNER->value) {
+            if ($member->user->hasRole('organization_owner')) {
                 $this->dispatch('error', [
                     'message' => '조직 소유자는 삭제할 수 없습니다.'
                 ]);
@@ -272,21 +290,21 @@ class MemberManagement extends Component
     {
         $this->showInviteModal = true;
         $this->inviteEmail = '';
-        $this->invitePermission = 100;
+        $this->inviteRole = 'user';
     }
 
     public function closeInviteModal()
     {
         $this->showInviteModal = false;
         $this->inviteEmail = '';
-        $this->invitePermission = 100;
+        $this->inviteRole = 'user';
     }
 
     public function inviteMember()
     {
         $this->validate([
             'inviteEmail' => 'required|email',
-            'invitePermission' => 'required|integer|min:0|max:500'
+            'inviteRole' => 'required|string|exists:roles,name'
         ]);
 
         try {
@@ -313,12 +331,18 @@ class MemberManagement extends Component
                 'country_code' => 'KR'
             ]);
 
-            // 조직 멤버 추가
-            $permission = OrganizationPermission::from($this->invitePermission);
+            // 사용자에게 역할 할당
+            $user->assignRole($this->inviteRole);
+            
+            // 동적 권한 서비스를 통한 기본 권한 할당
+            app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->inviteRole);
+            
+            // 조직 멤버 추가 (호환성 유지를 위해 permission_level도 설정)
+            $legacyPermissionLevel = $this->getLegacyPermissionLevel($this->inviteRole);
             OrganizationMember::create([
                 'organization_id' => $this->organizationId,
                 'user_id' => $user->id,
-                'permission_level' => $permission->value,
+                'permission_level' => $legacyPermissionLevel,
                 'invitation_status' => 'pending',
                 'invited_at' => now()
             ]);
@@ -331,9 +355,10 @@ class MemberManagement extends Component
             $this->loadData(); // 데이터 새로고침
             $this->closeInviteModal();
 
+            $roleInfo = $this->getRoleDisplayInfo($this->inviteRole);
             $this->dispatch('memberInvited', [
                 'email' => $this->inviteEmail,
-                'permission' => $permission->getLabel(),
+                'role' => $roleInfo['label'],
                 'message' => "{$this->inviteEmail}로 초대를 전송했습니다."
             ]);
 
@@ -347,15 +372,77 @@ class MemberManagement extends Component
         }
     }
 
-    public function getPermissionLevelsProperty()
+    public function getAvailableRolesProperty()
     {
-        return [
-            0 => '없음 (초대됨)',
-            1 => '사용자',
-            2 => '서비스 매니저',
-            3 => '조직 관리자',
-            4 => '조직 소유자',
-            5 => '플랫폼 관리자'
+        return Role::all()->mapWithKeys(function ($role) {
+            $info = $this->getRoleDisplayInfo($role->name);
+            return [$role->name => $info['label']];
+        })->toArray();
+    }
+    
+    /**
+     * 역할별 표시 정보 반환
+     */
+    private function getRoleDisplayInfo($roleName)
+    {
+        return match($roleName) {
+            'user' => [
+                'label' => '사용자',
+                'short_label' => '사용자',
+                'badge_color' => 'blue',
+                'level' => 1,
+                'level_name' => '사용자'
+            ],
+            'service_manager' => [
+                'label' => '서비스 매니저',
+                'short_label' => '매니저',
+                'badge_color' => 'green',
+                'level' => 2,
+                'level_name' => '서비스 매니저'
+            ],
+            'organization_admin' => [
+                'label' => '조직 관리자',
+                'short_label' => '관리자',
+                'badge_color' => 'purple',
+                'level' => 3,
+                'level_name' => '조직 관리자'
+            ],
+            'organization_owner' => [
+                'label' => '조직 소유자',
+                'short_label' => '소유자',
+                'badge_color' => 'red',
+                'level' => 4,
+                'level_name' => '조직 소유자'
+            ],
+            'platform_admin' => [
+                'label' => '플랫폼 관리자',
+                'short_label' => '최고관리자',
+                'badge_color' => 'gray',
+                'level' => 5,
+                'level_name' => '플랫폼 관리자'
+            ],
+            default => [
+                'label' => '게스트',
+                'short_label' => '게스트',
+                'badge_color' => 'yellow',
+                'level' => 0,
+                'level_name' => '게스트'
+            ]
+        ];
+    }
+    
+    /**
+     * 호환성을 위한 레거시 권한 레벨 반환
+     */
+    private function getLegacyPermissionLevel($roleName)
+    {
+        return match($roleName) {
+            'user' => 100,
+            'service_manager' => 200,
+            'organization_admin' => 300,
+            'organization_owner' => 400,
+            'platform_admin' => 500,
+            default => 0
         ];
     }
 
@@ -363,7 +450,7 @@ class MemberManagement extends Component
     {
         return view('900-page-platform-admin.910-livewire-member-management', [
             'filteredMembers' => $this->getFilteredMembersProperty(),
-            'permissionLevels' => $this->getPermissionLevelsProperty()
+            'availableRoles' => $this->getAvailableRolesProperty()
         ]);
     }
 }

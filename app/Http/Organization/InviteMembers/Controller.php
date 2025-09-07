@@ -6,9 +6,10 @@ use App\Http\Controllers\ApiController;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\OrganizationMember;
-use App\Enums\OrganizationPermission;
+use App\Services\DynamicPermissionService;
 use App\Exceptions\ApiException;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class Controller extends ApiController
 {
@@ -26,7 +27,7 @@ class Controller extends ApiController
             ->where('user_id', $currentUser->id)
             ->first();
 
-        if (!$currentMember || !OrganizationPermission::from($currentMember->permission_level)->canManageMembers()) {
+        if (!$currentMember || !$currentUser->can('invite members')) {
             throw ApiException::forbidden('멤버 초대 권한이 없습니다.');
         }
 
@@ -42,26 +43,24 @@ class Controller extends ApiController
         try {
             foreach ($invitations as $invitation) {
                 $email = $invitation['email'];
-                $permissionLevel = $invitation['permission_level'];
+                $roleName = $invitation['role'] ?? 'user';
                 $message = $invitation['message'] ?? null;
 
-                // 권한 레벨 유효성 확인
-                try {
-                    $permission = OrganizationPermission::from($permissionLevel);
-                } catch (\ValueError $e) {
+                // 역할 유효성 확인
+                $role = Role::where('name', $roleName)->first();
+                if (!$role) {
                     $results['failed'][] = [
                         'email' => $email,
-                        'reason' => '유효하지 않은 권한 레벨입니다.'
+                        'reason' => '유효하지 않은 역할입니다.'
                     ];
                     continue;
                 }
 
-                // 권한 부여 가능 여부 확인
-                $currentPermission = OrganizationPermission::from($currentMember->permission_level);
-                if (!$this->canGrantPermission($currentPermission, $permission)) {
+                // 역할 부여 가능 여부 확인
+                if (!$this->canGrantRole($currentUser, $roleName)) {
                     $results['failed'][] = [
                         'email' => $email,
-                        'reason' => '해당 권한을 부여할 수 있는 권한이 없습니다.'
+                        'reason' => '해당 역할을 부여할 수 있는 권한이 없습니다.'
                     ];
                     continue;
                 }
@@ -99,11 +98,18 @@ class Controller extends ApiController
                     continue;
                 }
 
-                // 멤버 초대 생성
+                // 사용자에게 역할 할당
+                $user->assignRole($roleName);
+                
+                // 동적 권한 서비스를 통한 기본 권한 할당
+                app(DynamicPermissionService::class)->assignBasicPermissions($user, $roleName);
+                
+                // 멤버 초대 생성 (호환성 유지)
+                $legacyPermissionLevel = $this->getLegacyPermissionLevel($roleName);
                 OrganizationMember::create([
                     'organization_id' => $organizationId,
                     'user_id' => $user->id,
-                    'permission_level' => $permissionLevel,
+                    'permission_level' => $legacyPermissionLevel,
                     'invitation_status' => 'pending',
                     'invited_at' => now()
                 ]);
@@ -111,9 +117,9 @@ class Controller extends ApiController
                 $results['successful'][] = [
                     'email' => $email,
                     'name' => $user->name,
-                    'permission' => [
-                        'level' => $permission->value,
-                        'label' => $permission->getLabel()
+                    'role' => [
+                        'name' => $roleName,
+                        'label' => $this->getRoleDisplayInfo($roleName)['label']
                     ]
                 ];
             }
@@ -140,30 +146,65 @@ class Controller extends ApiController
     }
 
     /**
-     * 권한 부여 가능 여부 확인
+     * 역할 부여 가능 여부 확인
      */
-    private function canGrantPermission(OrganizationPermission $currentPermission, OrganizationPermission $targetPermission): bool
+    private function canGrantRole(User $currentUser, string $targetRole): bool
     {
-        // 자신보다 높은 권한을 부여할 수 없음
-        if ($targetPermission->value >= $currentPermission->value) {
-            return false;
+        // 플랫폼 관리자만이 플랫폼 관리자 역할을 부여할 수 있음
+        if ($targetRole === 'platform_admin') {
+            return $currentUser->hasRole('platform_admin');
         }
 
-        // 플랫폼 관리자만이 플랫폼 관리자 권한을 부여할 수 있음
-        if ($targetPermission->value >= OrganizationPermission::PLATFORM_ADMIN->value) {
-            return $currentPermission->value >= OrganizationPermission::PLATFORM_ADMIN->value;
+        // 조직 소유자만이 조직 소유자 역할을 부여할 수 있음
+        if ($targetRole === 'organization_owner') {
+            return $currentUser->hasRole('organization_owner') || $currentUser->hasRole('platform_admin');
         }
 
-        // 조직 소유자만이 조직 소유자 권한을 부여할 수 있음
-        if ($targetPermission->value >= OrganizationPermission::ORGANIZATION_OWNER->value) {
-            return $currentPermission->value >= OrganizationPermission::ORGANIZATION_OWNER->value;
+        // 조직 관리자 이상은 조직 관리자까지 부여 가능
+        if ($targetRole === 'organization_admin') {
+            return $currentUser->hasAnyRole(['organization_admin', 'organization_owner', 'platform_admin']);
         }
 
-        // 조직 관리자는 조직 관리자까지만 부여 가능
-        if ($currentPermission->value >= OrganizationPermission::ORGANIZATION_ADMIN->value) {
-            return $targetPermission->value < OrganizationPermission::ORGANIZATION_OWNER->value;
+        // 서비스 매니저 이상은 서비스 매니저까지 부여 가능
+        if ($targetRole === 'service_manager') {
+            return $currentUser->hasAnyRole(['service_manager', 'organization_admin', 'organization_owner', 'platform_admin']);
+        }
+
+        // 사용자 역할은 서비스 매니저 이상이 부여 가능
+        if ($targetRole === 'user') {
+            return $currentUser->hasAnyRole(['service_manager', 'organization_admin', 'organization_owner', 'platform_admin']);
         }
 
         return false;
+    }
+    
+    /**
+     * 호환성을 위한 레거시 권한 레벨 반환
+     */
+    private function getLegacyPermissionLevel($roleName)
+    {
+        return match($roleName) {
+            'user' => 100,
+            'service_manager' => 200,
+            'organization_admin' => 300,
+            'organization_owner' => 400,
+            'platform_admin' => 500,
+            default => 0
+        };
+    }
+    
+    /**
+     * 역할별 표시 정보 반환
+     */
+    private function getRoleDisplayInfo($roleName)
+    {
+        return match($roleName) {
+            'user' => ['label' => '사용자'],
+            'service_manager' => ['label' => '서비스 매니저'],
+            'organization_admin' => ['label' => '조직 관리자'],
+            'organization_owner' => ['label' => '조직 소유자'],
+            'platform_admin' => ['label' => '플랫폼 관리자'],
+            default => ['label' => $roleName]
+        };
     }
 }

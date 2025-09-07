@@ -6,7 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\OrganizationMember;
-use App\Enums\OrganizationPermission;
+use App\Services\DynamicPermissionService;
 use App\Exceptions\ApiException;
 
 class Controller extends ApiController
@@ -25,7 +25,7 @@ class Controller extends ApiController
             ->where('user_id', $currentUser->id)
             ->first();
 
-        if (!$currentMember || !OrganizationPermission::from($currentMember->permission_level)->canManageMembers()) {
+        if (!$currentMember || !$currentUser->can('manage members')) {
             throw ApiException::forbidden('멤버 관리 권한이 없습니다.');
         }
 
@@ -49,7 +49,7 @@ class Controller extends ApiController
 
             $status = 'available'; // 초대 가능
             $statusText = '초대 가능';
-            $permission = null;
+            $roleInfo = null;
 
             if ($membership) {
                 switch ($membership->invitation_status) {
@@ -60,7 +60,9 @@ class Controller extends ApiController
                     case 'accepted':
                         $status = 'member';
                         $statusText = '이미 멤버';
-                        $permission = OrganizationPermission::from($membership->permission_level);
+                        $userRoles = $user->getRoleNames();
+                        $primaryRole = $userRoles->first() ?? 'user';
+                        $roleInfo = $this->getRoleDisplayInfo($primaryRole);
                         break;
                     case 'declined':
                         $status = 'declined';
@@ -76,10 +78,10 @@ class Controller extends ApiController
                 'avatar' => $user->avatar_url ?? null,
                 'status' => $status,
                 'status_text' => $statusText,
-                'permission' => $permission ? [
-                    'level' => $permission->value,
-                    'label' => $permission->getLabel(),
-                    'badge_color' => $permission->getBadgeColor()
+                'role' => $roleInfo ? [
+                    'name' => $roleInfo['name'],
+                    'label' => $roleInfo['label'],
+                    'badge_color' => $roleInfo['badge_color']
                 ] : null,
                 'joined_at' => $membership?->joined_at?->format('Y.m.d'),
                 'invited_at' => $membership?->invited_at?->format('Y.m.d')
@@ -91,5 +93,44 @@ class Controller extends ApiController
             'total' => $results->count(),
             'query' => $query
         ]);
+    }
+    
+    /**
+     * 역할별 표시 정보 반환
+     */
+    private function getRoleDisplayInfo($roleName)
+    {
+        return match($roleName) {
+            'user' => [
+                'name' => 'user',
+                'label' => '사용자',
+                'badge_color' => 'blue'
+            ],
+            'service_manager' => [
+                'name' => 'service_manager',
+                'label' => '서비스 매니저',
+                'badge_color' => 'green'
+            ],
+            'organization_admin' => [
+                'name' => 'organization_admin',
+                'label' => '조직 관리자',
+                'badge_color' => 'purple'
+            ],
+            'organization_owner' => [
+                'name' => 'organization_owner',
+                'label' => '조직 소유자',
+                'badge_color' => 'red'
+            ],
+            'platform_admin' => [
+                'name' => 'platform_admin',
+                'label' => '플랫폼 관리자',
+                'badge_color' => 'gray'
+            ],
+            default => [
+                'name' => $roleName,
+                'label' => $roleName,
+                'badge_color' => 'indigo'
+            ]
+        };
     }
 }

@@ -5,16 +5,19 @@ namespace App\Livewire\Organization\Admin;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Organization;
-use App\Enums\OrganizationPermission;
-use App\Services\PermissionService;
+use App\Services\DynamicPermissionService;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Collection;
 
 class PermissionManagement extends Component
 {
     public $organizationId;
     public $organization;
+    public $selectedRole = null;
     public $selectedPermission = null;
     public $permissionMatrix = [];
+    public $activeTab = 'overview';
 
     public function mount($organizationId = 1)
     {
@@ -25,82 +28,134 @@ class PermissionManagement extends Component
     public function loadData()
     {
         $this->organization = Organization::find($this->organizationId);
-        $this->permissionMatrix = PermissionService::getPermissionMatrix();
+        $this->permissionMatrix = app(DynamicPermissionService::class)->getPermissionMatrix();
     }
 
-    public function selectPermission($permissionValue)
+    public function selectRole($roleName)
     {
-        $this->selectedPermission = OrganizationPermission::from($permissionValue);
+        $this->selectedRole = Role::findByName($roleName);
+        $this->selectedPermission = null;
     }
 
-    public function getAvailableFeaturesForSelectedPermission()
+    public function selectPermission($permissionName)
     {
-        if (!$this->selectedPermission) {
-            return [];
+        $this->selectedPermission = Permission::findByName($permissionName);
+        $this->selectedRole = null;
+    }
+
+    public function getAvailableFeaturesForSelected()
+    {
+        if ($this->selectedRole) {
+            return app(DynamicPermissionService::class)->getRoleFeatures($this->selectedRole->name);
         }
-        
-        return PermissionService::getAvailableFeatures($this->selectedPermission);
+
+        if ($this->selectedPermission) {
+            return app(DynamicPermissionService::class)->getPermissionFeatures($this->selectedPermission->name);
+        }
+
+        return [];
     }
 
-    public function getPermissionLevelsProperty()
+    public function getRolesProperty()
     {
-        return [
-            [
-                'level' => 0,
-                'name' => '없음 (초대됨)',
-                'range' => '0-99',
-                'permissions' => [OrganizationPermission::INVITED],
-                'description' => '조직에 초대되었으나 아직 권한이 부여되지 않음',
-                'color' => 'yellow'
-            ],
-            [
-                'level' => 1,
-                'name' => '사용자',
-                'range' => '100-199',
-                'permissions' => [OrganizationPermission::USER, OrganizationPermission::USER_ADVANCED],
+        return Role::all()->map(function ($role) {
+            $permissions = $role->permissions->pluck('name')->toArray();
+            $info = $this->getRoleDisplayInfo($role->name);
+
+            return [
+                'name' => $role->name,
+                'label' => $info['label'],
+                'description' => $info['description'],
+                'color' => $info['color'],
+                'level' => $info['level'],
+                'permissions' => $permissions,
+                'permission_count' => count($permissions)
+            ];
+        })->sortBy('level')->values()->toArray();
+    }
+
+    public function getPermissionsProperty()
+    {
+        return Permission::all()->map(function ($permission) {
+            $roles = $permission->roles->pluck('name')->toArray();
+            $category = $this->getPermissionCategory($permission->name);
+
+            return [
+                'name' => $permission->name,
+                'guard_name' => $permission->guard_name,
+                'category' => $category,
+                'roles' => $roles,
+                'role_count' => count($roles)
+            ];
+        })->groupBy('category')->toArray();
+    }
+
+    /**
+     * 역할별 표시 정보 반환
+     */
+    private function getRoleDisplayInfo($roleName)
+    {
+        return match($roleName) {
+            'user' => [
+                'label' => '사용자',
                 'description' => '기본 사용자 권한, 프로젝트 참여 및 기본 기능 사용',
-                'color' => 'blue'
+                'color' => 'blue',
+                'level' => 1
             ],
-            [
-                'level' => 2,
-                'name' => '서비스 매니저',
-                'range' => '200-299',
-                'permissions' => [OrganizationPermission::SERVICE_MANAGER, OrganizationPermission::SERVICE_MANAGER_SENIOR],
+            'service_manager' => [
+                'label' => '서비스 매니저',
                 'description' => '서비스 관리 권한, 프로젝트 관리 및 팀 리딩',
-                'color' => 'green'
+                'color' => 'green',
+                'level' => 2
             ],
-            [
-                'level' => 3,
-                'name' => '조직 관리자',
-                'range' => '300-399',
-                'permissions' => [OrganizationPermission::ORGANIZATION_ADMIN, OrganizationPermission::ORGANIZATION_ADMIN_SENIOR],
+            'organization_admin' => [
+                'label' => '조직 관리자',
                 'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
-                'color' => 'purple'
+                'color' => 'purple',
+                'level' => 3
             ],
-            [
-                'level' => 4,
-                'name' => '조직 소유자',
-                'range' => '400-499',
-                'permissions' => [OrganizationPermission::ORGANIZATION_OWNER, OrganizationPermission::ORGANIZATION_OWNER_FOUNDER],
+            'organization_owner' => [
+                'label' => '조직 소유자',
                 'description' => '조직 소유자, 모든 조직 관리 권한',
-                'color' => 'red'
+                'color' => 'red',
+                'level' => 4
             ],
-            [
-                'level' => 5,
-                'name' => '플랫폼 관리자',
-                'range' => '500-599',
-                'permissions' => [OrganizationPermission::PLATFORM_ADMIN, OrganizationPermission::PLATFORM_ADMIN_SUPER],
+            'platform_admin' => [
+                'label' => '플랫폼 관리자',
                 'description' => '플랫폼 관리자, 시스템 관리 권한',
-                'color' => 'gray'
+                'color' => 'gray',
+                'level' => 5
+            ],
+            default => [
+                'label' => $roleName,
+                'description' => '사용자 정의 역할',
+                'color' => 'indigo',
+                'level' => 999
             ]
-        ];
+        };
+    }
+
+    /**
+     * 권한 카테고리 반환
+     */
+    private function getPermissionCategory($permissionName)
+    {
+        if (str_contains($permissionName, 'member')) return '멤버 관리';
+        if (str_contains($permissionName, 'project')) return '프로젝트 관리';
+        if (str_contains($permissionName, 'billing')) return '결제 관리';
+        if (str_contains($permissionName, 'organization')) return '조직 설정';
+        if (str_contains($permissionName, 'permission')) return '권한 관리';
+        return '기타';
     }
 
     public function render()
     {
         return view('900-page-platform-admin.920-livewire-permission-management', [
-            'permissionLevels' => $this->getPermissionLevelsProperty(),
-            'availableFeatures' => $this->getAvailableFeaturesForSelectedPermission()
+            'roles' => $this->getRolesProperty(),
+            'permissions' => $this->getPermissionsProperty(),
+            'availableFeatures' => $this->getAvailableFeaturesForSelected(),
+            'selectedRole' => $this->selectedRole,
+            'selectedPermission' => $this->selectedPermission
         ]);
     }
 }

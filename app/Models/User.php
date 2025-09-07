@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use App\Services\PhoneNumberHelper;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     protected $fillable = [
         'email',
@@ -104,5 +105,39 @@ class User extends Authenticatable
         return $this->belongsToMany(Organization::class, 'organization_members')
                     ->withPivot(['permission_level', 'joined_at', 'invited_at', 'invitation_status'])
                     ->withTimestamps();
+    }
+
+    /**
+     * 동적 권한 체크 - 편리한 메소드
+     */
+    public function canPerform(string $resourceType, string $action, array $context = []): bool
+    {
+        return app(\App\Services\DynamicPermissionService::class)
+            ->canPerformAction($this, $resourceType, $action, $context);
+    }
+
+    /**
+     * 기존 OrganizationPermission enum과의 호환성
+     */
+    public function hasOrganizationPermission(\App\Enums\OrganizationPermission $permission): bool
+    {
+        $organizationMember = $this->organizationMemberships()
+            ->where('organization_id', request()->route('organization'))
+            ->first();
+
+        if (!$organizationMember) {
+            return false;
+        }
+
+        return $organizationMember->permission_level >= $permission->value;
+    }
+
+    /**
+     * 사용자의 권한 요약 반환
+     */
+    public function getPermissionSummary(): array
+    {
+        return app(\App\Services\DynamicPermissionService::class)
+            ->getUserPermissionSummary($this);
     }
 }
