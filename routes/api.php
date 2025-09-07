@@ -35,8 +35,10 @@ use App\Http\CoreApi\OrganizationBilling\ProcessPayment\Controller as ProcessPay
 use App\Http\CoreApi\OrganizationBilling\CreateBusinessInfo\Controller as CreateBusinessInfoController;
 use App\Http\CoreApi\OrganizationBilling\BusinessLookup\Controller as BusinessLookupController;
 use App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller as DownloadReceiptController;
+use App\Http\CoreApi\OrganizationBilling\GetAvailablePlans\Controller as GetAvailablePlansController;
 use App\Http\CoreApi\User\SearchUsers\Controller as SearchUsersController;
 use App\Http\CoreApi\Sandbox\FileList\Controller as SandboxFileListController;
+use App\Http\CoreApi\PlatformAdmin\Pricing\Controller as PlatformAdminPricingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -103,6 +105,7 @@ Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(functio
     // 조직 결제 관리 API
     Route::prefix('{organization}/billing')->group(function () {
         Route::get('/data', GetBillingDataController::class);
+        Route::get('/available-plans', GetAvailablePlansController::class);
         Route::post('/payment/confirm', ProcessPaymentController::class);
         Route::post('/business-info', CreateBusinessInfoController::class);
         Route::post('/business-lookup', BusinessLookupController::class);
@@ -124,38 +127,10 @@ Route::prefix('projects')->group(function () {
 // 테스트용 결제 API (인증 없음 - 개발용)
 Route::prefix('test/organizations')->group(function () {
     Route::get('{organization}/billing/data', GetBillingDataController::class);
+    Route::get('{organization}/billing/available-plans', GetAvailablePlansController::class);
     Route::post('{organization}/billing/business-info', CreateBusinessInfoController::class);
     Route::post('{organization}/billing/business-lookup', BusinessLookupController::class);
     Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
-});
-
-// 플랫폼 관리자 권한 관리 API (개발용 - 인증 없음)
-Route::prefix('platform/admin/permissions')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Api\PermissionsController::class, 'index']);
-    Route::get('/matrix', [\App\Http\Controllers\Api\PermissionsController::class, 'getPermissionMatrix']);
-    Route::get('/stats', [\App\Http\Controllers\Api\PermissionsController::class, 'getStats']);
-    Route::get('/search', [\App\Http\Controllers\Api\PermissionsController::class, 'search']);
-    Route::get('/export', [\App\Http\Controllers\Api\PermissionsController::class, 'export']);
-    
-    Route::post('/', [\App\Http\Controllers\Api\PermissionsController::class, 'store']);
-    Route::put('/{permission}', [\App\Http\Controllers\Api\PermissionsController::class, 'update']);
-    Route::delete('/{permission}', [\App\Http\Controllers\Api\PermissionsController::class, 'destroy']);
-    
-    Route::post('/roles/permissions', [\App\Http\Controllers\Api\PermissionsController::class, 'updateRolePermissions']);
-    Route::post('/users/permissions', [\App\Http\Controllers\Api\PermissionsController::class, 'updateUserPermissions']);
-});
-
-// 플랫폼 관리자 역할 계층 관리 API (개발용 - 인증 없음)
-Route::prefix('platform/admin/roles')->group(function () {
-    Route::get('/hierarchy', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getHierarchy']);
-    Route::get('/assignable', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getAssignableRoles']);
-    Route::get('/stats', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getRoleStats']);
-    Route::get('/permissions', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getRolePermissions']);
-    Route::get('/capabilities', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'getUserManagementCapabilities']);
-    
-    Route::post('/validate-assignment', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'validateAssignment']);
-    Route::post('/assign', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'assignRole']);
-    Route::post('/suggest', [\App\Http\Controllers\Api\RoleHierarchyController::class, 'suggestRole']);
 });
 
 // 샌드박스 API (개발용 - 인증 없음)
@@ -163,13 +138,12 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
 });
 
-// 플랫폼 관리자 요금제 관리 API (개발용 - 인증 없음)
+// 플랫폼 관리자 - 요금제 관리 API (개발용 - 인증 없음)
 Route::prefix('platform/admin/pricing')->group(function () {
-    Route::get('/plans', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'index']);
-    Route::post('/plans', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'store']);
-    Route::get('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'show']);
-    Route::put('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'update']);
-    Route::delete('/plans/{id}', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'destroy']);
-    Route::get('/statistics', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'getStatistics']);
-    Route::post('/subscriptions/{id}/cancel', [\App\Http\Controllers\Api\PlatformAdmin\PricingPlanController::class, 'cancelSubscription']);
+    Route::get('/statistics', [PlatformAdminPricingController::class, 'getStatistics']);
+    Route::get('/plans', [PlatformAdminPricingController::class, 'getPlans']);
+    Route::post('/plans', [PlatformAdminPricingController::class, 'createPlan']);
+    Route::get('/plans/{id}', [PlatformAdminPricingController::class, 'showPlan']);
+    Route::put('/plans/{id}', [PlatformAdminPricingController::class, 'updatePlan']);
+    Route::delete('/plans/{id}', [PlatformAdminPricingController::class, 'deletePlan']);
 });

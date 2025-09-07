@@ -33,7 +33,7 @@
                     <div class="flex items-center">
 
                         <div class="ml-4">
-                            <div class="text-2xl font-bold text-gray-900" x-text="stats.totalMembers"></div>
+                            <div class="text-2xl font-bold text-gray-900">{{ $stats['totalMembers'] }}</div>
                             <div class="text-sm text-gray-600">총 멤버</div>
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                     <div class="flex items-center">
 
                         <div class="ml-4">
-                            <div class="text-2xl font-bold text-gray-900" x-text="stats.totalRoles"></div>
+                            <div class="text-2xl font-bold text-gray-900">{{ $stats['totalRoles'] }}</div>
                             <div class="text-sm text-gray-600">활성 역할</div>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                     <div class="flex items-center">
 
                         <div class="ml-4">
-                            <div class="text-2xl font-bold text-gray-900" x-text="stats.totalPermissions"></div>
+                            <div class="text-2xl font-bold text-gray-900">{{ $stats['totalPermissions'] }}</div>
                             <div class="text-sm text-gray-600">사용 가능한 권한</div>
                         </div>
                     </div>
@@ -79,37 +79,49 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
-                                <template x-for="member in members" :key="member.id">
+                                @foreach($members as $member)
                                     <tr>
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
-                                                    <span class="text-xs font-medium" x-text="member.name.charAt(0)"></span>
+                                                    <span class="text-xs font-medium">{{ substr($member['name'], 0, 1) }}</span>
                                                 </div>
-                                                <span x-text="member.name"></span>
+                                                <span>{{ $member['name'] }}</span>
                                             </div>
                                         </td>
                                         <td class="text-center py-2">
-                                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800" x-text="member.role"></span>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{{ $member['primary_role'] }}</span>
                                         </td>
                                         <td class="text-center py-2">
-                                            <span x-show="member.permissions.member" class="text-green-600">✓</span>
-                                            <span x-show="!member.permissions.member" class="text-gray-300">-</span>
+                                            @if($member['permissions']['member'])
+                                                <span class="text-green-600">✓</span>
+                                            @else
+                                                <span class="text-gray-300">-</span>
+                                            @endif
                                         </td>
                                         <td class="text-center py-2">
-                                            <span x-show="member.permissions.project" class="text-green-600">✓</span>
-                                            <span x-show="!member.permissions.project" class="text-gray-300">-</span>
+                                            @if($member['permissions']['project'])
+                                                <span class="text-green-600">✓</span>
+                                            @else
+                                                <span class="text-gray-300">-</span>
+                                            @endif
                                         </td>
                                         <td class="text-center py-2">
-                                            <span x-show="member.permissions.billing" class="text-green-600">✓</span>
-                                            <span x-show="!member.permissions.billing" class="text-gray-300">-</span>
+                                            @if($member['permissions']['billing'])
+                                                <span class="text-green-600">✓</span>
+                                            @else
+                                                <span class="text-gray-300">-</span>
+                                            @endif
                                         </td>
                                         <td class="text-center py-2">
-                                            <span x-show="member.permissions.organization" class="text-green-600">✓</span>
-                                            <span x-show="!member.permissions.organization" class="text-gray-300">-</span>
+                                            @if($member['permissions']['organization'])
+                                                <span class="text-green-600">✓</span>
+                                            @else
+                                                <span class="text-gray-300">-</span>
+                                            @endif
                                         </td>
                                     </tr>
-                                </template>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -142,30 +154,30 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <template x-for="role in organizationRoles" :key="role.id">
+                            @foreach($roles as $role)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div>
-                                            <div class="text-sm font-medium text-gray-900" x-text="role.name"></div>
-                                            <div class="text-sm text-gray-500" x-text="role.description"></div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $role['label'] }}</div>
+                                            <div class="text-sm text-gray-500">{{ $role['description'] }}</div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900" x-text="role.permissions_count + '개'"></div>
+                                        <div class="text-sm text-gray-900">{{ $role['permission_count'] }}개</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900" x-text="role.members_count + '명'"></div>
+                                        <div class="text-sm text-gray-900">{{ $role['member_count'] }}명</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end gap-2">
-                                            <button @click="editRole(role.id)"
+                                            <button onclick="editRole('{{ $role['name'] }}')"
                                                     class="text-blue-600 hover:text-blue-900">편집</button>
-                                            <button @click="manageRolePermissions(role.id)"
+                                            <button onclick="manageRolePermissions('{{ $role['name'] }}')"
                                                     class="text-green-600 hover:text-green-900">권한</button>
                                         </div>
                                     </td>
                                 </tr>
-                            </template>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -190,33 +202,143 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <template x-for="member in members" :key="member.id">
+                            @foreach($members as $member)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
-                                                <span class="text-sm font-medium text-gray-700" x-text="member.name.charAt(0)"></span>
+                                                <span class="text-sm font-medium text-gray-700">{{ substr($member['name'], 0, 1) }}</span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-medium text-gray-900" x-text="member.name"></div>
-                                                <div class="text-sm text-gray-500" x-text="member.email"></div>
+                                                <div class="text-sm font-medium text-gray-900">{{ $member['name'] }}</div>
+                                                <div class="text-sm text-gray-500">{{ $member['email'] }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800" x-text="member.role"></span>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ $member['primary_role'] }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span x-text="member.joined_at"></span>
+                                        <span>{{ $member['joined_at'] }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button @click="changeMemberRole(member.id)"
+                                        <button onclick="showRoleChangeModal({{ $member['id'] }}, '{{ $member['name'] }}', '{{ $member['primary_role'] }}')"
                                                 class="text-blue-600 hover:text-blue-900">역할 변경</button>
                                     </td>
                                 </tr>
-                            </template>
+                            @endforeach
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 역할 변경 모달 --}}
+    <div x-show="showRoleChangeModal" 
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         x-cloak
+         style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showRoleChangeModal = false"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">멤버 역할 변경</h3>
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600" x-text="'멤버: ' + selectedMember.name"></p>
+                        <p class="text-sm text-gray-600" x-text="'현재 역할: ' + selectedMember.currentRole"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">새 역할</label>
+                        <select x-model="selectedMember.newRole" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">역할을 선택하세요</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role['name'] }}">{{ $role['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" 
+                            @click="confirmRoleChange()"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        변경
+                    </button>
+                    <button type="button" 
+                            @click="showRoleChangeModal = false"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        취소
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 새 역할 추가 모달 --}}
+    <div x-show="showCreateRoleModal" 
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         x-cloak
+         style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showCreateRoleModal = false"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">새 역할 추가</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">역할 이름</label>
+                            <input type="text" 
+                                   x-model="newRole.name"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="역할 이름을 입력하세요">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">역할 설명</label>
+                            <textarea x-model="newRole.description"
+                                     rows="3"
+                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                     placeholder="역할에 대한 설명을 입력하세요"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">권한 선택</label>
+                            <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
+                                @foreach($permissions as $category => $categoryPermissions)
+                                    <div class="col-span-2">
+                                        <h4 class="font-medium text-gray-900 mt-2 mb-1">{{ $category }}</h4>
+                                    </div>
+                                    @foreach($categoryPermissions as $permission)
+                                        <label class="flex items-center space-x-2 text-sm">
+                                            <input type="checkbox" 
+                                                   :value="'{{ $permission['name'] }}'"
+                                                   x-model="newRole.permissions"
+                                                   class="rounded border-gray-300">
+                                            <span>{{ $permission['name'] }}</span>
+                                        </label>
+                                    @endforeach
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" 
+                            @click="createNewRole()"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        생성
+                    </button>
+                    <button type="button" 
+                            @click="showCreateRoleModal = false"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        취소
+                    </button>
                 </div>
             </div>
         </div>
@@ -229,60 +351,18 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('organizationPermissionManagement', () => ({
         activeTab: 'overview',
         showCreateRoleModal: false,
-        stats: {
-            totalMembers: 8,
-            totalRoles: 4,
-            totalPermissions: 15
+        showRoleChangeModal: false,
+        selectedMember: {
+            id: null,
+            name: '',
+            currentRole: '',
+            newRole: ''
         },
-        members: [
-            {
-                id: 1,
-                name: '김철수',
-                email: 'kim@company.com',
-                role: '조직 관리자',
-                joined_at: '2024-01-15',
-                permissions: { member: true, project: true, billing: true, organization: true }
-            },
-            {
-                id: 2,
-                name: '이영희',
-                email: 'lee@company.com',
-                role: '프로젝트 관리자',
-                joined_at: '2024-02-01',
-                permissions: { member: false, project: true, billing: false, organization: false }
-            },
-            {
-                id: 3,
-                name: '박민수',
-                email: 'park@company.com',
-                role: '일반 멤버',
-                joined_at: '2024-02-15',
-                permissions: { member: false, project: false, billing: false, organization: false }
-            }
-        ],
-        organizationRoles: [
-            {
-                id: 1,
-                name: '조직 관리자',
-                description: '조직의 모든 권한을 가진 관리자',
-                permissions_count: 12,
-                members_count: 2
-            },
-            {
-                id: 2,
-                name: '프로젝트 관리자',
-                description: '프로젝트 관리 권한을 가진 역할',
-                permissions_count: 8,
-                members_count: 3
-            },
-            {
-                id: 3,
-                name: '일반 멤버',
-                description: '기본적인 조직 참여 권한',
-                permissions_count: 3,
-                members_count: 15
-            }
-        ],
+        newRole: {
+            name: '',
+            description: '',
+            permissions: []
+        },
 
         init() {
             console.log('Organization permission management initialized');
@@ -290,15 +370,64 @@ document.addEventListener('alpine:init', () => {
 
         editRole(roleId) {
             console.log('Editing role:', roleId);
+            // TODO: 역할 편집 모달 구현
         },
 
         manageRolePermissions(roleId) {
             console.log('Managing permissions for role:', roleId);
+            // TODO: 권한 관리 페이지로 이동
         },
 
-        changeMemberRole(memberId) {
-            console.log('Changing role for member:', memberId);
+        showRoleChangeDialog(memberId, memberName, currentRole) {
+            this.selectedMember = {
+                id: memberId,
+                name: memberName,
+                currentRole: currentRole,
+                newRole: ''
+            };
+            this.showRoleChangeModal = true;
+        },
+
+        confirmRoleChange() {
+            if (!this.selectedMember.newRole) {
+                alert('새 역할을 선택해주세요.');
+                return;
+            }
+
+            @this.call('changeMemberRole', this.selectedMember.id, this.selectedMember.newRole)
+                .then(() => {
+                    this.showRoleChangeModal = false;
+                    location.reload(); // 페이지 새로고침
+                })
+                .catch(error => {
+                    alert('역할 변경 중 오류가 발생했습니다.');
+                    console.error(error);
+                });
+        },
+
+        createNewRole() {
+            if (!this.newRole.name) {
+                alert('역할 이름을 입력해주세요.');
+                return;
+            }
+
+            @this.call('createRole', this.newRole.name, this.newRole.description, this.newRole.permissions)
+                .then(() => {
+                    this.showCreateRoleModal = false;
+                    this.newRole = { name: '', description: '', permissions: [] };
+                    location.reload(); // 페이지 새로고침
+                })
+                .catch(error => {
+                    alert('역할 생성 중 오류가 발생했습니다.');
+                    console.error(error);
+                });
         }
     }));
 });
+
+// 전역 함수로 모달 호출
+function showRoleChangeModal(memberId, memberName, currentRole) {
+    const component = Alpine.$data(document.querySelector('[x-data="organizationPermissionManagement"]'));
+    component.showRoleChangeDialog(memberId, memberName, currentRole);
+}
 </script>

@@ -528,10 +528,60 @@
                 }
             }
 
+            // 전역 변수로 사용 가능한 플랜 데이터 저장
+            let availablePlans = {};
+
             /**
              * 플랜 변경 모달 표시
              */
-            function showPlanChangeModal() {
+            async function showPlanChangeModal() {
+                try {
+                    // API에서 사용 가능한 플랜 데이터 가져오기
+                    const response = await fetch(`/api/test/organizations/${currentOrganizationId}/billing/available-plans`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        credentials: 'same-origin'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        // 플랜 데이터를 전역 변수에 저장
+                        availablePlans = {};
+                        data.data.forEach(plan => {
+                            const planKey = plan.slug; // Use slug as key to match HTML data-plan attributes
+                            availablePlans[planKey] = {
+                                id: plan.id,
+                                name: plan.name,
+                                price: plan.formatted_price,
+                                monthly: plan.monthly_price,
+                                description: plan.description,
+                                max_members: plan.max_members,
+                                max_storage: plan.max_storage
+                            };
+                        });
+                        
+                        console.log('Available plans loaded:', availablePlans);
+                    } else {
+                        throw new Error('Failed to load available plans');
+                    }
+                } catch (error) {
+                    console.error('Failed to load available plans:', error);
+                    // 플랜 로드 실패 시 하드코딩된 데이터로 폴백
+                    availablePlans = {
+                        starter: { id: 2, name: 'Starter', price: '₩29,000', monthly: 29000 },
+                        pro: { id: 3, name: 'Pro', price: '₩59,000', monthly: 59000 },
+                        business: { id: 4, name: 'Business', price: '₩99,000', monthly: 99000 }
+                    };
+                    showError('플랜 정보를 불러오는 중 오류가 발생했습니다. 기본값으로 진행합니다.');
+                }
+
                 planChangeModal.classList.remove('hidden');
                 planChangeConfirm.classList.add('hidden');
                 // 모든 플랜 선택 초기화
@@ -552,14 +602,13 @@
              * 플랜 선택
              */
             function selectPlan(planType) {
-                const planData = {
-                    starter: { name: 'Starter', price: '₩29,000', monthly: 29000 },
-                    pro: { name: 'Pro', price: '₩99,000', monthly: 99000 },
-                    enterprise: { name: 'Enterprise', price: '₩199,000', monthly: 199000 }
-                };
-                
-                const selectedPlan = planData[planType];
-                if (!selectedPlan) return;
+                // API에서 로드된 동적 데이터 사용
+                const selectedPlan = availablePlans[planType];
+                if (!selectedPlan) {
+                    console.error('Selected plan not found:', planType);
+                    showError('선택한 플랜을 찾을 수 없습니다.');
+                    return;
+                }
                 
                 // 플랜 선택 UI 업데이트
                 planOptions.forEach(option => {
@@ -574,19 +623,26 @@
                 }
                 
                 // 확인 섹션 표시
-                document.getElementById('selectedPlanName').textContent = selectedPlan.name + ' 플랜';
-                document.getElementById('selectedPlanPrice').textContent = ` - ${selectedPlan.price}/월`;
+                const selectedPlanNameEl = document.getElementById('selectedPlanName');
+                const selectedPlanPriceEl = document.getElementById('selectedPlanPrice');
+                const nextBillingDateEl = document.getElementById('nextBillingDate');
+                
+                if (selectedPlanNameEl) selectedPlanNameEl.textContent = selectedPlan.name + ' 플랜';
+                if (selectedPlanPriceEl) selectedPlanPriceEl.textContent = ` - ${selectedPlan.price}/월`;
                 
                 // 다음 결제일 계산 (현재 날짜 + 1개월)
                 const nextMonth = new Date();
                 nextMonth.setMonth(nextMonth.getMonth() + 1);
-                document.getElementById('nextBillingDate').textContent = nextMonth.toLocaleDateString('ko-KR');
+                if (nextBillingDateEl) nextBillingDateEl.textContent = nextMonth.toLocaleDateString('ko-KR');
                 
                 planChangeConfirm.classList.remove('hidden');
                 
-                // 확인 버튼에 플랜 정보 저장
+                // 확인 버튼에 플랜 정보 저장 (데이터베이스 ID도 포함)
                 confirmPlanChange.dataset.planType = planType;
+                confirmPlanChange.dataset.planId = selectedPlan.id;
                 confirmPlanChange.dataset.planPrice = selectedPlan.monthly;
+                
+                console.log('Plan selected:', selectedPlan);
             }
             
             /**
@@ -594,9 +650,10 @@
              */
             async function submitPlanChange() {
                 const planType = confirmPlanChange.dataset.planType;
+                const planId = confirmPlanChange.dataset.planId;
                 const planPrice = confirmPlanChange.dataset.planPrice;
                 
-                if (!planType) {
+                if (!planType || !planId) {
                     showError('플랜을 선택해주세요.');
                     return;
                 }
@@ -605,15 +662,18 @@
                     confirmPlanChange.disabled = true;
                     confirmPlanChange.textContent = '변경 중...';
                     
-                    const response = await fetch(`/api/organizations/${currentOrganizationId}/plan-change`, {
+                    // ProcessPayment API 호출 (플랜 변경은 결제 프로세스의 일부)
+                    const response = await fetch(`/api/test/organizations/${currentOrganizationId}/billing/payment/confirm`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                         },
                         body: JSON.stringify({
+                            plan_id: planId,
                             plan_type: planType,
-                            monthly_price: planPrice
+                            monthly_price: planPrice,
+                            action: 'plan_change'
                         })
                     });
                     

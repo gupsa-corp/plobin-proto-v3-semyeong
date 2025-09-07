@@ -123,7 +123,7 @@ Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
-    return view('800-page-organization-admin.805-page-permissions-overview.000-index', compact('organizations'))->with('activeTab', 'overview');
+    return view('800-page-organization-admin.805-page-permissions-overview.000-index', compact('organizations'));
 })->name('organization.admin.permissions.overview');
 
 // 역할 관리 탭
@@ -136,7 +136,7 @@ Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
-    return view('800-page-organization-admin.806-page-permissions-roles.000-index', compact('organizations'))->with('activeTab', 'roles');
+    return view('800-page-organization-admin.806-page-permissions-roles.000-index', compact('organizations'));
 })->name('organization.admin.permissions.roles');
 
 // 권한 관리 탭
@@ -214,11 +214,6 @@ Route::get('/platform/admin/organizations', function () {
 
 // 플랫폼 관리자 - 사용자 관리
 Route::get('/platform/admin/users', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'users'])->name('platform.admin.users');
-
-// 플랫폼 관리자 - 시스템 설정
-Route::get('/platform/admin/system-settings', function () {
-    return view('900-page-platform-admin.904-page-system-settings.000-index');
-})->name('platform.admin.system-settings');
 
 // 플랫폼 관리자 - 요금제 관리
 Route::get('/platform/admin/pricing', function () {

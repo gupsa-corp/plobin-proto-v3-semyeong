@@ -10,26 +10,20 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Collection;
 
-class PermissionManagement extends Component
+class PermissionMembers extends Component
 {
     public $organizationId;
     public $organization;
-    public $selectedRole = null;
-    public $selectedPermission = null;
-    public $permissionMatrix = [];
-    public $activeTab = 'overview';
 
     public function mount($organizationId = 1)
     {
         $this->organizationId = $organizationId;
-        $this->activeTab = request('activeTab', 'overview');
         $this->loadData();
     }
 
     public function loadData()
     {
         $this->organization = Organization::with(['users.roles', 'users.permissions'])->find($this->organizationId);
-        $this->permissionMatrix = app(DynamicPermissionService::class)->getPermissionMatrix();
     }
 
     /**
@@ -63,18 +57,6 @@ class PermissionManagement extends Component
     }
 
     /**
-     * 통계 데이터 조회
-     */
-    public function getStatsProperty()
-    {
-        return [
-            'totalMembers' => $this->organization ? $this->organization->users->count() : 0,
-            'totalRoles' => Role::count(),
-            'totalPermissions' => Permission::count()
-        ];
-    }
-
-    /**
      * 역할 변경
      */
     public function changeMemberRole($memberId, $roleName)
@@ -96,86 +78,11 @@ class PermissionManagement extends Component
         }
     }
 
-    /**
-     * 새 역할 생성
-     */
-    public function createRole($roleName, $roleDescription, $permissions = [])
-    {
-        try {
-            $role = Role::create([
-                'name' => $roleName,
-                'guard_name' => 'web'
-            ]);
-
-            if (!empty($permissions)) {
-                $role->syncPermissions($permissions);
-            }
-
-            $this->loadData();
-            
-            session()->flash('success', '새 역할이 성공적으로 생성되었습니다.');
-        } catch (\Exception $e) {
-            session()->flash('error', '역할 생성 중 오류가 발생했습니다: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * 역할 권한 업데이트
-     */
-    public function updateRolePermissions($roleId, $permissions)
-    {
-        try {
-            $role = Role::find($roleId);
-            if (!$role) {
-                throw new \Exception('역할을 찾을 수 없습니다.');
-            }
-
-            $role->syncPermissions($permissions);
-            
-            $this->loadData();
-            
-            session()->flash('success', '역할 권한이 성공적으로 업데이트되었습니다.');
-        } catch (\Exception $e) {
-            session()->flash('error', '권한 업데이트 중 오류가 발생했습니다: ' . $e->getMessage());
-        }
-    }
-
-    public function selectRole($roleName)
-    {
-        $this->selectedRole = Role::findByName($roleName);
-        $this->selectedPermission = null;
-    }
-
-    public function selectPermission($permissionName)
-    {
-        $this->selectedPermission = Permission::findByName($permissionName);
-        $this->selectedRole = null;
-    }
-
-    public function getAvailableFeaturesForSelected()
-    {
-        if ($this->selectedRole) {
-            return app(DynamicPermissionService::class)->getRoleFeatures($this->selectedRole->name);
-        }
-
-        if ($this->selectedPermission) {
-            return app(DynamicPermissionService::class)->getPermissionFeatures($this->selectedPermission->name);
-        }
-
-        return [];
-    }
-
     public function getRolesProperty()
     {
         return Role::all()->map(function ($role) {
             $permissions = $role->permissions->pluck('name')->toArray();
             $info = $this->getRoleDisplayInfo($role->name);
-            
-            // 조직 내 해당 역할을 가진 멤버 수 계산
-            $memberCount = $this->organization ? 
-                $this->organization->users()->whereHas('roles', function ($query) use ($role) {
-                    $query->where('name', $role->name);
-                })->count() : 0;
 
             return [
                 'name' => $role->name,
@@ -184,26 +91,9 @@ class PermissionManagement extends Component
                 'color' => $info['color'],
                 'level' => $info['level'],
                 'permissions' => $permissions,
-                'permission_count' => count($permissions),
-                'member_count' => $memberCount
+                'permission_count' => count($permissions)
             ];
         })->sortBy('level')->values()->toArray();
-    }
-
-    public function getPermissionsProperty()
-    {
-        return Permission::all()->map(function ($permission) {
-            $roles = $permission->roles->pluck('name')->toArray();
-            $category = $this->getPermissionCategory($permission->name);
-
-            return [
-                'name' => $permission->name,
-                'guard_name' => $permission->guard_name,
-                'category' => $category,
-                'roles' => $roles,
-                'role_count' => count($roles)
-            ];
-        })->groupBy('category')->toArray();
     }
 
     /**
@@ -251,29 +141,11 @@ class PermissionManagement extends Component
         };
     }
 
-    /**
-     * 권한 카테고리 반환
-     */
-    private function getPermissionCategory($permissionName)
-    {
-        if (str_contains($permissionName, 'member')) return '멤버 관리';
-        if (str_contains($permissionName, 'project')) return '프로젝트 관리';
-        if (str_contains($permissionName, 'billing')) return '결제 관리';
-        if (str_contains($permissionName, 'organization')) return '조직 설정';
-        if (str_contains($permissionName, 'permission')) return '권한 관리';
-        return '기타';
-    }
-
     public function render()
     {
-        return view('800-page-organization-admin.920-livewire-permission-management', [
-            'roles' => $this->getRolesProperty(),
-            'permissions' => $this->getPermissionsProperty(),
-            'availableFeatures' => $this->getAvailableFeaturesForSelected(),
-            'selectedRole' => $this->selectedRole,
-            'selectedPermission' => $this->selectedPermission,
+        return view('800-page-organization-admin.807-page-permissions-management.000-index', [
             'members' => $this->getMembersProperty(),
-            'stats' => $this->getStatsProperty()
+            'roles' => $this->getRolesProperty()
         ]);
     }
 }

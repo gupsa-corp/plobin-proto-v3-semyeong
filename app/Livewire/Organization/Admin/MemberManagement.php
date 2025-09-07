@@ -374,9 +374,12 @@ class MemberManagement extends Component
 
     public function getAvailableRolesProperty()
     {
-        return Role::all()->mapWithKeys(function ($role) {
+        return Role::all()->map(function ($role) {
             $info = $this->getRoleDisplayInfo($role->name);
-            return [$role->name => $info['label']];
+            return [
+                'name' => $role->name,
+                'display_name' => $info['label']
+            ];
         })->toArray();
     }
     
@@ -428,7 +431,7 @@ class MemberManagement extends Component
                 'level' => 0,
                 'level_name' => '게스트'
             ]
-        ];
+        };
     }
     
     /**
@@ -443,12 +446,12 @@ class MemberManagement extends Component
             'organization_owner' => 400,
             'platform_admin' => 500,
             default => 0
-        ];
+        };
     }
 
     public function render()
     {
-        return view('900-page-platform-admin.910-livewire-member-management', [
+        return view('livewire.organization.admin.member-management', [
             'filteredMembers' => $this->getFilteredMembersProperty(),
             'availableRoles' => $this->getAvailableRolesProperty()
         ]);

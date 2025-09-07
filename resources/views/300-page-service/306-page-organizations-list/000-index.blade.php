@@ -11,8 +11,5 @@
             @include(getCurrentViewPath())
         </div>
     </div>
-
-    {{-- Alpine.js 초기화 --}}
-    @include($common . '.900-alpine-init')
 </body>
 </html>

@@ -4,45 +4,6 @@
 - **300-common**: 인증/공통 기능 처리 (인증 토큰, 공통 AJAX 함수 등)
 - **30x 폴더**: 비즈니스 로직만 처리, 인증 관련 코드 금지 (300-common의 함수 활용)
 
-## 실제 디렉토리 구조 (수정 X)
-
-```
-resources/views/
-├── 100-page-landing/           # 랜딩페이지 영역
-│   ├── 100-common/            # 랜딩페이지 공통 컴포넌트
-│   │   ├── 100-header-main.blade.php      # 랜딩 헤더
-│   │   ├── 301-layout-head.blade.php      # HTML head
-│   │   ├── 302-layout-css-imports.blade.php  # CSS imports
-│   │   └── 900-layout-footer.blade.php    # 랜딩 푸터
-├── 200-page-auth/             # 인증 페이지 영역
-│   ├── 200-common/            # 인증 공통 컴포넌트
-│   │   ├── 100-header-main.blade.php      # 인증 헤더
-│   │   ├── 301-layout-head.blade.php      # HTML head
-│   │   ├── 302-layout-css-imports.blade.php  # CSS imports
-│   │   └── 900-layout-footer.blade.php    # 인증 푸터
-└── 300-page-service/          # 본 서비스 영역
-    ├── 300-common/            # 서비스 공통 컴포넌트
-    │   ├── 000-auth-token-manager.blade.php # 토큰 관리
-    │   ├── 100-header-main.blade.php      # 메인 헤더
-    │   ├── 102-header-breadcrumb.blade.php # 브레드크럼
-    │   ├── 103-header-user-dropdown.blade.php # 사용자 드롭다운
-    │   ├── 104-header-alarm.blade.php     # 알림 버튼
-    │   ├── 105-header-settings.blade.php  # 설정 버튼
-    │   ├── 106-header-mobile-menu.blade.php # 모바일 메뉴
-    │   ├── 107-header-right-menu.blade.php # 우측 메뉴 통합
-    │   ├── 200-sidebar-main.blade.php     # 메인 사이드바
-    │   ├── 201-sidebar-navigation.blade.php # 네비게이션
-    │   ├── 202-sidebar-organization-info.blade.php # 조직 정보
-    │   ├── 301-layout-head.blade.php      # HTML head
-    │   ├── 302-layout-css-imports.blade.php # CSS imports
-    │   ├── 303-layout-js-imports.blade.php # JS imports
-    │   ├── 500-ajax-get.blade.php         # AJAX GET
-    │   ├── 500-ajax-post.blade.php        # AJAX POST
-    │   ├── 500-ajax-put.blade.php         # AJAX PUT
-    │   ├── 500-ajax-delete.blade.php      # AJAX DELETE
-    │   └── 900-alpine-init.blade.php      # Alpine.js 초기화
-```
-
 ## 네이밍 컨벤션
 
 ### 디렉토리 네이밍
@@ -68,6 +29,7 @@ resources/views/
 - `400-xxx.blade.php`: JavaScript 파일들 (**필수: 400번대 사용**)
 - `500-xxx.blade.php`: AJAX 요청 파일들
 - `600-xxx.blade.php`: 데이터 관련 파일들
+- `700-xxx.blade.php`: 샌드박스 관련 파일들
 - `900-xxx.blade.php`: 초기화, 푸터 파일들
 
 #### JavaScript 파일 세분화 규칙 (400번대 사용 필수)
@@ -112,9 +74,6 @@ JavaScript 파일이 복잡할 경우, 다음과 같이 기능별로 분리하�
     <!-- 페이지별 스크립트들 -->
     @include('300-page-service.{current-page}.400-js-{function}')
     @include('300-page-service.{current-page}.500-ajax-{specific-action}')
-    
-    <!-- Alpine.js 초기화 -->
-    @include('300-page-service.300-common.900-alpine-init')
 </body>
 </html>
 ```

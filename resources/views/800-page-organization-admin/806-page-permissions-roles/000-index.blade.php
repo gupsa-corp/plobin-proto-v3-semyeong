@@ -8,8 +8,8 @@
         <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
             @include('800-page-organization-admin.800-common.100-header-main')
             
-            {{-- 권한 관리 Livewire 컴포넌트 --}}
-            <livewire:organization.admin.permission-management :organizationId="1" :activeTab="'roles'" />
+            {{-- 역할 관리 Livewire 컴포넌트 --}}
+            <livewire:organization.admin.permission-roles :organizationId="request()->route('id')" />
         </div>
     </div>
 </body>
