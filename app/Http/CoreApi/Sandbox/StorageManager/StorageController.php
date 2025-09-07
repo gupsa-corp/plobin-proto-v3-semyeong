@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Sandbox\StorageManager;
+namespace App\Http\CoreApi\Sandbox\StorageManager;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
-class StorageController extends \App\Http\Controllers\Controller
+class StorageController extends  \App\Http\CoreApi\ApiController
 {
     private function getStoragePath()
     {
@@ -24,7 +23,7 @@ class StorageController extends \App\Http\Controllers\Controller
     {
         $storages = $this->getStorageList();
         $currentStorage = Session::get('sandbox_storage', '1');
-        
+
         return view('700-page-sandbox.707-page-storage-manager.000-index', compact('storages', 'currentStorage'));
     }
 
@@ -40,7 +39,7 @@ class StorageController extends \App\Http\Controllers\Controller
 
         $storageName = $request->storage_name;
         $targetPath = $this->getStoragePath() . '/storage-sandbox-' . $storageName;
-        
+
         // 이미 존재하는지 확인
         if (File::exists($targetPath)) {
             return back()->withErrors(['storage_name' => '이미 존재하는 스토리지 이름입니다.']);
@@ -54,7 +53,7 @@ class StorageController extends \App\Http\Controllers\Controller
         try {
             // 템플릿 복사
             File::copyDirectory($this->getTemplateStoragePath(), $targetPath);
-            
+
             return back()->with('success', "스토리지 '{$storageName}'이 성공적으로 생성되었습니다.");
         } catch (\Exception $e) {
             return back()->with('error', '스토리지 생성 중 오류가 발생했습니다: ' . $e->getMessage());
@@ -75,7 +74,7 @@ class StorageController extends \App\Http\Controllers\Controller
         }
 
         Session::put('sandbox_storage', $storageName);
-        
+
         return back()->with('success', "스토리지 '{$storageName}'이 선택되었습니다.");
     }
 
@@ -86,7 +85,7 @@ class StorageController extends \App\Http\Controllers\Controller
         ]);
 
         $storageName = $request->storage_name;
-        
+
         // template은 삭제할 수 없음
         if ($storageName === 'template') {
             return back()->with('error', '템플릿 스토리지는 삭제할 수 없습니다.');
@@ -115,19 +114,19 @@ class StorageController extends \App\Http\Controllers\Controller
     {
         $storages = [];
         $storagePath = $this->getStoragePath();
-        
+
         if (!File::exists($storagePath)) {
             return $storages;
         }
 
         $directories = File::directories($storagePath);
-        
+
         foreach ($directories as $directory) {
             $basename = basename($directory);
-            
+
             if (strpos($basename, 'storage-sandbox-') === 0) {
                 $name = substr($basename, strlen('storage-sandbox-'));
-                
+
                 $storages[] = [
                     'name' => $name,
                     'full_path' => $directory,
@@ -168,14 +167,14 @@ class StorageController extends \App\Http\Controllers\Controller
     private function getDirectorySizeRecursive($path)
     {
         $size = 0;
-        
+
         if (is_dir($path)) {
             $files = File::allFiles($path);
             foreach ($files as $file) {
                 $size += $file->getSize();
             }
         }
-        
+
         return $size;
     }
 
@@ -192,12 +191,12 @@ class StorageController extends \App\Http\Controllers\Controller
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $unitIndex = 0;
-        
+
         while ($size >= 1024 && $unitIndex < count($units) - 1) {
             $size /= 1024;
             $unitIndex++;
         }
-        
+
         return round($size, 1) . ' ' . $units[$unitIndex];
     }
 }

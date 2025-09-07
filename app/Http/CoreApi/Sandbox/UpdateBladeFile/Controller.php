@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Sandbox\ApiCreate;
+namespace App\Http\CoreApi\Sandbox\UpdateBladeFile;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
-class Controller extends \App\Http\Controllers\Controller
+class Controller extends \App\Http\CoreApi\ApiController
 {
-    public function execute($id)
+    public function update(Request $request, $id)
     {
         // 구현필요
         return response()->json(['message' => '구현필요']);

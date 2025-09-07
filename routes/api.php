@@ -36,7 +36,7 @@ use App\Http\CoreApi\OrganizationBilling\CreateBusinessInfo\Controller as Create
 use App\Http\CoreApi\OrganizationBilling\BusinessLookup\Controller as BusinessLookupController;
 use App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller as DownloadReceiptController;
 use App\Http\CoreApi\User\SearchUsers\Controller as SearchUsersController;
-use App\Http\Sandbox\FileList\Controller as SandboxFileListController;
+use App\Http\CoreApi\Sandbox\FileList\Controller as SandboxFileListController;
 use Illuminate\Support\Facades\Route;
 
 /*

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Sandbox\PreviewBlade;
+namespace App\Http\CoreApi\Sandbox\PreviewBlade;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class Controller extends \App\Http\Controllers\Controller
+class Controller extends \App\Http\CoreApi\ApiController
 {
     public function show($id)
     {

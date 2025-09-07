@@ -5,15 +5,8 @@
 <body class="bg-gray-100">
     @include('700-page-sandbox.700-common.400-sandbox-header')
     
-    <div class="min-h-screen sandbox-container">
-        <div class="sandbox-card">
-            <h1 class="text-3xl font-bold text-gray-900 mb-6">파일 에디터</h1>
-            <p class="text-gray-600 mb-8">코드 파일 편집 도구</p>
-            
-            <div class="text-center py-20 text-gray-500">
-                구현필요
-            </div>
-        </div>
+    <div class="min-h-screen sandbox-container p-4">
+        @livewire('sandbox.file-editor')
     </div>
     @livewireScripts
 </body>
