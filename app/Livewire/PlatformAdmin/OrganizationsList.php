@@ -23,6 +23,10 @@ class OrganizationsList extends Component
     // 사용자 검색 관련 속성
     public $selectedUser = null;
     public $showUserSearch = true;
+    public $userSearchQuery = '';
+    public $searchResults = [];
+    public $showSearchResults = false;
+    public $searchLoading = false;
     
     public function updatingSearch()
     {
@@ -113,6 +117,43 @@ class OrganizationsList extends Component
         }
     }
 
+    public function updatedUserSearchQuery()
+    {
+        if (strlen($this->userSearchQuery) >= 2) {
+            $this->searchUsers();
+        } else {
+            $this->searchResults = [];
+            $this->showSearchResults = false;
+        }
+    }
+
+    public function searchUsers()
+    {
+        $this->searchLoading = true;
+        $this->searchResults = User::where('display_name', 'like', '%' . $this->userSearchQuery . '%')
+            ->orWhere('email', 'like', '%' . $this->userSearchQuery . '%')
+            ->limit(10)
+            ->get();
+        $this->showSearchResults = true;
+        $this->searchLoading = false;
+    }
+
+    public function selectSearchedUser($userId)
+    {
+        $user = User::find($userId);
+        $this->selectedUser = $user;
+        $this->userSearchQuery = '';
+        $this->searchResults = [];
+        $this->showSearchResults = false;
+    }
+
+    public function clearUserSearch()
+    {
+        $this->userSearchQuery = '';
+        $this->searchResults = [];
+        $this->showSearchResults = false;
+    }
+
     private function resetForm()
     {
         $this->name = '';
@@ -120,6 +161,10 @@ class OrganizationsList extends Component
         $this->description = '';
         $this->selectedUser = null;
         $this->showUserSearch = true;
+        $this->userSearchQuery = '';
+        $this->searchResults = [];
+        $this->showSearchResults = false;
+        $this->searchLoading = false;
         $this->resetErrorBag();
     }
 

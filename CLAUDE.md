@@ -1,3 +1,34 @@
+===========================================
+개발 가이드라인 (DEVELOPMENT GUIDELINES)
+===========================================
+⚠️ 중요: 이 프로젝트에서는 순수 JavaScript 사용을 금지합니다
+❌ 사용 금지: Vanilla JS, jQuery, Alpine.js의 복잡한 로직
+✅ 사용 필수: Livewire + Filament 조합만 사용
+모든 상호작용과 동적 기능은 다음으로만 구현:
+- Livewire: 서버사이드 상태관리, 이벤트 처리
+- Filament: UI 컴포넌트, 폼, 테이블 등
+- 간단한 Alpine.js: 토글, 드롭다운 등 최소한의 UI 상호작용만
+JavaScript가 필요한 경우 → Livewire로 재작성 필수
+복잡한 UI가 필요한 경우 → Filament 컴포넌트 사용
+===========================================
+
+## ⚠️ 매우 중요한 파일 작성 규칙
+### 1. 프론트엔드 작성규칙 (FRONTEND RULES)
+**절대 원칙**: 모든 프론트엔드 파일은 **무조건** 숫자 접두사 사용
+- ✅ 올바른 예: `700-page-dashboard.blade.php`, `301-layout-head.blade.php`
+- ❌ 잘못된 예: `dashboard.blade.php`, `head.blade.php`
+- ✅ 폴더도 동일: `700-page-sandbox/`, `300-common/`
+- ❌ 절대 금지: `components/`, `layouts/`, `pages/` , `livewire/`
+**뷰 파일 규칙**:
+- 메인 페이지: `000-index.blade.php`
+- 레이아웃: `301-layout-head.blade.php`
+- 컴포넌트: `200-sidebar-main.blade.php`
+- Livewire 뷰: `700-livewire-api-creator.blade.php`
+
+### 2. 백엔드 작성규칙 (BACKEND RULES)  
+**절대 원칙**: 모든 백엔드 파일은 **폴더명/기능명/Controller.php** 구조 사용
+
+
 2. 서버가 실행되어있다고 가정하고 진행
 3. 구현하려는 기능이 이미 있는지 검토할것
 4. 말하지 않은 컴포넌트 내용 만들지 말고 내용 비울 것
