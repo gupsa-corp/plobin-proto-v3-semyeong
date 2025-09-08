@@ -34,7 +34,7 @@ class EditProfile extends Component
         $this->name = ($user->first_name ?? '') . ' ' . ($user->last_name ?? '');
         $this->email = $user->email ?? '';
         $this->phone = $user->phone ?? '';
-        $this->organization = $user->organization ?? '샘플 조직';
+        $this->organization = $user->organization()->first()->name ?? '샘플 조직';
     }
 
     public function updateProfile()

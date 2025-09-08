@@ -13,6 +13,8 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 use App\Services\PhoneNumberHelper;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Organization;
+use App\Models\OrganizationMember;
 
 class User extends Authenticatable
 {
@@ -111,7 +113,7 @@ class User extends Authenticatable
 
     public function organization()
     {
-        return $this->organizations()->first();
+        return $this->organizations()->limit(1);
     }
 
     /**
