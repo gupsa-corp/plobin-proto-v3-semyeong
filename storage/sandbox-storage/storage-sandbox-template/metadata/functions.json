@@ -1,0 +1,177 @@
+{
+    "functions": {
+        "GanttChart": {
+            "versions": [
+                "release",
+                "v20250908140755",
+                "v20250908140750"
+            ],
+            "description": "간트차트 데이터 관리 및 API 제공",
+            "dependencies": [
+                "ProjectsApiHandler",
+                "TasksApiHandler",
+                "GanttDataApiHandler",
+                "TaskProgressApiHandler",
+                "ApiInfoHandler"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "get_projects",
+                        "get_project",
+                        "get_project_overview",
+                        "get_tasks",
+                        "get_task",
+                        "get_tasks_by_status",
+                        "get_tasks_by_priority",
+                        "get_gantt_data",
+                        "get_optimized_gantt_data",
+                        "get_gantt_critical_path",
+                        "update_task_progress",
+                        "batch_update_progress",
+                        "update_task_status",
+                        "get_task_progress_history",
+                        "info",
+                        "functions"
+                    ]
+                },
+                "project_id": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "프로젝트 ID"
+                },
+                "task_id": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "태스크 ID"
+                },
+                "status": {
+                    "type": "string",
+                    "required": false,
+                    "description": "태스크 상태"
+                },
+                "priority": {
+                    "type": "string",
+                    "required": false,
+                    "description": "태스크 우선순위"
+                },
+                "progress": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "진행률 (0-100)"
+                }
+            },
+            "category": "data-management",
+            "created_at": "2025-09-08T14:07:50Z",
+            "updated_at": "2025-09-08T14:07:55Z",
+            "author": "system",
+            "tags": [
+                "gantt",
+                "project",
+                "task",
+                "api"
+            ]
+        },
+        "UserAuth": {
+            "versions": [
+                "Release",
+                "v20250902231151"
+            ],
+            "description": "사용자 인증 및 권한 관리",
+            "dependencies": [],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "login",
+                        "logout",
+                        "register",
+                        "verify",
+                        "reset_password"
+                    ]
+                },
+                "username": {
+                    "type": "string",
+                    "required": false,
+                    "description": "사용자명"
+                },
+                "password": {
+                    "type": "string",
+                    "required": false,
+                    "description": "비밀번호"
+                },
+                "email": {
+                    "type": "string",
+                    "required": false,
+                    "description": "이메일 주소"
+                }
+            },
+            "category": "authentication",
+            "created_at": "2025-09-02T23:11:51Z",
+            "updated_at": "2025-09-02T23:11:51Z",
+            "author": "system",
+            "tags": [
+                "auth",
+                "user",
+                "security"
+            ]
+        },
+        "UserManager": {
+            "versions": [
+                "release"
+            ],
+            "description": "사용자 관리를 위한 API 함수입니다. 사용자 생성, 조회, 수정, 삭제 기능을 제공합니다.",
+            "dependencies": [
+                "DatabaseConnection"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "list",
+                        "create",
+                        "read",
+                        "update",
+                        "delete",
+                        "search"
+                    ]
+                }
+            },
+            "category": "api",
+            "template_used": "api-endpoint",
+            "created_at": "2025-09-08T16:02:45.793190Z",
+            "updated_at": "2025-09-08T16:02:45.793278Z",
+            "author": "user",
+            "tags": [
+                "api",
+                "crud",
+                "database",
+                "rest"
+            ]
+        }
+    },
+    "categories": {
+        "data-management": {
+            "name": "데이터 관리",
+            "description": "데이터 관리 및 처리 관련 함수",
+            "color": "blue"
+        },
+        "authentication": {
+            "name": "인증",
+            "description": "사용자 인증 및 권한 관리 함수",
+            "color": "red"
+        }
+    },
+    "statistics": {
+        "total_functions": 3,
+        "total_versions": 6,
+        "last_updated": "2025-09-08T16:02:45.793305Z"
+    }
+}

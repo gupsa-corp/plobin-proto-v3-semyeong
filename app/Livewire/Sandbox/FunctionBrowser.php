@@ -9,6 +9,8 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use App\Http\Sandbox\GlobalFunctions\BaseGlobalFunction;
 use App\Http\Sandbox\GlobalFunctions\PHPExcelGenerator;
+use App\Services\FunctionTemplateService;
+use App\Services\FunctionMetadataService;
 
 class FunctionBrowser extends Component implements HasForms
 {
@@ -31,11 +33,26 @@ class FunctionBrowser extends Component implements HasForms
     public string $globalFunctionParams = '{}';
     public array $globalFunctionResults = [];
 
+    // 새로운 탭 시스템
+    public string $activeTab = 'browser';
+    public array $availableTabs = [
+        'browser' => ['name' => '함수 브라우저', 'icon' => '📚'],
+        'creator' => ['name' => '함수 생성', 'icon' => '✨'],
+        'dependencies' => ['name' => '의존성 관리', 'icon' => '🔗'],
+        'automation' => ['name' => '자동화', 'icon' => '⚡'],
+        'templates' => ['name' => '템플릿', 'icon' => '🏪']
+    ];
+
+    // Services
+    private ?FunctionTemplateService $templateService = null;
+    private ?FunctionMetadataService $metadataService = null;
+
     public ?array $data = [];
 
     public function mount()
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
+        $this->initializeServices();
         $this->loadAvailableFunctions();
         $this->loadGlobalFunctions();
         
@@ -47,6 +64,40 @@ class FunctionBrowser extends Component implements HasForms
                 $this->loadFunction($firstFunction['name'], 'release');
             }
         }
+    }
+
+    /**
+     * Initialize services
+     */
+    private function initializeServices()
+    {
+        $this->templateService = new FunctionTemplateService();
+        $this->metadataService = new FunctionMetadataService();
+    }
+
+    /**
+     * Switch active tab
+     */
+    public function switchTab(string $tab)
+    {
+        if (array_key_exists($tab, $this->availableTabs)) {
+            $this->activeTab = $tab;
+        }
+    }
+
+    /**
+     * Handle function created event from FunctionCreator
+     */
+    public function functionCreated(string $functionName)
+    {
+        // Refresh the function list
+        $this->loadAvailableFunctions();
+        
+        // Auto-load the new function
+        $this->loadFunction($functionName, 'release');
+        
+        // Switch to browser tab to show the created function
+        $this->activeTab = 'browser';
     }
 
     /**

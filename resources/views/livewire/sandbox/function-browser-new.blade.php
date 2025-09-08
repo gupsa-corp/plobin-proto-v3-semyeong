@@ -137,19 +137,14 @@
                         <p class="text-gray-600">사용 가능한 함수 템플릿을 둘러보고 새 함수 생성에 활용하세요.</p>
                     </div>
 
-                    @if($templateService)
+                    @if($templateService && method_exists($templateService, 'getTemplates'))
                         @php
-                            try {
-                                $templates = $templateService->getTemplates();
-                                $categories = $templateService->getCategories();
-                            } catch (\Exception $e) {
-                                $templates = [];
-                                $categories = [];
-                            }
+                            $templates = $templateService->getTemplates();
+                            $categories = $templateService->getCategories();
                         @endphp
                         
                         @if(!empty($templates))
-                            {{-- Templates Grid --}}
+                            {{-- Categories --}}
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($templates as $templateId => $template)
                                     <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
