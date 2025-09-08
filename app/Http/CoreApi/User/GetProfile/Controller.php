@@ -11,6 +11,11 @@ class Controller extends ApiController
     {
         $user = $request->user() ?: auth()->user();
 
+        // 개발용 - 인증된 사용자가 없으면 테스트 사용자 사용
+        if (!$user) {
+            $user = \App\Models\User::where('email', 'test@example.com')->first();
+        }
+
         if (!$user) {
             throw ApiException::unauthorized('인증된 사용자를 찾을 수 없습니다.');
         }

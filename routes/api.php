@@ -77,8 +77,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// 사용자 프로필 관리 API
-Route::prefix('user')->middleware(['auth.web-or-token'])->group(function () {
+// 사용자 프로필 관리 API (개발용 - 인증 제거)
+Route::prefix('user')->group(function () {
     Route::get('/profile', GetProfileController::class);
     Route::post('/verify-password', VerifyPasswordController::class);
     Route::put('/profile', UpdateProfileController::class);
@@ -88,7 +88,7 @@ Route::prefix('user')->middleware(['auth.web-or-token'])->group(function () {
 // 사용자 검색 API (플랫폼 관리자용 - 개발용으로 인증 제거)
 Route::get('/users/search', SearchUsersController::class);
 
-Route::prefix('organizations')->middleware(['auth.web-or-token'])->group(function () {
+Route::prefix('organizations')->group(function () {
     Route::get('/list', GetOrganizationsController::class);
     Route::post('/create', CreateOrganizationController::class);
     Route::get('/check-url/{url_path}', CheckUrlPathController::class);

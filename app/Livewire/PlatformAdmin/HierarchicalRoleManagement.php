@@ -13,7 +13,6 @@ use Spatie\Activitylog\Models\Activity;
 class HierarchicalRoleManagement extends Component
 {
     public $roles = [];
-    public $filteredRoles = [];
     public $selectedRole = null;
     public $showCreateModal = false;
     public $showEditModal = false;
@@ -58,7 +57,7 @@ class HierarchicalRoleManagement extends Component
     public function mount()
     {
         $this->loadRoles();
-        $this->applyFilters();
+        // Filtering is now handled by computed property getFilteredRolesProperty()
     }
 
     public function loadRoles()
@@ -129,10 +128,9 @@ class HierarchicalRoleManagement extends Component
             ->values()
             ->toArray();
             
-        $this->applyFilters();
     }
     
-    public function applyFilters()
+    public function getFilteredRolesProperty()
     {
         $filtered = collect($this->roles);
 
@@ -165,27 +163,28 @@ class HierarchicalRoleManagement extends Component
             });
         }
 
-        $this->filteredRoles = $filtered->values()->toArray();
+        return $filtered->values()->toArray();
     }
 
     public function updatedFilterScopeLevel()
     {
-        $this->applyFilters();
+        // Force Livewire to re-render the component
+        $this->dispatch('$refresh');
     }
 
     public function updatedFilterOrganization()
     {
-        $this->applyFilters();
+        // Livewire will automatically recalculate filteredRoles property
     }
 
     public function updatedFilterStatus()
     {
-        $this->applyFilters();
+        // Livewire will automatically recalculate filteredRoles property
     }
 
     public function updatedSearchTerm()
     {
-        $this->applyFilters();
+        // Livewire will automatically recalculate filteredRoles property
     }
 
     public function clearFilters()
@@ -194,7 +193,7 @@ class HierarchicalRoleManagement extends Component
         $this->filterOrganization = '';
         $this->filterStatus = '';
         $this->searchTerm = '';
-        $this->applyFilters();
+        // Livewire will automatically recalculate filteredRoles property
     }
 
     public function selectRole($roleId)

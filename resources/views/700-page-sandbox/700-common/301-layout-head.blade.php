@@ -11,8 +11,7 @@
     <!-- Vite CSS -->
     @vite('resources/css/app.css')
     
-    <!-- Filemanager 스타일 -->
-    @filemanagerStyles
+    <!-- FileManager 관련 스타일 (필요시 추가) -->
     
     <!-- Filament Styles -->
     @filamentStyles

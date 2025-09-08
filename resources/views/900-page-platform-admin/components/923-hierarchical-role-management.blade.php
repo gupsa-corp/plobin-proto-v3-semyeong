@@ -16,6 +16,50 @@
         </button>
     </div>
 
+    {{-- 빠른 필터 라디오 버튼 섹션 --}}
+    <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4">
+        <div class="flex items-center space-x-6">
+            <span class="text-sm font-medium text-gray-700">빠른 필터:</span>
+            <div class="flex items-center space-x-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" 
+                           wire:model.live="filterScopeLevel" 
+                           value="" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">전체</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" 
+                           wire:model.live="filterScopeLevel" 
+                           value="platform" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">🏢 플랫폼</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" 
+                           wire:model.live="filterScopeLevel" 
+                           value="organization" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">🏢 조직</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" 
+                           wire:model.live="filterScopeLevel" 
+                           value="project" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">📁 프로젝트</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" 
+                           wire:model.live="filterScopeLevel" 
+                           value="page" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">📄 페이지</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     {{-- 필터 섹션 --}}
     <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
         <div class="flex flex-wrap items-end gap-4">
@@ -32,6 +76,7 @@
             <div class="min-w-40">
                 <label for="scopeLevel" class="block text-sm font-medium text-gray-700 mb-1">범위 레벨</label>
                 <select wire:model.live="filterScopeLevel" 
+                        wire:change="applyFilters"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">전체</option>
                     @foreach($scopeLevels as $value => $label)
@@ -457,7 +502,167 @@
         </div>
     @endif
 
-    {{-- 역할 편집 모달은 생성 모달과 동일한 구조로 만들 수 있으나 여기서는 생략 --}}
+    {{-- 역할 편집 모달 --}}
+    @if($showEditModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50" x-show="true">
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+                        <div class="bg-white px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-medium text-gray-900">역할 편집</h3>
+                                <button wire:click="closeModals" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <form wire:submit.prevent="updateRole" class="space-y-6">
+                            <div class="px-6 py-4 space-y-6">
+                                {{-- 기본 정보 --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">역할명 *</label>
+                                        <input type="text" 
+                                               wire:model="name" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                               placeholder="예: Project Manager">
+                                        @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Guard Name</label>
+                                        <select wire:model="guard_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="web">web</option>
+                                            <option value="api">api</option>
+                                        </select>
+                                        @error('guard_name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+
+                                {{-- 계층 정보 --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">계층 레벨 *</label>
+                                        <select wire:model="scope_level" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="platform">🏢 플랫폼</option>
+                                            <option value="organization">🏢 조직</option>
+                                            <option value="project">📁 프로젝트</option>
+                                            <option value="page">📄 페이지</option>
+                                        </select>
+                                        @error('scope_level') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">활성 상태</label>
+                                        <select wire:model="is_active" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="1">활성</option>
+                                            <option value="0">비활성</option>
+                                        </select>
+                                        @error('is_active') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+
+                                {{-- 부모 역할 및 조직 --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">부모 역할</label>
+                                        <select wire:model="parent_role_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="">선택 안함</option>
+                                            @foreach($availableParentRoles as $parentRole)
+                                                <option value="{{ $parentRole->id }}">
+                                                    {{ $parentRole->scope_level }} - {{ $parentRole->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('parent_role_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">조직 (조직/프로젝트/페이지 레벨 시)</label>
+                                        <select wire:model="organization_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="">선택 안함</option>
+                                            @foreach($availableOrganizations as $org)
+                                                <option value="{{ $org->id }}">{{ $org->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('organization_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+
+                                {{-- 설명 --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+                                    <textarea wire:model="description" 
+                                              rows="3" 
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                              placeholder="역할에 대한 설명을 입력하세요..."></textarea>
+                                    @error('description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                                </div>
+
+                                {{-- 권한 선택 --}}
+                                <div>
+                                    <div class="flex items-center justify-between mb-4">
+                                        <label class="block text-sm font-medium text-gray-700">권한 선택</label>
+                                        <button type="button" 
+                                                @click="
+                                                    const checkboxes = document.querySelectorAll('input[type=checkbox][wire\\:model=selectedPermissions]');
+                                                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                                                    checkboxes.forEach(cb => {
+                                                        if (allChecked) {
+                                                            cb.checked = false;
+                                                            cb.dispatchEvent(new Event('input'));
+                                                        } else {
+                                                            cb.checked = true;
+                                                            cb.dispatchEvent(new Event('input'));
+                                                        }
+                                                    });
+                                                "
+                                                class="text-sm text-blue-600 hover:text-blue-800">
+                                            전체 선택/해제
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-md p-4">
+                                        @foreach($permissions as $category => $categoryPermissions)
+                                            <div class="mb-4 last:mb-0">
+                                                <h4 class="text-sm font-medium text-gray-900 mb-2 border-b border-gray-100 pb-1">{{ $category }}</h4>
+                                                <div class="space-y-2">
+                                                    @foreach($categoryPermissions as $permission)
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" 
+                                                                   wire:model="selectedPermissions" 
+                                                                   value="{{ $permission->name }}"
+                                                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                            <span class="ml-2 text-sm text-gray-700">{{ $permission->name }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                                <button type="button" 
+                                        wire:click="closeModals" 
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    취소
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                                    업데이트
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- 역할 삭제 모달 --}}
     @if($showDeleteModal)

@@ -25,8 +25,14 @@ class EditProfile extends Component
     public function mount()
     {
         $user = Auth::user();
-        $this->name = $user->first_name . ' ' . $user->last_name;
-        $this->email = $user->email;
+        
+        // 인증되지 않은 사용자인 경우 리다이렉트
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $this->name = ($user->first_name ?? '') . ' ' . ($user->last_name ?? '');
+        $this->email = $user->email ?? '';
         $this->phone = $user->phone ?? '';
         $this->organization = $user->organization ?? '샘플 조직';
     }
@@ -36,6 +42,13 @@ class EditProfile extends Component
         $this->validate();
 
         $user = Auth::user();
+        
+        // 인증되지 않은 사용자인 경우 처리
+        if (!$user) {
+            session()->flash('error', '인증이 필요합니다.');
+            return redirect()->route('login');
+        }
+
         $nameParts = explode(' ', $this->name, 2);
         
         $user->update([
