@@ -180,7 +180,7 @@ class OrganizationsList extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('livewire.platform-admin.organizations-list', [
+        return view('livewire.platform-admin.103-organizations-list', [
             'organizations' => $organizations
         ]);
     }

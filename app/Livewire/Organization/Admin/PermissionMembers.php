@@ -143,7 +143,7 @@ class PermissionMembers extends Component
 
     public function render()
     {
-        return view('livewire.organization.admin.permission-members', [
+        return view('livewire.organization.admin.301-permission-members', [
             'members' => $this->getMembersProperty(),
             'roles' => $this->getRolesProperty()
         ]);

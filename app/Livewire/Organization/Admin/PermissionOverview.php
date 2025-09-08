@@ -70,7 +70,7 @@ class PermissionOverview extends Component
 
     public function render()
     {
-        return view('livewire.organization.admin.permission-overview', [
+        return view('livewire.organization.admin.302-permission-overview', [
             'members' => $this->getMembersProperty(),
             'stats' => $this->getStatsProperty()
         ]);

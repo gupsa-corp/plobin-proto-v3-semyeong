@@ -110,6 +110,6 @@ class FileManagerEditor extends Component
     
     public function render()
     {
-        return view('livewire.sandbox.file-manager-editor');
+        return view('livewire.sandbox.200-file-manager-editor');
     }
 }

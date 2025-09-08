@@ -262,7 +262,7 @@ class UserPermissionManagement extends Component
 
     public function render()
     {
-        return view('livewire.platform-admin.user-permission-management', [
+        return view('livewire.platform-admin.105-user-permission-management', [
             'users' => $this->getUsers(),
             'roles' => $this->getRoles(),
             'organizations' => $this->getOrganizations(),

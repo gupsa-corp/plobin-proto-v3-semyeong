@@ -328,7 +328,7 @@ class PermissionMatrixManagement extends Component
 
     public function render()
     {
-        return view('livewire.platform-admin.permission-matrix-management', [
+        return view('livewire.platform-admin.104-permission-matrix-management', [
             'organizations' => $this->getOrganizations(),
         ]);
     }

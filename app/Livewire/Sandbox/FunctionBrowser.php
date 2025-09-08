@@ -330,7 +330,7 @@ class FunctionBrowser extends Component implements HasForms
 
     public function render()
     {
-        return view('livewire.sandbox.function-browser', [
+        return view('livewire.sandbox.201-function-browser', [
             'functions' => $this->getAvailableFunctions(),
             'activeContent' => $this->functionContents[$this->activeFunction] ?? '',
             'testResults' => array_reverse($this->testResults)

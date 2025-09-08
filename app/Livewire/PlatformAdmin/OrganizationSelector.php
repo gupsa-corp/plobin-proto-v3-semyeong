@@ -55,6 +55,6 @@ class OrganizationSelector extends Component
 
     public function render()
     {
-        return view('livewire.platform-admin.organization-selector');
+        return view('livewire.platform-admin.102-organization-selector');
     }
 }

@@ -136,6 +136,6 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
 
 
     {{-- 모달 컴포넌트 포함 --}}
-    @include('livewire.platform-admin.modal-delete-organization')
-    @include('livewire.platform-admin.modal-create-organization')
+    @include('livewire.platform-admin.101-modal-delete-organization')
+    @include('livewire.platform-admin.100-modal-create-organization')
 </div>

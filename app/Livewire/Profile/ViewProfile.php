@@ -24,6 +24,6 @@ class ViewProfile extends Component
 
     public function render()
     {
-        return view('livewire.profile.view-profile');
+        return view('livewire.profile.400-view-profile');
     }
 }
