@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\PageAccessLevel;
 use App\Enums\ProjectRole;
@@ -73,6 +74,11 @@ class ProjectPage extends Model
     public function children()
     {
         return $this->hasMany(ProjectPage::class, 'parent_id');
+    }
+
+    public function deploymentLogs(): HasMany
+    {
+        return $this->hasMany(ProjectPageDeploymentLog::class);
     }
 
     // 탭용 페이지들 (parent_id가 null인 것들)
