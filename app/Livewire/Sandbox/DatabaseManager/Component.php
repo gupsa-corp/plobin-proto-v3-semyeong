@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config;
 use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Component extends LivewireComponent
 {
@@ -84,6 +85,20 @@ class Component extends LivewireComponent
         }
     }
 
+    private function createEmptyPaginator()
+    {
+        return new LengthAwarePaginator(
+            [], // items
+            0,  // total
+            $this->perPage, // perPage
+            1, // currentPage
+            [
+                'path' => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
+    }
+
     public function render()
     {
         try {
@@ -94,7 +109,7 @@ class Component extends LivewireComponent
             // 안전한 기본값 보장
             return view('700-page-sandbox.705-livewire-database-manager', [
                 'tables' => $tables ?? [],
-                'paginatedData' => $paginatedData ?? collect([])->paginate($this->perPage),
+                'paginatedData' => $paginatedData ?? $this->createEmptyPaginator(),
                 'selectedSandbox' => $selectedSandbox ?? '1'
             ]);
 
@@ -103,7 +118,7 @@ class Component extends LivewireComponent
 
             return view('700-page-sandbox.705-livewire-database-manager', [
                 'tables' => [],
-                'paginatedData' => collect([])->paginate($this->perPage),
+                'paginatedData' => $this->createEmptyPaginator(),
                 'selectedSandbox' => Session::get('sandbox_storage', '1')
             ]);
         }
@@ -221,20 +236,20 @@ class Component extends LivewireComponent
     {
         // 기본값 초기화
         if (!$this->selectedTable || empty($this->columns)) {
-            return collect([])->paginate($this->perPage);
+            return $this->createEmptyPaginator();
         }
 
         try {
             $connection = $this->getSandboxConnection();
 
             if (!$connection) {
-                return collect([])->paginate($this->perPage);
+                return $this->createEmptyPaginator();
             }
 
             // 테이블 존재 재확인
             $tableExists = $connection->select("SELECT name FROM sqlite_master WHERE type='table' AND name = ?", [$this->selectedTable]);
             if (empty($tableExists)) {
-                return collect([])->paginate($this->perPage);
+                return $this->createEmptyPaginator();
             }
 
             $query = $connection->table($this->selectedTable);
@@ -266,7 +281,7 @@ class Component extends LivewireComponent
 
         } catch (\Exception $e) {
             $this->addError('pagination', '데이터 조회 실패: ' . $e->getMessage());
-            return collect([])->paginate($this->perPage);
+            return $this->createEmptyPaginator();
         }
     }
 
