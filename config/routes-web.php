@@ -56,4 +56,10 @@ return [
     '/sandbox/form-publisher/editor' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.editor'],
     '/sandbox/form-publisher/list' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.list'],
     '/sandbox/form-publisher/preview/{id}' => ['view' => '700-page-sandbox.900-form-publisher-gateway', 'name' => 'sandbox.form-publisher.preview'],
+    // Function Browser 라우트들
+    '/sandbox/function-browser' => ['view' => '700-page-sandbox.708-page-function-browser-main.000-index', 'name' => 'sandbox.function-browser'],
+    '/sandbox/function-creator' => ['view' => '700-page-sandbox.709-page-function-creator.000-index', 'name' => 'sandbox.function-creator'],
+    '/sandbox/function-dependencies' => ['view' => '700-page-sandbox.710-page-function-dependencies.000-index', 'name' => 'sandbox.function-dependencies'],
+    '/sandbox/function-automation' => ['view' => '700-page-sandbox.711-page-function-automation.000-index', 'name' => 'sandbox.function-automation'],
+    '/sandbox/function-templates' => ['view' => '700-page-sandbox.712-page-function-templates.000-index', 'name' => 'sandbox.function-templates'],
 ];

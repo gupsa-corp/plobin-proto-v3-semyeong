@@ -102,7 +102,19 @@
                         Git 버전 관리
                     </a>
                     <a href="/sandbox/function-browser" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors font-medium">
-                        함수 브라우저
+                        📚 함수 브라우저
+                    </a>
+                    <a href="/sandbox/function-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors">
+                        ✨ 함수 생성
+                    </a>
+                    <a href="/sandbox/function-dependencies" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors">
+                        🔗 의존성 관리
+                    </a>
+                    <a href="/sandbox/function-automation" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors">
+                        ⚡ 자동화
+                    </a>
+                    <a href="/sandbox/function-templates" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors">
+                        🏪 템플릿
                     </a>
                     <a href="/sandbox/form-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors font-medium">
                         Form Creator

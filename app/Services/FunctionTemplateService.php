@@ -90,11 +90,16 @@ class FunctionTemplateService
             return null;
         }
 
-        // Simple template processing (can be enhanced with proper template engine)
+        // Process array parameters first (they need special handling)
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
                 $content = $this->processArrayParameter($content, $key, $value);
-            } else {
+            }
+        }
+        
+        // Then process simple string replacements
+        foreach ($parameters as $key => $value) {
+            if (!is_array($value)) {
                 $content = str_replace('{{' . $key . '}}', $value, $content);
             }
         }
@@ -110,13 +115,16 @@ class FunctionTemplateService
      */
     private function processArrayParameter(string $content, string $key, array $value): string
     {
-        // Handle {{#each actions}} blocks
-        if (preg_match('/\{\{#each ' . $key . '\}\}(.*?)\{\{\/each\}\}/s', $content, $matches)) {
+        // Handle {{#each actions}} blocks with more aggressive pattern matching
+        $pattern = '/\{\{#each\s+' . preg_quote($key) . '\s*\}\}(.*?)\{\{\/each\}\}/s';
+        
+        if (preg_match($pattern, $content, $matches)) {
             $template = $matches[1];
             $result = '';
             
             foreach ($value as $item) {
-                $itemContent = str_replace('{{this}}', $item, $template);
+                $itemContent = $template;
+                $itemContent = str_replace('{{this}}', $item, $itemContent);
                 $itemContent = str_replace('{{capitalize this}}', ucfirst($item), $itemContent);
                 $result .= $itemContent;
             }
