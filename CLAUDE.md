@@ -146,7 +146,7 @@ resources/views/
 - [문서화](docs/DOCUMENTATION.md)
 
 ### 시스템 사용법
-- [AI 샌드박스 가이드](docs/AI-SANDBOX-GUIDE.md)
+- [샌드박스 가이드](docs/AI-SANDBOX-GUIDE.md)
 - [ApiClient 가이드](docs/API-CLIENT-GUIDE.md)
 - [AuthManager 가이드](docs/AUTH-MANAGER-GUIDE.md)
 - [권한 시스템](docs/PERMISSION-SYSTEM.md)

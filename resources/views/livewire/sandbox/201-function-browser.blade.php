@@ -119,6 +119,46 @@
         </div>
     </div>
 
+    {{-- 2차 사이드바: release 폴더 파일 목록 --}}
+    @if(!empty($folderFiles))
+        <div class="bg-gray-50 border-r border-gray-200 flex flex-col w-72">
+            <div class="p-3 border-b border-gray-200 bg-gray-100">
+                <h3 class="text-sm font-semibold text-gray-800 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5L12 5H5a2 2 0 00-2 2z"/>
+                    </svg>
+                    Release 폴더 파일
+                </h3>
+            </div>
+            
+            <div class="flex-1 overflow-auto p-2">
+                @foreach($folderFiles as $file)
+                    <button
+                        wire:click="selectFile('{{ $file['name'] }}')"
+                        class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 flex items-center mb-1
+                            {{ $selectedFile === $file['name'] ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-500' : 'text-gray-700' }}"
+                    >
+                        <div class="flex items-center min-w-0 flex-1">
+                            @if($file['isPhp'])
+                                <svg class="w-4 h-4 mr-2 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                </svg>
+                            @else
+                                <svg class="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            @endif
+                            <span class="truncate">{{ $file['name'] }}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 ml-2 flex-shrink-0">
+                            {{ number_format($file['size']) }}B
+                        </div>
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- 사이드바 리사이저 --}}
     <div
         class="w-1 bg-gray-300 hover:bg-blue-500 cursor-col-resize flex-shrink-0 transition-colors"
@@ -162,37 +202,71 @@
 
             {{-- 코드 에디터 영역 --}}
             <div class="flex-1 flex flex-col">
-                @if($activeContent)
-                    <div class="flex-1 p-4">
-                        <div class="mb-4 flex justify-between items-center">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <h3 class="font-medium text-gray-800">함수 코드</h3>
+                @if($activeContent || $selectedFileContent)
+                    <div class="flex-1 flex flex-col">
+                        {{-- 메인 함수 코드 --}}
+                        @if($activeContent)
+                            <div class="flex-1 p-4 border-b border-gray-200">
+                                <div class="mb-4 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                        </svg>
+                                        <h3 class="font-medium text-gray-800">함수 코드 (Function.php)</h3>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button
+                                            @click="$wire.saveFunction($refs.codeEditor.value)"
+                                            class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                                            title="Ctrl+S"
+                                        >
+                                            저장
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <textarea
+                                    x-ref="codeEditor"
+                                    wire:model.live="functionContents.{{ $activeFunction }}"
+                                    class="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    style="font-family: 'Fira Code', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', monospace;"
+                                    placeholder="함수 코드가 여기에 표시됩니다..."
+                                >{{ $activeContent }}</textarea>
+                                
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <p>💡 팁: Ctrl+S로 저장하면 기존 release가 자동으로 백업됩니다.</p>
+                                </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button
-                                    @click="$wire.saveFunction($refs.codeEditor.value)"
-                                    class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-                                    title="Ctrl+S"
-                                >
-                                    저장
-                                </button>
+                        @endif
+
+                        {{-- 선택된 파일 내용 --}}
+                        @if($selectedFileContent && $selectedFile)
+                            <div class="flex-1 p-4">
+                                <div class="mb-4 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <h3 class="font-medium text-gray-800">{{ $selectedFile }}</h3>
+                                    </div>
+                                    <button
+                                        wire:click="selectFile('')"
+                                        class="px-2 py-1 text-gray-500 hover:text-gray-700 text-sm"
+                                        title="닫기"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <div class="w-full h-64 p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto">
+                                    <pre class="font-mono text-xs text-gray-800 whitespace-pre-wrap"
+                                         style="font-family: 'Fira Code', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', monospace;"
+                                    >{{ $selectedFileContent }}</pre>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <textarea
-                            x-ref="codeEditor"
-                            wire:model.live="functionContents.{{ $activeFunction }}"
-                            class="w-full h-96 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            style="font-family: 'Fira Code', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', monospace;"
-                            placeholder="함수 코드가 여기에 표시됩니다..."
-                        >{{ $activeContent }}</textarea>
-                        
-                        <div class="mt-2 text-xs text-gray-500">
-                            <p>💡 팁: Ctrl+S로 저장하면 기존 release가 자동으로 백업됩니다.</p>
-                        </div>
+                        @endif
                     </div>
                 @else
                     <div class="flex-1 flex items-center justify-center text-gray-500">

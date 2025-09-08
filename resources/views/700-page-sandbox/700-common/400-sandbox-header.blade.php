@@ -3,21 +3,21 @@
         <!-- 메인 타이틀 및 스토리지 선택 -->
         <div class="flex items-center justify-between h-16">
             <a href="/sandbox" class="text-xl font-bold text-gray-900 hover:text-gray-700">
-                AI 샌드박스
+                샌드박스
             </a>
-            
+
             <!-- 스토리지 선택 드롭다운 -->
             <div class="flex items-center space-x-4">
                 <div class="relative">
                     <label for="storage-select" class="text-sm text-gray-600 mr-2">선택된 샌드박스:</label>
-                    <select id="storage-select" 
+                    <select id="storage-select"
                             class="text-sm border border-gray-300 rounded-md px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onchange="selectStorage(this.value)">
                         @php
                             $currentStorage = session('sandbox_storage', '1');
                             $storageOptions = [];
                             $storagePath = storage_path();
-                            
+
                             if (file_exists($storagePath)) {
                                 $directories = glob($storagePath . '/storage-sandbox-*', GLOB_ONLYDIR);
                                 foreach ($directories as $directory) {
@@ -30,7 +30,7 @@
                                 sort($storageOptions);
                             }
                         @endphp
-                        
+
                         @forelse($storageOptions as $storage)
                             <option value="{{ $storage }}" {{ $storage == $currentStorage ? 'selected' : '' }}>
                                 storage-sandbox-{{ $storage }}
@@ -40,8 +40,8 @@
                         @endforelse
                     </select>
                 </div>
-                
-                <a href="/sandbox/storage-manager" 
+
+                <a href="/sandbox/storage-manager"
                    class="text-sm text-blue-600 hover:text-blue-800 underline">
                     관리
                 </a>
@@ -120,21 +120,21 @@
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/sandbox/storage-manager/select';
-        
+
         // CSRF 토큰 추가
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = '_token';
         csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         form.appendChild(csrfInput);
-        
+
         // 스토리지 이름 추가
         const storageInput = document.createElement('input');
         storageInput.type = 'hidden';
         storageInput.name = 'storage_name';
         storageInput.value = storageName;
         form.appendChild(storageInput);
-        
+
         // 폼을 body에 추가하고 전송
         document.body.appendChild(form);
         form.submit();

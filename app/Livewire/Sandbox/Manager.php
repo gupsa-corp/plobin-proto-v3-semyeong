@@ -119,13 +119,13 @@ class Manager extends Component
     public function executeSql()
     {
         try {
-            // AI 샌드박스 전용 SQLite 사용
+            // 샌드박스 전용 SQLite 사용
             $this->sqlResult = \DB::connection('ai_sandbox')->select($this->sqlQuery);
 
             // 쿼리 히스토리에 추가
             $this->addToHistory($this->sqlQuery);
 
-            session()->flash('sql-message', 'SQL 쿼리가 실행되었습니다. (AI 샌드박스 SQLite)');
+            session()->flash('sql-message', 'SQL 쿼리가 실행되었습니다. (샌드박스 SQLite)');
         } catch (\Exception $e) {
             $this->sqlResult = [];
 

@@ -184,7 +184,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', f
 // 프로젝트 설정 라우트들 (특정 설정 먼저)
 Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
     return view('300-page-service.314-page-project-settings-name.000-index', [
-        'currentProjectId' => $projectId, 
+        'currentProjectId' => $projectId,
         'activeTab' => 'name',
         'organizationId' => $id,
         'projectId' => $projectId
@@ -462,7 +462,7 @@ Route::post('/platform/admin/permissions/users/change-role', [\App\Http\CoreView
 Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
 Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
 
-// AI 샌드박스 페이지들 - 실제 존재하는 파일들만 라우트 등록
+// 샌드박스 페이지들 - 실제 존재하는 파일들만 라우트 등록
 // 메인 인덱스
 Route::get('/sandbox', function () {
     return view('700-page-sandbox.000-index');

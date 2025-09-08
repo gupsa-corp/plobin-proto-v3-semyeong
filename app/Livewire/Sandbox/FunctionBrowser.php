@@ -19,6 +19,9 @@ class FunctionBrowser extends Component implements HasForms
     public string $currentStorage = '';
     public array $testResults = [];
     public string $lastTestParams = '{}';
+    public array $currentFolderFiles = [];
+    public string $selectedFile = '';
+    public string $selectedFileContent = '';
 
     public ?array $data = [];
 
@@ -112,11 +115,70 @@ class FunctionBrowser extends Component implements HasForms
             $this->activeFunction = $tabKey;
             $this->activeGroup = $functionName;
             
+            // release 폴더인 경우 파일 목록 로드
+            if ($version === 'release') {
+                $this->loadFolderFiles($functionName, $version);
+            } else {
+                $this->currentFolderFiles = [];
+                $this->selectedFile = '';
+                $this->selectedFileContent = '';
+            }
+            
             $this->dispatch('function-loaded', [
                 'function' => $functionName,
                 'version' => $version,
                 'content' => $this->functionContents[$tabKey]
             ]);
+        }
+    }
+
+    /**
+     * 폴더의 파일 목록 로드
+     */
+    public function loadFolderFiles($functionName, $version)
+    {
+        $folderPath = $this->getFunctionDirectoryPath($functionName, $version);
+        $this->currentFolderFiles = [];
+        
+        if (File::exists($folderPath)) {
+            $files = File::allFiles($folderPath);
+            
+            foreach ($files as $file) {
+                $relativePath = str_replace($folderPath . '/', '', $file->getPathname());
+                $this->currentFolderFiles[] = [
+                    'name' => $relativePath,
+                    'path' => $file->getPathname(),
+                    'size' => $file->getSize(),
+                    'modified' => $file->getMTime(),
+                    'isPhp' => pathinfo($file->getFilename(), PATHINFO_EXTENSION) === 'php'
+                ];
+            }
+            
+            // 파일명으로 정렬
+            usort($this->currentFolderFiles, function($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+        }
+    }
+
+    /**
+     * 파일 선택
+     */
+    public function selectFile($fileName)
+    {
+        $this->selectedFile = $fileName;
+        
+        // 현재 활성 함수에서 파일 경로 찾기
+        if ($this->activeFunction) {
+            [$functionName, $version] = explode(':', $this->activeFunction);
+            $folderPath = $this->getFunctionDirectoryPath($functionName, $version);
+            $filePath = $folderPath . '/' . $fileName;
+            
+            if (File::exists($filePath)) {
+                $this->selectedFileContent = File::get($filePath);
+            } else {
+                $this->selectedFileContent = '파일을 읽을 수 없습니다.';
+            }
         }
     }
 
@@ -333,7 +395,10 @@ class FunctionBrowser extends Component implements HasForms
         return view('livewire.sandbox.201-function-browser', [
             'functions' => $this->getAvailableFunctions(),
             'activeContent' => $this->functionContents[$this->activeFunction] ?? '',
-            'testResults' => array_reverse($this->testResults)
+            'testResults' => array_reverse($this->testResults),
+            'folderFiles' => $this->currentFolderFiles,
+            'selectedFileContent' => $this->selectedFileContent,
+            'selectedFile' => $this->selectedFile
         ]);
     }
 }

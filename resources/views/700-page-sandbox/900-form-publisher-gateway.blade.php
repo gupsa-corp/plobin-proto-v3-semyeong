@@ -1,22 +1,22 @@
 <?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
-@include($common . '.301-layout-head', ['title' => 'Form Publisher - AI 샌드박스'])
+@include($common . '.301-layout-head', ['title' => 'Form Publisher - 샌드박스'])
 <body class="bg-gray-100">
     @include('700-page-sandbox.700-common.400-sandbox-header')
-    
+
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 2rem;">
         <div style="max-width: 1200px; margin: 0 auto;">
             <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 1rem 2rem; border-radius: 10px; margin-bottom: 2rem;">
                 <h1 style="color: white; font-size: 1.5rem; margin: 0;">🎨 Form Publisher</h1>
                 <p style="color: rgba(255, 255, 255, 0.8); margin: 0.5rem 0 0 0;">샌드박스 폼 생성 및 관리 도구</p>
             </div>
-            
+
             <div style="background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
             @php
                 // 샌드박스 경로 설정
                 $sandboxPath = storage_path('storage-sandbox-1/Frontend/Page');
-                
+
                 // URL에서 페이지 타입 결정
                 $currentPath = request()->path();
                 if (str_contains($currentPath, '/editor')) {
@@ -28,17 +28,17 @@
                 } else {
                     $page = 'list'; // 기본값
                 }
-                
+
                 // 페이지별 파일 매핑
                 $pageFiles = [
                     'editor' => 'form-publisher-editor.php',
-                    'preview' => 'form-publisher-preview.php', 
+                    'preview' => 'form-publisher-preview.php',
                     'list' => 'form-publisher-list.php'
                 ];
-                
+
                 $currentFile = $pageFiles[$page] ?? $pageFiles['list'];
                 $filePath = $sandboxPath . '/' . $currentFile;
-                
+
                 // GET 파라미터 전달
                 $queryParams = [];
                 if (isset($id)) {
@@ -53,33 +53,33 @@
                 if (request()->has('page')) {
                     $queryParams['page'] = request('page');
                 }
-                
+
                 // 쿼리 스트링 생성
                 $queryString = '';
                 if (!empty($queryParams)) {
                     $queryString = '?' . http_build_query($queryParams);
                 }
-                
+
                 // POST 데이터 전달
                 if (request()->isMethod('post')) {
                     $_POST = request()->all();
                 }
-                
+
                 // GET 파라미터를 $_GET에 설정
                 foreach ($queryParams as $key => $value) {
                     $_GET[$key] = $value;
                 }
             @endphp
-            
+
             @if (file_exists($filePath))
                 @php
                     // 출력 버퍼링 시작
                     ob_start();
-                    
+
                     // 현재 디렉토리 변경
                     $originalDir = getcwd();
                     chdir(dirname($filePath));
-                    
+
                     try {
                         // PHP 파일 실행
                         include $filePath;
@@ -92,10 +92,10 @@
                         // 원래 디렉토리로 복원
                         chdir($originalDir);
                     }
-                    
+
                     // 출력 내용 가져오기
                     $content = ob_get_clean();
-                    
+
                     // HTML 문서인 경우 body 내용만 추출
                     if (strpos($content, '<!DOCTYPE html') !== false) {
                         preg_match('/<body[^>]*>(.*?)<\/body>/s', $content, $matches);
@@ -116,7 +116,7 @@
                         파일 경로: {{ $filePath }}
                     </p>
                     <div style="margin-top: 2rem;">
-                        <a href="{{ route('sandbox.form-publisher.list') }}" 
+                        <a href="{{ route('sandbox.form-publisher.list') }}"
                            style="background: #667eea; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 5px; display: inline-block;">
                             📋 폼 목록으로 이동
                         </a>
@@ -124,9 +124,9 @@
                 </div>
             @endif
             </div>
-            
+
             <div style="text-align: center; margin-top: 2rem;">
-                <a href="{{ url('/sandbox') }}" 
+                <a href="{{ url('/sandbox') }}"
                    style="color: white; text-decoration: none; background: rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 5px; backdrop-filter: blur(10px);">
                     🏠 샌드박스 홈으로 돌아가기
                 </a>
@@ -136,7 +136,7 @@
 
     <!-- Livewire Scripts -->
     @livewireScripts
-    
+
     <!-- Filament Scripts -->
     @filamentScripts
 
@@ -150,11 +150,11 @@
     .sandbox-content * {
         box-sizing: border-box;
     }
-    
+
     .sandbox-container {
         padding: 2rem;
     }
-    
+
     .sandbox-card {
         max-width: 1200px;
         margin: 0 auto;
