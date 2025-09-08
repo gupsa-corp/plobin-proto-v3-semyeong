@@ -11,5 +11,8 @@
             @include(getCurrentViewPath())
         </div>
     </div>
+    
+    {{-- 인증 만료 모달 --}}
+    @include('300-page-service.300-common.310-modal-login')
 </body>
 </html>

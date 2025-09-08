@@ -91,13 +91,13 @@ foreach ($routes as $path => $config) {
         $route->name($routeName);
     }
 
-    // 개발용 - 인증 미들웨어 제거
-    // $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    // $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
+    // 인증 미들웨어 적용
+    $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
+    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
 
-    // if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
-    //     $route->middleware('auth');
-    // }
+    if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
+        $route->middleware(\App\Http\Middleware\SimpleAuth::class);
+    }
 }
 
 // 매개변수가 있는 특수 라우트들을 수동으로 등록 (개발용 - 인증 제거)
@@ -600,6 +600,21 @@ Route::prefix('sandbox/form-publisher')->group(function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list.post');
 });
+
+// 로그인 처리 라우트 추가 (모달용)
+Route::post('/login', function () {
+    $credentials = request()->only('email', 'password');
+    
+    if (Auth::attempt($credentials)) {
+        request()->session()->regenerate();
+        return response()->json(['success' => true]);
+    }
+    
+    return response()->json([
+        'success' => false, 
+        'message' => '이메일 또는 비밀번호가 일치하지 않습니다.'
+    ], 401);
+})->name('login.post');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {

@@ -33,6 +33,11 @@ class SimpleAuth
             return $next($request);
         }
 
+        // Livewire 요청 감지
+        if ($this->isLivewireRequest($request)) {
+            return response()->json(['auth_expired' => true], 401);
+        }
+
         if ($request->expectsJson()) {
             throw ApiException::unauthorized('인증이 필요합니다.');
         }
@@ -72,5 +77,11 @@ class SimpleAuth
         auth()->setUser($user);
 
         return $next($request);
+    }
+
+    private function isLivewireRequest(Request $request): bool
+    {
+        return $request->hasHeader('X-Livewire') || 
+               $request->hasHeader('X-Livewire-Request');
     }
 }

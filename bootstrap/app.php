@@ -19,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'rate.limit' => \App\Http\Middleware\ApiRateLimit::class,
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
         ]);
+        
+        // SimpleAuth를 CSRF 검증보다 먼저 실행하도록 우선순위 설정
+        $middleware->priority([
+            \App\Http\Middleware\SimpleAuth::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 단순한 예외 처리
