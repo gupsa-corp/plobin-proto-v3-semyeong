@@ -1,9 +1,16 @@
 {{-- 재귀적 페이지 트리 아이템 --}}
-<div style="margin-left: {{ $level * 16 }}px;" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
+<div style="margin-left: {{ $level * 16 }}px;" 
+     x-data="{ dropdownOpen: false }" 
+     @click.away="dropdownOpen = false"
+     class="page-item" 
+     data-page-id="{{ $page['id'] }}"
+     data-parent-id="{{ $page['parent_id'] ?? '' }}">
+    
     <div @if($editingPageId != $page['id']) @click="if(!$event.target.closest('.page-dropdown-{{ $page['id'] }}')) { window.location.href='{{ route('project.dashboard.page', ['id' => $orgId, 'projectId' => $projectId, 'pageId' => $page['id']]) }}' }" @endif
-       style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: {{ $editingPageId == $page['id'] ? 'default' : 'pointer' }}; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }}"
+         style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: {{ $editingPageId == $page['id'] ? 'default' : 'move' }}; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }} border: 1px solid transparent; transition: all 0.2s ease;"
          onmouseover="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='#F9FAFB'; }"
-         onmouseout="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; }">
+         onmouseout="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; }"
+         class="sortable-item">
         <div style="display: flex; align-items: center; gap: 8px;">
             @if($level > 0)
                 <div style="width: 16px; height: 1px; background: #E5E7EB; margin-right: -8px;"></div>

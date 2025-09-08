@@ -1,7 +1,7 @@
 {{-- 페이지 목록 --}}
-<div style="display: flex; flex-direction: column; gap: 4px;">
+<div>
     {{-- 동적 페이지 목록 --}}
-    <div style="display: flex; flex-direction: column; gap: 4px;">
+    <div id="sortable-pages" style="display: flex; flex-direction: column; gap: 4px;">
         @if(count($pages) > 0)
             @foreach($pages as $page)
                 @include('300-page-service.308-page-project-dashboard.302-page-tree-item', [
@@ -33,4 +33,69 @@
             </div>
         @endif
     </div>
+
+    {{-- SortableJS 드래그 앤 드롭 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sortableContainer = document.getElementById('sortable-pages');
+        
+        if (sortableContainer) {
+            new Sortable(sortableContainer, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                handle: '.sortable-item',
+                onEnd: function(evt) {
+                    const item = evt.item;
+                    const pageId = item.dataset.pageId;
+                    
+                    // 새로운 위치 계산
+                    const newIndex = evt.newIndex;
+                    const allItems = Array.from(sortableContainer.children);
+                    
+                    // 이전/이후 형제 찾기
+                    let beforePageId = null;
+                    let afterPageId = null;
+                    
+                    if (newIndex > 0) {
+                        const beforeItem = allItems[newIndex - 1];
+                        beforePageId = beforeItem.dataset.pageId;
+                    }
+                    
+                    if (newIndex < allItems.length - 1) {
+                        const afterItem = allItems[newIndex + 1];
+                        afterPageId = afterItem.dataset.pageId;
+                    }
+                    
+                    // Livewire로 순서 변경 요청
+                    @this.call('updatePageOrder', pageId, newIndex, beforePageId, afterPageId);
+                }
+            });
+        }
+    });
+    </script>
+
+    <style>
+    .sortable-ghost {
+        opacity: 0.4;
+    }
+
+    .sortable-chosen {
+        cursor: grabbing !important;
+    }
+
+    .sortable-drag {
+        opacity: 1;
+    }
+
+    .sortable-item {
+        cursor: grab;
+    }
+
+    .sortable-item:active {
+        cursor: grabbing;
+    }
+    </style>
 </div>

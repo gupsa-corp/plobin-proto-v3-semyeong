@@ -36,8 +36,8 @@ class PageListLivewire extends Component
     private function setCurrentPageFromUrl($currentPageId = null)
     {
         if ($currentPageId) {
-            // 동적 페이지 찾기
-            $page = collect($this->pages)->firstWhere('id', $currentPageId);
+            // 재귀적으로 페이지 찾기 (하위 페이지 포함)
+            $page = $this->findPageRecursively($this->pages, $currentPageId);
             if ($page) {
                 $this->currentPage = [
                     'id' => $page['id'],
@@ -58,6 +58,29 @@ class PageListLivewire extends Component
                 ];
             }
         }
+    }
+
+    /**
+     * 재귀적으로 페이지 찾기 (하위 페이지 포함)
+     */
+    private function findPageRecursively($pages, $pageId)
+    {
+        foreach ($pages as $page) {
+            // 현재 페이지가 찾는 페이지인지 확인
+            if ($page['id'] == $pageId) {
+                return $page;
+            }
+            
+            // 하위 페이지가 있으면 재귀적으로 검색
+            if (isset($page['children']) && count($page['children']) > 0) {
+                $found = $this->findPageRecursively($page['children'], $pageId);
+                if ($found) {
+                    return $found;
+                }
+            }
+        }
+        
+        return null;
     }
 
     public function loadPages()
@@ -351,6 +374,86 @@ class PageListLivewire extends Component
             
         } catch (\Exception $e) {
             $this->dispatch('show-error', '페이지 삭제 중 오류가 발생했습니다.');
+        }
+    }
+
+    /**
+     * 페이지 순서 변경 (SortableJS)
+     */
+    public function updatePageOrder($pageId, $newIndex, $beforePageId = null, $afterPageId = null)
+    {
+        try {
+            $page = ProjectPage::find($pageId);
+            if (!$page) {
+                return;
+            }
+
+            // 같은 부모의 페이지들을 가져와서 순서 재정렬
+            $siblings = ProjectPage::where('project_id', $this->projectId)
+                ->whereNull('parent_id') // 현재는 최상위 페이지만 지원
+                ->where('id', '!=', $pageId)
+                ->orderBy('sort_order')
+                ->get();
+
+            // 새로운 순서로 재배치
+            $newOrder = 0;
+            foreach ($siblings as $sibling) {
+                if ($newOrder == $newIndex) {
+                    // 현재 이동한 페이지 위치
+                    $page->update(['sort_order' => $newOrder]);
+                    $newOrder++;
+                }
+                $sibling->update(['sort_order' => $newOrder]);
+                $newOrder++;
+            }
+
+            // 마지막에 추가된 경우
+            if ($newIndex >= count($siblings)) {
+                $page->update(['sort_order' => $newOrder]);
+            }
+
+            // 페이지 목록 새로고침
+            $this->loadPages();
+            
+        } catch (\Exception $e) {
+            $this->dispatch('show-error', '페이지 순서 변경 중 오류가 발생했습니다.');
+        }
+    }
+
+    /**
+     * 하위 페이지인지 확인
+     */
+    private function isDescendant($ancestorId, $descendantId)
+    {
+        $page = ProjectPage::find($descendantId);
+        
+        while ($page && $page->parent_id) {
+            if ($page->parent_id == $ancestorId) {
+                return true;
+            }
+            $page = ProjectPage::find($page->parent_id);
+        }
+        
+        return false;
+    }
+
+    /**
+     * sort_order를 정수로 재정렬
+     */
+    private function reorderSortNumbers()
+    {
+        // 모든 부모별로 그룹화하여 정렬
+        $allPages = ProjectPage::where('project_id', $this->projectId)
+            ->orderBy('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+
+        $groups = $allPages->groupBy('parent_id');
+        
+        foreach ($groups as $parentId => $pages) {
+            foreach ($pages as $index => $page) {
+                $page->update(['sort_order' => $index]);
+            }
         }
     }
 
