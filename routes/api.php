@@ -221,3 +221,24 @@ Route::prefix('platform/admin/permissions')->group(function () {
 
 // 코어 권한 API (개발용 - 인증 없음)
 Route::get('/core/permissions', [\App\Http\CoreApi\Core\Permissions\Controller::class, 'getRoles']);
+
+// E2E 테스트 API (개발용 - 인증 없음)
+Route::prefix('test/e2e')->group(function () {
+    // 시스템 상태 조회
+    Route::get('/status', [\App\Http\Controllers\API\TestController::class, 'status']);
+    
+    // 함수 실행 테스트
+    Route::post('/execute-function', [\App\Http\Controllers\API\TestController::class, 'executeFunction']);
+    
+    // 파일 조회/쿼리 테스트
+    Route::get('/query-files', [\App\Http\Controllers\API\TestController::class, 'queryFiles']);
+    
+    // 파일 수정 테스트
+    Route::post('/modify-files', [\App\Http\Controllers\API\TestController::class, 'modifyFiles']);
+    
+    // 함수 정보 조회
+    Route::get('/function-info/{functionName}', [\App\Http\Controllers\API\TestController::class, 'getFunctionInfo']);
+    
+    // 테스트 함수 생성
+    Route::post('/create-test-function', [\App\Http\Controllers\API\TestController::class, 'createTestFunction']);
+});

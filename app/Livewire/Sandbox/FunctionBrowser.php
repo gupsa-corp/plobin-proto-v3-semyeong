@@ -387,7 +387,7 @@ class FunctionBrowser extends Component implements HasForms
      */
     private function getFunctionsPath()
     {
-        return storage_path('storage-sandbox-' . $this->currentStorage . '/Backend/Functions');
+        return storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}/functions");
     }
 
     /**
@@ -411,12 +411,14 @@ class FunctionBrowser extends Component implements HasForms
      */
     private function getFunctionDescription($functionName)
     {
-        $descriptions = [
-            'GanttChart' => '간트차트 데이터 관리 및 API 제공',
-            'UserAuth' => '사용자 인증 및 권한 관리',
-        ];
+        if ($this->metadataService) {
+            $function = $this->metadataService->getFunction($functionName);
+            if ($function && isset($function['description'])) {
+                return $function['description'];
+            }
+        }
         
-        return $descriptions[$functionName] ?? '함수 설명이 없습니다.';
+        return '함수 설명이 없습니다.';
     }
 
     /**

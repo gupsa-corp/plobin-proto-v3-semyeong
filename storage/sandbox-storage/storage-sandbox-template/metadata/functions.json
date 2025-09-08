@@ -224,6 +224,116 @@
                 "database",
                 "rest"
             ]
+        },
+        "DataProcessor": {
+            "versions": [
+                "release"
+            ],
+            "description": "고성능 데이터 처리 함수입니다. 필터링, 변환, 집계, 검증 등 다양한 데이터 조작 기능을 제공합니다.",
+            "dependencies": [],
+            "parameters": {
+                "data": {
+                    "type": "array",
+                    "required": true,
+                    "description": "처리할 데이터"
+                },
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "데이터 처리 작업",
+                    "options": [
+                        "process",
+                        "filter",
+                        "transform",
+                        "aggregate",
+                        "validate"
+                    ]
+                }
+            },
+            "category": "data",
+            "template_used": "data-processor",
+            "created_at": "2025-09-08T16:31:41.140070Z",
+            "updated_at": "2025-09-08T16:31:41.140179Z",
+            "author": "user",
+            "tags": [
+                "data",
+                "processing",
+                "filter",
+                "transform",
+                "validation"
+            ]
+        },
+        "StringHelper": {
+            "versions": [
+                "release"
+            ],
+            "description": "문자열 처리와 변환을 위한 유틸리티 함수입니다. 포맷팅, 검증, 변환 등 다양한 문자열 작업을 지원합니다.",
+            "dependencies": [],
+            "parameters": {
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "유틸리티 작업",
+                    "options": [
+                        "main",
+                        "format",
+                        "convert",
+                        "calculate",
+                        "generate"
+                    ]
+                }
+            },
+            "category": "utility",
+            "template_used": "utility-function",
+            "created_at": "2025-09-08T16:36:14.277152Z",
+            "updated_at": "2025-09-08T16:36:14.277256Z",
+            "author": "user",
+            "tags": [
+                "utility",
+                "helper",
+                "format",
+                "convert",
+                "calculate",
+                "generate"
+            ]
+        },
+        "TestProcessor": {
+            "versions": [
+                "release"
+            ],
+            "description": "E2E 테스트용 데이터 프로세서 함수",
+            "dependencies": [],
+            "parameters": {
+                "data": {
+                    "type": "array",
+                    "required": true,
+                    "description": "처리할 데이터"
+                },
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "데이터 처리 작업",
+                    "options": [
+                        "process",
+                        "filter",
+                        "transform",
+                        "aggregate",
+                        "validate"
+                    ]
+                }
+            },
+            "category": "data",
+            "template_used": "data-processor",
+            "created_at": "2025-09-08T16:41:52.185598Z",
+            "updated_at": "2025-09-08T16:41:52.185684Z",
+            "author": "user",
+            "tags": [
+                "data",
+                "processing",
+                "filter",
+                "transform",
+                "validation"
+            ]
         }
     },
     "categories": {
@@ -239,8 +349,8 @@
         }
     },
     "statistics": {
-        "total_functions": 5,
-        "total_versions": 8,
-        "last_updated": "2025-09-08T16:28:56.198853Z"
+        "total_functions": 8,
+        "total_versions": 11,
+        "last_updated": "2025-09-08T16:41:52.185711Z"
     }
 }
