@@ -11,5 +11,6 @@
 
     <!-- JavaScript -->
     @include('300-page-service.300-common.303-layout-js-imports')
+    @livewireScripts
 </body>
 </html>
