@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Enums\OrganizationPermission;
+use App\Enums\ProjectRole;
 
 class OrganizationMember extends Model
 {
     protected $fillable = [
         'organization_id',
         'user_id',
-        'permission_level',
+        'role',
         'joined_at',
         'invited_at',
         'invitation_status'
@@ -32,18 +32,41 @@ class OrganizationMember extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getPermissionAttribute(): OrganizationPermission
+    /**
+     * 역할을 ProjectRole Enum으로 반환
+     */
+    public function getRoleEnum(): ProjectRole
     {
-        return OrganizationPermission::from($this->permission_level);
+        if ($this->role) {
+            return ProjectRole::from($this->role);
+        }
+
+        // 기본값은 게스트
+        return ProjectRole::GUEST;
     }
 
-    public function setPermissionAttribute(OrganizationPermission $permission): void
+    /**
+     * 특정 역할 이상인지 확인
+     */
+    public function hasRoleOrHigher(ProjectRole $role): bool
     {
-        $this->permission_level = $permission->value;
+        $currentRole = $this->getRoleEnum();
+        return $currentRole->includes($role);
     }
 
-    public function hasPermission(OrganizationPermission $requiredPermission): bool
+    /**
+     * 역할명 설정
+     */
+    public function setRoleEnum(ProjectRole $role): void
     {
-        return $this->permission_level >= $requiredPermission->value;
+        $this->role = $role->value;
+    }
+
+    /**
+     * 역할 표시명 반환
+     */
+    public function getRoleDisplayName(): string
+    {
+        return $this->getRoleEnum()->getDisplayName();
     }
 }

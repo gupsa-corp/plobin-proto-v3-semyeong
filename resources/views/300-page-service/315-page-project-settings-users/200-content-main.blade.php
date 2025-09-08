@@ -51,8 +51,11 @@
                                     name="invite-role"
                                     x-model="inviteRole"
                                     class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                <option value="member">멤버</option>
-                                <option value="admin">관리자</option>
+                                <option value="guest">게스트 - 제한적 접근 권한</option>
+                                <option value="member">멤버 - 기본 프로젝트 멤버 권한</option>
+                                <option value="contributor">기여자 - 프로젝트 수정 및 기여 권한</option>
+                                <option value="moderator">중간관리자 - 중간 관리 및 조정 권한</option>
+                                <option value="admin">관리자 - 프로젝트 관리 권한</option>
                             </select>
                         </div>
                     </div>
@@ -103,9 +106,19 @@
                                     </p>
                                 </div>
                                 <div class="flex-shrink-0">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        프로젝트 소유자
-                                    </span>
+                                    <div class="flex flex-col space-y-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ \App\Enums\ProjectRole::OWNER->getColorClass() }}"
+                                              title="{{ \App\Enums\ProjectRole::OWNER->getDescription() }}">
+                                            {{ \App\Enums\ProjectRole::OWNER->getDisplayName() }}
+                                            <svg class="ml-1 h-3 w-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600"
+                                              title="이 프로젝트를 생성한 사용자입니다">
+                                            프로젝트 소유자
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -132,35 +145,48 @@
                                     </div>
                                     <div class="flex-shrink-0 flex items-center space-x-2">
                                         @php
-                                            $userRoles = $member->user->roles->pluck('name')->toArray();
-                                            $isAdmin = in_array('organization_admin', $userRoles) || in_array('platform_admin', $userRoles);
-                                            $isProjectManager = in_array('project_manager', $userRoles);
+                                            $accessControlService = app(\App\Services\AccessControlService::class);
+                                            $userProjectRole = $accessControlService->getUserProjectRole($member->user, $project);
+                                            $organizationRole = $member->getRoleEnum();
+                                            $currentUserRole = $accessControlService->getUserProjectRole(auth()->user(), $project);
+                                            $canManageRole = $currentUserRole->includes(\App\Enums\ProjectRole::MODERATOR) && 
+                                                           $currentUserRole->includes($userProjectRole);
                                         @endphp
                                         
-                                        @if(in_array('platform_admin', $userRoles))
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                플랫폼 관리자
+                                        <!-- 프로젝트 역할 표시 -->
+                                        <div class="flex flex-col space-y-1">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $userProjectRole->getColorClass() }}"
+                                                  title="{{ $userProjectRole->getDescription() }}">
+                                                {{ $userProjectRole->getDisplayName() }}
+                                                <svg class="ml-1 h-3 w-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                                </svg>
                                             </span>
-                                        @elseif(in_array('organization_admin', $userRoles))
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                조직 목록자
-                                            </span>
-                                        @elseif($isProjectManager)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                프로젝트 관리자
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                일반 멤버
-                                            </span>
-                                        @endif
+                                            <!-- 조직 역할도 표시 (다른 경우에만) -->
+                                            @if($organizationRole->value !== $userProjectRole->value)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-600"
+                                                      title="조직에서의 기본 역할: {{ $organizationRole->getDescription() }}">
+                                                    조직: {{ $organizationRole->getDisplayName() }}
+                                                </span>
+                                            @endif
+                                        </div>
                                         
-                                        @if(!$isAdmin)
-                                        <button class="text-gray-400 hover:text-gray-600" title="멤버 제거">
-                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </button>
+                                        <!-- 역할 관리 버튼 -->
+                                        @if($canManageRole && $userProjectRole !== \App\Enums\ProjectRole::OWNER)
+                                        <div class="flex space-x-1">
+                                            <button class="text-indigo-600 hover:text-indigo-900 text-xs px-2 py-1 border border-indigo-200 rounded" 
+                                                    title="역할 변경"
+                                                    onclick="openRoleChangeModal('{{ $member->user->id }}', '{{ $userProjectRole->value }}')">
+                                                역할 변경
+                                            </button>
+                                            @if($userProjectRole === \App\Enums\ProjectRole::GUEST || $userProjectRole === \App\Enums\ProjectRole::MEMBER)
+                                            <button class="text-red-600 hover:text-red-900 text-xs px-2 py-1 border border-red-200 rounded" 
+                                                    title="멤버 제거"
+                                                    onclick="removeMember('{{ $member->user->id }}')">
+                                                제거
+                                            </button>
+                                            @endif
+                                        </div>
                                         @endif
                                     </div>
                                 </div>
@@ -185,3 +211,103 @@
         </div>
     </div>
 </div>
+
+<!-- 역할 변경 모달 -->
+<div id="roleChangeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">역할 변경</h3>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">새로운 역할</label>
+                <select id="newRole" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="guest">게스트 - 제한적 접근 권한</option>
+                    <option value="member">멤버 - 기본 프로젝트 멤버 권한</option>
+                    <option value="contributor">기여자 - 프로젝트 수정 및 기여 권한</option>
+                    <option value="moderator">중간관리자 - 중간 관리 및 조정 권한</option>
+                    <option value="admin">관리자 - 프로젝트 관리 권한</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeRoleChangeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded">
+                    취소
+                </button>
+                <button onclick="saveRoleChange()" class="bg-indigo-500 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+                    변경
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+let currentUserId = null;
+
+function openRoleChangeModal(userId, currentRole) {
+    currentUserId = userId;
+    document.getElementById('newRole').value = currentRole;
+    document.getElementById('roleChangeModal').classList.remove('hidden');
+}
+
+function closeRoleChangeModal() {
+    currentUserId = null;
+    document.getElementById('roleChangeModal').classList.add('hidden');
+}
+
+function saveRoleChange() {
+    const newRole = document.getElementById('newRole').value;
+    
+    // AJAX로 역할 변경 요청
+    fetch(`/projects/{{ request()->route('projectId') }}/members/${currentUserId}/role`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            role: newRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('역할 변경에 실패했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('오류가 발생했습니다.');
+    });
+    
+    closeRoleChangeModal();
+}
+
+function removeMember(userId) {
+    if (!confirm('정말 이 멤버를 프로젝트에서 제거하시겠습니까?')) {
+        return;
+    }
+    
+    // AJAX로 멤버 제거 요청
+    fetch(`/projects/{{ request()->route('projectId') }}/members/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('멤버 제거에 실패했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('오류가 발생했습니다.');
+    });
+}
+</script>

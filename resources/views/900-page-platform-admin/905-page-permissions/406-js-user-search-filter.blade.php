@@ -100,25 +100,8 @@ function filterByPermission(permissionLevel) {
         const orgPermissionCell = row.querySelector('td:nth-child(3)');
         let hasPermission = false;
 
-        // 권한 레벨에 따른 텍스트 매핑
-        const permissionText = {
-            '0': '초대됨',
-            '100': '사용자',
-            '150': '사용자+',
-            '200': '서비스 매니저',
-            '250': '서비스 매니저+',
-            '300': '관리자',
-            '350': '관리자+',
-            '400': '소유자',
-            '450': '창립자',
-            '500': '플랫폼 관리자',
-            '550': '최고 관리자'
-        };
-
-        const targetPermission = permissionText[permissionLevel];
-        if (targetPermission) {
-            hasPermission = orgPermissionCell.textContent.includes(targetPermission);
-        }
+        // 새로운 역할 기반 시스템에서는 역할명으로 직접 검색
+        hasPermission = orgPermissionCell.textContent.includes(permissionLevel);
 
         row.style.display = hasPermission ? '' : 'none';
     });

@@ -29,6 +29,14 @@
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.sandboxes') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 샌드박스 관리
             </a>
+            <a href="{{ route('project.dashboard.project.settings.page-delete', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.page-delete') ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-orange-700 hover:border-orange-300' }} font-medium text-sm">
+                페이지 삭제
+            </a>
+            <a href="{{ route('project.dashboard.project.settings.logs', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.logs') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
+                변경 로그
+            </a>
         </nav>
     </div>
 </div>

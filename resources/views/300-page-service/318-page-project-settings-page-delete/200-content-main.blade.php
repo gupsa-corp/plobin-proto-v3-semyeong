@@ -1,4 +1,4 @@
-<!-- 프로젝트 삭제 콘텐츠 -->
+<!-- 페이지 삭제 콘텐츠 -->
 <div class="px-6 py-6">
     <!-- 프로젝트로 이동 버튼 -->
     <div class="mb-6">
@@ -11,16 +11,17 @@
         </a>
     </div>
 
-    <!-- Livewire 프로젝트 삭제 컴포넌트 -->
-    @livewire('project-delete', ['projectId' => request()->route('projectId'), 'organizationId' => request()->route('id')])
+    <!-- Livewire 페이지 삭제 컴포넌트 -->
+    @livewire('project-page-delete', ['projectId' => request()->route('projectId'), 'organizationId' => request()->route('id')])
 
     <!-- 추가 정보 -->
-    <div class="mt-6 bg-gray-50 border border-gray-200 rounded-md p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">삭제 전 확인사항:</h4>
-        <ul class="text-sm text-gray-700 space-y-1">
-            <li>• 중요한 데이터가 백업되었는지 확인하세요</li>
-            <li>• 다른 팀원들에게 삭제 계획을 알렸는지 확인하세요</li>
-            <li>• 프로덕션 환경에 배포된 내용이 있다면 먼저 처리하세요</li>
+    <div class="mt-6 bg-orange-50 border border-orange-200 rounded-md p-4">
+        <h4 class="text-sm font-medium text-orange-900 mb-2">페이지 삭제 주의사항:</h4>
+        <ul class="text-sm text-orange-700 space-y-1">
+            <li>• 삭제된 페이지는 복구할 수 없습니다</li>
+            <li>• 페이지에 포함된 모든 데이터가 완전히 제거됩니다</li>
+            <li>• 다른 페이지에서 참조하는 링크가 있는지 확인하세요</li>
+            <li>• 중요한 페이지의 경우 백업을 먼저 생성하세요</li>
         </ul>
     </div>
 </div>

@@ -9,13 +9,30 @@
             @include('800-page-organization-admin.800-common.100-header-main')
             
             <!-- Projects Management Content -->
-            <div class="p-6">
+            <div class="p-6" x-data="{ activeTab: 'active' }">
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">프로젝트 관리</h2>
                     <p class="text-gray-600">조직의 프로젝트를 관리합니다.</p>
                 </div>
 
-                <div class="bg-white rounded-lg shadow overflow-hidden">
+                <!-- 탭 네비게이션 -->
+                <div class="mb-6">
+                    <nav class="flex space-x-8" aria-label="Tabs">
+                        <button @click="activeTab = 'active'"
+                                :class="activeTab === 'active' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                            활성 프로젝트
+                        </button>
+                        <button @click="activeTab = 'deleted'"
+                                :class="activeTab === 'deleted' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                            삭제된 프로젝트
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- 활성 프로젝트 탭 -->
+                <div x-show="activeTab === 'active'" class="bg-white rounded-lg shadow overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">프로젝트 목록</h3>
                     </div>
@@ -95,6 +112,11 @@
                             </div>
                         </div>
                     @endif
+                </div>
+
+                <!-- 삭제된 프로젝트 탭 -->
+                <div x-show="activeTab === 'deleted'">
+                    @livewire('deleted-projects', ['organizationId' => $id])
                 </div>
             </div>
         </div>

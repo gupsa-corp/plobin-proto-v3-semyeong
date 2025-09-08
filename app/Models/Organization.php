@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Enums\OrganizationPermission;
+use App\Enums\ProjectRole;
 
 class Organization extends Model
 {
@@ -51,10 +51,10 @@ class Organization extends Model
                     ->withTimestamps();
     }
 
-    public function getMemberPermission(User $user): ?OrganizationPermission
+    public function getMemberRole(User $user): ?ProjectRole
     {
-        $member = $this->members()->where('user_id', $user->id)->first();
-        return $member ? $member->permission : null;
+        $member = $this->organizationMembers()->where('user_id', $user->id)->first();
+        return $member ? $member->getRoleEnum() : null;
     }
 
     public function hasMember(User $user): bool
@@ -62,11 +62,11 @@ class Organization extends Model
         return $this->members()->where('user_id', $user->id)->exists();
     }
 
-    public function addMember(User $user, OrganizationPermission $permission = OrganizationPermission::INVITED): OrganizationMember
+    public function addMember(User $user, ProjectRole $role = ProjectRole::GUEST): OrganizationMember
     {
-        return $this->members()->create([
+        return $this->organizationMembers()->create([
             'user_id' => $user->id,
-            'permission_level' => $permission->value,
+            'role' => $role->value,
             'invited_at' => now(),
             'joined_at' => now(),
             'invitation_status' => 'accepted',

@@ -201,6 +201,14 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', functi
     return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
 })->name('project.dashboard.project.settings.sandboxes');
 
+Route::get('/organizations/{id}/projects/{projectId}/settings/page-delete', function ($id, $projectId) {
+    return view('300-page-service.318-page-project-settings-page-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'page-delete']);
+})->name('project.dashboard.project.settings.page-delete');
+
+Route::get('/organizations/{id}/projects/{projectId}/settings/logs', function ($id, $projectId) {
+    return view('300-page-service.319-page-project-settings-logs.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'logs']);
+})->name('project.dashboard.project.settings.logs');
+
 // 기본 프로젝트 설정 경로 (settings로 접근시 name으로 리다이렉트)
 Route::get('/organizations/{id}/projects/{projectId}/settings', function ($id, $projectId) {
     return redirect()->route('project.dashboard.project.settings.name', ['id' => $id, 'projectId' => $projectId]);

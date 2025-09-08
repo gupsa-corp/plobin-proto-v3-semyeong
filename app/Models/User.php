@@ -126,19 +126,21 @@ class User extends Authenticatable
     }
 
     /**
-     * 기존 OrganizationPermission enum과의 호환성
+     * 조직 내 특정 역할 이상인지 확인
      */
-    public function hasOrganizationPermission(\App\Enums\OrganizationPermission $permission): bool
+    public function hasOrganizationRole(\App\Enums\ProjectRole $role, $organizationId = null): bool
     {
+        $organizationId = $organizationId ?? request()->route('organization');
+        
         $organizationMember = $this->organizationMemberships()
-            ->where('organization_id', request()->route('organization'))
+            ->where('organization_id', $organizationId)
             ->first();
 
         if (!$organizationMember) {
             return false;
         }
 
-        return $organizationMember->permission_level >= $permission->value;
+        return $organizationMember->hasRoleOrHigher($role);
     }
 
     /**

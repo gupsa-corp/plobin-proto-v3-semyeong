@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\OrganizationPermission;
+use App\Enums\ProjectRole;
 
 class PermissionService
 {
@@ -13,35 +13,35 @@ class PermissionService
     {
         return [
             'member_management' => [
-                'view' => [OrganizationPermission::SERVICE_MANAGER->value, '멤버 목록 보기'],
-                'invite' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '멤버 초대'],
-                'edit' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '멤버 정보 수정'],
-                'delete' => [OrganizationPermission::ORGANIZATION_OWNER->value, '멤버 삭제'],
-                'change_permission' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '권한 변경'],
+                'view' => [ProjectRole::MODERATOR->value, '멤버 목록 보기'],
+                'invite' => [ProjectRole::ADMIN->value, '멤버 초대'],
+                'edit' => [ProjectRole::ADMIN->value, '멤버 정보 수정'],
+                'delete' => [ProjectRole::OWNER->value, '멤버 삭제'],
+                'change_permission' => [ProjectRole::ADMIN->value, '권한 변경'],
             ],
             'project_management' => [
-                'view' => [OrganizationPermission::USER->value, '프로젝트 보기'],
-                'create' => [OrganizationPermission::SERVICE_MANAGER->value, '프로젝트 생성'],
-                'edit' => [OrganizationPermission::SERVICE_MANAGER->value, '프로젝트 수정'],
-                'delete' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '프로젝트 삭제'],
-                'assign_members' => [OrganizationPermission::SERVICE_MANAGER->value, '멤버 배정'],
+                'view' => [ProjectRole::GUEST->value, '프로젝트 보기'],
+                'create' => [ProjectRole::MODERATOR->value, '프로젝트 생성'],
+                'edit' => [ProjectRole::CONTRIBUTOR->value, '프로젝트 수정'],
+                'delete' => [ProjectRole::ADMIN->value, '프로젝트 삭제'],
+                'assign_members' => [ProjectRole::MODERATOR->value, '멤버 배정'],
             ],
             'billing_management' => [
-                'view' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '결제 정보 보기'],
-                'edit' => [OrganizationPermission::ORGANIZATION_OWNER->value, '결제 정보 수정'],
-                'download_receipts' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '영수증 다운로드'],
-                'change_plan' => [OrganizationPermission::ORGANIZATION_OWNER->value, '요금제 변경'],
+                'view' => [ProjectRole::ADMIN->value, '결제 정보 보기'],
+                'edit' => [ProjectRole::OWNER->value, '결제 정보 수정'],
+                'download_receipts' => [ProjectRole::ADMIN->value, '영수증 다운로드'],
+                'change_plan' => [ProjectRole::OWNER->value, '요금제 변경'],
             ],
             'organization_settings' => [
-                'view' => [OrganizationPermission::SERVICE_MANAGER->value, '조직 정보 보기'],
-                'edit' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '조직 정보 수정'],
-                'delete' => [OrganizationPermission::ORGANIZATION_OWNER->value, '조직 삭제'],
+                'view' => [ProjectRole::MODERATOR->value, '조직 정보 보기'],
+                'edit' => [ProjectRole::ADMIN->value, '조직 정보 수정'],
+                'delete' => [ProjectRole::OWNER->value, '조직 삭제'],
             ],
             'permission_management' => [
-                'view' => [OrganizationPermission::SERVICE_MANAGER->value, '권한 현황 보기'],
-                'edit' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '권한 수정'],
-                'create_role' => [OrganizationPermission::ORGANIZATION_ADMIN->value, '역할 생성'],
-                'delete_role' => [OrganizationPermission::ORGANIZATION_OWNER->value, '역할 삭제'],
+                'view' => [ProjectRole::MODERATOR->value, '권한 현황 보기'],
+                'edit' => [ProjectRole::ADMIN->value, '권한 수정'],
+                'create_role' => [ProjectRole::ADMIN->value, '역할 생성'],
+                'delete_role' => [ProjectRole::OWNER->value, '역할 삭제'],
             ]
         ];
     }
@@ -50,7 +50,7 @@ class PermissionService
      * 특정 권한이 특정 작업을 수행할 수 있는지 확인
      */
     public static function canPerformAction(
-        OrganizationPermission $userPermission,
+        ProjectRole $userRole,
         string $category,
         string $action
     ): bool {
@@ -60,14 +60,16 @@ class PermissionService
             return false;
         }
 
-        $requiredPermissionValue = $matrix[$category][$action][0];
-        return $userPermission->value >= $requiredPermissionValue;
+        $requiredRoleValue = $matrix[$category][$action][0];
+        $requiredRole = ProjectRole::from($requiredRoleValue);
+        
+        return $userRole->includes($requiredRole);
     }
 
     /**
      * 권한별로 접근 가능한 기능 목록 반환
      */
-    public static function getAvailableFeatures(OrganizationPermission $permission): array
+    public static function getAvailableFeatures(ProjectRole $role): array
     {
         $features = [];
         $matrix = self::getPermissionMatrix();
@@ -75,7 +77,8 @@ class PermissionService
         foreach ($matrix as $category => $actions) {
             $availableActions = [];
             foreach ($actions as $action => $requirements) {
-                if ($permission->value >= $requirements[0]) {
+                $requiredRole = ProjectRole::from($requirements[0]);
+                if ($role->includes($requiredRole)) {
                     $availableActions[$action] = $requirements[1];
                 }
             }
@@ -91,28 +94,23 @@ class PermissionService
      * 권한 업그레이드 가능 여부 확인
      */
     public static function canUpgradePermission(
-        OrganizationPermission $currentPermission,
-        OrganizationPermission $targetPermission,
-        OrganizationPermission $actorPermission
+        ProjectRole $currentRole,
+        ProjectRole $targetRole,
+        ProjectRole $actorRole
     ): bool {
         // 자신보다 높은 권한을 부여할 수 없음
-        if ($targetPermission->value >= $actorPermission->value) {
+        if (!$actorRole->includes($targetRole)) {
             return false;
         }
 
-        // 플랫폼 관리자만이 플랫폼 관리자 권한을 부여할 수 있음
-        if ($targetPermission->value >= OrganizationPermission::PLATFORM_ADMIN->value) {
-            return $actorPermission->value >= OrganizationPermission::PLATFORM_ADMIN->value;
+        // OWNER만이 OWNER 권한을 부여할 수 있음
+        if ($targetRole === ProjectRole::OWNER) {
+            return $actorRole === ProjectRole::OWNER;
         }
 
-        // 조직 소유자만이 조직 소유자 권한을 부여할 수 있음
-        if ($targetPermission->value >= OrganizationPermission::ORGANIZATION_OWNER->value) {
-            return $actorPermission->value >= OrganizationPermission::ORGANIZATION_OWNER->value;
-        }
-
-        // 조직 목록자는 조직 목록자까지만 부여 가능
-        if ($actorPermission->value >= OrganizationPermission::ORGANIZATION_ADMIN->value) {
-            return $targetPermission->value < OrganizationPermission::ORGANIZATION_OWNER->value;
+        // ADMIN은 OWNER 이하 권한만 부여 가능
+        if ($actorRole->includes(ProjectRole::ADMIN)) {
+            return $targetRole !== ProjectRole::OWNER;
         }
 
         return false;
@@ -121,12 +119,12 @@ class PermissionService
     /**
      * 권한별 사이드바 메뉴 필터링
      */
-    public static function filterSidebarMenu(OrganizationPermission $permission): array
+    public static function filterSidebarMenu(ProjectRole $role): array
     {
         $menuItems = [];
 
         // 회원 관리
-        if ($permission->canManageMembers()) {
+        if ($role->includes(ProjectRole::ADMIN)) {
             $menuItems[] = [
                 'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -140,7 +138,7 @@ class PermissionService
         }
 
         // 권한 관리
-        if ($permission->canManagePermissions()) {
+        if ($role->includes(ProjectRole::ADMIN)) {
             $menuItems[] = [
                 'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -154,7 +152,7 @@ class PermissionService
         }
 
         // 결제 관리
-        if ($permission->canManageBilling()) {
+        if ($role === ProjectRole::OWNER) {
             $menuItems[] = [
                 'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -168,7 +166,7 @@ class PermissionService
         }
 
         // 프로젝트 관리
-        if ($permission->canManageProjects()) {
+        if ($role->includes(ProjectRole::MODERATOR)) {
             $menuItems[] = [
                 'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
