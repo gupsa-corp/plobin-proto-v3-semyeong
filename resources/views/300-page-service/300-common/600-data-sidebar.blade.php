@@ -9,7 +9,7 @@ return [
                 if (preg_match('/\/organizations\/(\d+)/', request()->getRequestUri(), $matches)) {
                     return '/organizations/' . $matches[1] . '/dashboard';
                 }
-                // 기본값으로 첫 번째 조직 또는 조직 선택 페이지
+                // 조직 ID를 찾을 수 없으면 조직 목록으로 리다이렉트
                 return '/organizations';
             },
             'active' => request()->is('organizations/*/dashboard') || request()->is('organizations/*/dashboard/*'),
@@ -32,7 +32,7 @@ return [
                 if (preg_match('/\/organizations\/(\d+)/', request()->getRequestUri(), $matches)) {
                     return '/organizations/' . $matches[1] . '/admin';
                 }
-                // 기본값으로 조직 선택 페이지
+                // 조직 ID를 찾을 수 없으면 조직 목록으로 리다이렉트
                 return '/organizations';
             },
             'active' => request()->is('organizations/*/admin') || request()->is('organizations/*/admin/*'),

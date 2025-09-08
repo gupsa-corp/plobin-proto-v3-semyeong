@@ -19,7 +19,7 @@ class ProjectLogService
         array $metadata = [],
         int $userId = null
     ) {
-        $userId = $userId ?: (Auth::check() ? Auth::id() : 1); // 개발용 기본값
+        $userId = $userId ?: Auth::id();
 
         return ProjectLog::create([
             'project_id' => $projectId,

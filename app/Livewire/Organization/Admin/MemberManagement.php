@@ -33,7 +33,7 @@ class MemberManagement extends Component
     public $editingMemberRole = '';
     public $editingMemberPermissions = [];
 
-    public function mount($organizationId = 1)
+    public function mount($organizationId)
     {
         $this->organizationId = $organizationId;
         try {
