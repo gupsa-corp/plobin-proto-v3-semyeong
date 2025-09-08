@@ -180,6 +180,11 @@ Route::prefix('test/organizations')->group(function () {
 Route::prefix('sandbox')->group(function () {
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     
+    // AI Server Callback API
+    Route::prefix('storage-sandbox-1/callbacks')->group(function () {
+        Route::post('/ai-server', \App\Http\Sandbox\AIServer\Callback\Controller::class);
+    });
+    
     // Form Creator API
     Route::prefix('form-creator')->group(function () {
         Route::post('/save', \App\Http\Sandbox\FormCreator\Save\Controller::class);
