@@ -1,5 +1,5 @@
 <!-- 권한 관리 콘텐츠 -->
-<div class="px-6 py-6" x-data="{ showCreateRoleForm: false, newRoleName: '', selectedPermissions: [] }">
+<div class="px-6 py-6">
     <!-- 프로젝트로 이동 버튼 -->
     <div class="mb-6">
         <a href="{{ route('project.dashboard', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
@@ -11,74 +11,8 @@
         </a>
     </div>
 
-    <!-- 커스텀 역할 생성 버튼 -->
-    <div class="mb-6">
-        <button @click="showCreateRoleForm = !showCreateRoleForm" 
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            커스텀 역할 생성
-        </button>
-    </div>
-
-    <!-- 커스텀 역할 생성 폼 -->
-    <div x-show="showCreateRoleForm" x-transition class="mb-6">
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">커스텀 역할 생성</h3>
-                <p class="mt-1 text-sm text-gray-500">
-                    프로젝트에 특화된 커스텀 역할을 생성하고 권한을 설정할 수 있습니다.
-                </p>
-                
-                <div class="mt-6">
-                    <label for="role-name" class="block text-sm font-medium text-gray-700">역할 이름</label>
-                    <div class="mt-1">
-                        <input type="text" 
-                               name="role-name" 
-                               id="role-name" 
-                               x-model="newRoleName"
-                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
-                               placeholder="예: QA 담당자, 디자이너">
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700">권한 선택</label>
-                    <div class="mt-2 space-y-2">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="perm-read" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                            <label for="perm-read" class="ml-3 text-sm text-gray-700">프로젝트 읽기</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="perm-write" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                            <label for="perm-write" class="ml-3 text-sm text-gray-700">프로젝트 수정</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="perm-deploy" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                            <label for="perm-deploy" class="ml-3 text-sm text-gray-700">배포 관리</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="perm-members" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                            <label for="perm-members" class="ml-3 text-sm text-gray-700">멤버 관리</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="showCreateRoleForm = false" 
-                            type="button" 
-                            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        취소
-                    </button>
-                    <button type="button" 
-                            class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        역할 생성
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Livewire 커스텀 역할 관리 컴포넌트 -->
+    @livewire('project-settings-permissions', ['projectId' => request()->route('projectId'), 'organizationId' => request()->route('id')])
 
     <!-- 기본 역할 섹션 -->
     <div class="bg-white shadow rounded-lg mb-6">
@@ -157,26 +91,6 @@
                         <li>• 프로젝트 삭제</li>
                         <li>• 소유권 이전</li>
                     </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 커스텀 역할 목록 -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">커스텀 역할</h3>
-            <p class="mt-1 text-sm text-gray-500">
-                프로젝트에 생성된 커스텀 역할을 관리할 수 있습니다.
-            </p>
-            
-            <div class="mt-6">
-                <div class="text-center py-6">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <h4 class="mt-2 text-lg font-medium text-gray-900">커스텀 역할이 없습니다</h4>
-                    <p class="mt-1 text-sm text-gray-500">위의 버튼을 클릭하여 새로운 커스텀 역할을 생성하세요.</p>
                 </div>
             </div>
         </div>

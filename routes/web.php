@@ -163,7 +163,12 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', f
 
 // 프로젝트 설정 라우트들 (특정 설정 먼저)
 Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
-    return view('300-page-service.314-page-project-settings-name.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'name']);
+    return view('300-page-service.314-page-project-settings-name.000-index', [
+        'currentProjectId' => $projectId, 
+        'activeTab' => 'name',
+        'organizationId' => $id,
+        'projectId' => $projectId
+    ]);
 })->name('project.dashboard.project.settings.name');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {

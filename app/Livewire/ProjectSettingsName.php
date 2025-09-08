@@ -59,6 +59,6 @@ class ProjectSettingsName extends Component
     
     public function render()
     {
-        return view('project-settings-name');
+        return view('livewire.project-settings-name');
     }
 }
