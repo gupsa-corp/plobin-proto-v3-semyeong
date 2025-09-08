@@ -37,68 +37,16 @@
     </div>
 
     <div id="paymentMethodsList" class="space-y-3">
-        <!-- 1순위 결제 수단 -->
-        <div class="payment-method-item flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-green-50 border-green-200" data-method-id="card1" data-priority="1">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                        <span class="text-white text-xs font-bold">1</span>
-                    </div>
-                    <button class="priority-btn text-gray-400 hover:text-gray-600 cursor-move" title="드래그하여 순서 변경">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M7 2a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1V2zM7 8a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1V8zM8 13a1 1 0 00-1 1v2a1 1 0 001 1h4a1 1 0 001-1v-2a1 1 0 00-1-1H8z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="w-12 h-8 bg-blue-600 rounded flex items-center justify-center">
-                    <span class="text-white text-xs font-bold">VISA</span>
-                </div>
-                <div>
-                    <p class="font-medium text-gray-900">**** **** **** 1234</p>
-                    <p class="text-sm text-gray-500">만료일: 12/26</p>
-                </div>
-                <div class="flex gap-2">
-                    <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">1순위</span>
-                    <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">기본</span>
-                </div>
+        <!-- 등록된 결제 수단이 없을 때 표시 -->
+        <div id="no-payment-methods" class="text-center py-8 text-gray-500">
+            <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
             </div>
-            <div class="flex gap-2">
-                <button onclick="editPaymentMethod('card1')" class="text-blue-600 hover:text-blue-800 text-sm">편집</button>
-                <button onclick="setPriorityPaymentMethod('card1')" class="text-purple-600 hover:text-purple-800 text-sm">우선순위 변경</button>
-                <button onclick="deletePaymentMethod('card1')" class="text-red-600 hover:text-red-800 text-sm">삭제</button>
-            </div>
+            <p class="text-sm">등록된 결제 수단이 없습니다.</p>
+            <p class="text-xs text-gray-400 mt-1">결제 수단을 추가하여 자동 결제를 이용하세요.</p>
         </div>
-
-        <!-- 2순위 결제 수단 -->
-        <div class="payment-method-item flex items-center justify-between p-4 border border-gray-200 rounded-lg" data-method-id="card2" data-priority="2">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
-                        <span class="text-white text-xs font-bold">2</span>
-                    </div>
-                    <button class="priority-btn text-gray-400 hover:text-gray-600 cursor-move" title="드래그하여 순서 변경">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M7 2a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1V2zM7 8a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1V8zM8 13a1 1 0 00-1 1v2a1 1 0 001 1h4a1 1 0 001-1v-2a1 1 0 00-1-1H8z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="w-12 h-8 bg-red-600 rounded flex items-center justify-center">
-                    <span class="text-white text-xs font-bold">MC</span>
-                </div>
-                <div>
-                    <p class="font-medium text-gray-900">**** **** **** 5678</p>
-                    <p class="text-sm text-gray-500">만료일: 08/27</p>
-                </div>
-                <span class="px-2.5 py-0.5 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">2순위</span>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="editPaymentMethod('card2')" class="text-blue-600 hover:text-blue-800 text-sm">편집</button>
-                <button onclick="setPriorityPaymentMethod('card2')" class="text-purple-600 hover:text-purple-800 text-sm">우선순위 변경</button>
-                <button onclick="setDefaultPaymentMethod('card2')" class="text-green-600 hover:text-green-800 text-sm">기본으로 설정</button>
-                <button onclick="deletePaymentMethod('card2')" class="text-red-600 hover:text-red-800 text-sm">삭제</button>
-            </div>
-        </div>
-
     </div>
 
     <!-- 결제 우선순위 안내 -->

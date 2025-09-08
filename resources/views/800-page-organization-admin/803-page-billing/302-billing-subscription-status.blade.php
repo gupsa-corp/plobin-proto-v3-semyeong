@@ -6,7 +6,7 @@
                 <h3 id="plan-name" class="text-xl font-semibold"></h3>
                 <span id="plan-status" class="px-2.5 py-0.5 bg-blue-500 rounded-full text-xs font-medium"></span>
             </div>
-            <p class="text-blue-100 mb-4">팀 협업을 위한 플랜</p>
+            <p id="plan-description" class="text-blue-100 mb-4"></p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <p class="text-blue-100 text-sm">다음 결제일</p>

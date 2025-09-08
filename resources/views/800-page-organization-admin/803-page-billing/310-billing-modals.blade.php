@@ -215,19 +215,19 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">결제 일시</label>
-                                <p id="detailDate" class="text-gray-900 font-medium">2024.03.15 14:30</p>
+                                <p id="detailDate" class="text-gray-900 font-medium">-</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">결제 상태</label>
-                                <span id="detailStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">결제 완료</span>
+                                <span id="detailStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">-</span>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">결제 금액</label>
-                                <p id="detailAmount" class="text-gray-900 font-medium text-lg">₩99,000</p>
+                                <p id="detailAmount" class="text-gray-900 font-medium text-lg">-</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">결제 ID</label>
-                                <p id="detailPaymentId" class="text-gray-600 text-sm font-mono">pay_2024031514300001</p>
+                                <p id="detailPaymentId" class="text-gray-600 text-sm font-mono">-</p>
                             </div>
                         </div>
                     </div>
@@ -238,15 +238,15 @@
                         <div class="space-y-2">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">플랜명</span>
-                                <span id="detailPlanName" class="font-medium">Pro 플랜</span>
+                                <span id="detailPlanName" class="font-medium">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">사용 기간</span>
-                                <span id="detailPeriod" class="font-medium">2024.03.15 - 2024.04.15</span>
+                                <span id="detailPeriod" class="font-medium">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">결제 방식</span>
-                                <span id="detailBillingCycle" class="font-medium">월간 구독</span>
+                                <span id="detailBillingCycle" class="font-medium">-</span>
                             </div>
                         </div>
                     </div>
@@ -255,12 +255,12 @@
                     <div class="border border-gray-200 rounded-lg p-4 mb-6">
                         <h4 class="font-medium text-gray-900 mb-3">결제 수단</h4>
                         <div class="flex items-center gap-3">
-                            <div id="detailCardIcon" class="w-12 h-8 bg-blue-600 rounded flex items-center justify-center">
-                                <span class="text-white text-xs font-bold">VISA</span>
+                            <div id="detailCardIcon" class="w-12 h-8 bg-gray-400 rounded flex items-center justify-center">
+                                <span class="text-white text-xs font-bold">-</span>
                             </div>
                             <div>
-                                <p id="detailCardNumber" class="font-medium">**** **** **** 1234</p>
-                                <p id="detailCardInfo" class="text-sm text-gray-500">VISA · 만료일: 12/26</p>
+                                <p id="detailCardNumber" class="font-medium">-</p>
+                                <p id="detailCardInfo" class="text-sm text-gray-500">-</p>
                             </div>
                         </div>
                     </div>
@@ -270,17 +270,17 @@
                         <h4 class="font-medium text-gray-900 mb-3">결제 내역</h4>
                         <div class="space-y-2">
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Pro 플랜 (월간)</span>
-                                <span class="font-medium">₩99,000</span>
+                                <span class="text-gray-600">-</span>
+                                <span class="font-medium">-</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-500">VAT (10%)</span>
-                                <span>₩9,000</span>
+                                <span>-</span>
                             </div>
                             <hr class="border-gray-200">
                             <div class="flex justify-between font-medium text-lg">
                                 <span>총 결제 금액</span>
-                                <span id="detailTotalAmount">₩108,000</span>
+                                <span id="detailTotalAmount">-</span>
                             </div>
                         </div>
                     </div>
@@ -291,15 +291,15 @@
                         <div class="space-y-2">
                             <div class="flex justify-between">
                                 <span class="text-red-700">실패 사유</span>
-                                <span id="failureReason" class="font-medium text-red-900">한도 초과</span>
+                                <span id="failureReason" class="font-medium text-red-900">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-red-700">실패 시간</span>
-                                <span id="failureTime" class="font-medium text-red-900">2024.03.10 15:45</span>
+                                <span id="failureTime" class="font-medium text-red-900">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-red-700">에러 코드</span>
-                                <span id="errorCode" class="font-medium font-mono text-red-900">LIMIT_EXCEEDED</span>
+                                <span id="errorCode" class="font-medium font-mono text-red-900">-</span>
                             </div>
                         </div>
                     </div>
@@ -310,15 +310,15 @@
                         <div class="space-y-2">
                             <div class="flex justify-between">
                                 <span class="text-purple-700">환불 사유</span>
-                                <span id="refundReason" class="font-medium text-purple-900">중도 해지</span>
+                                <span id="refundReason" class="font-medium text-purple-900">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-purple-700">환불 금액</span>
-                                <span id="refundAmount" class="font-medium text-purple-900">₩33,000</span>
+                                <span id="refundAmount" class="font-medium text-purple-900">-</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-purple-700">환불 처리일</span>
-                                <span id="refundDate" class="font-medium text-purple-900">2024.01.25</span>
+                                <span id="refundDate" class="font-medium text-purple-900">-</span>
                             </div>
                         </div>
                     </div>
