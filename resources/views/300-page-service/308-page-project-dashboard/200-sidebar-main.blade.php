@@ -31,7 +31,7 @@
         @livewire('service.project-dashboard.page-list-livewire', [
             'orgId' => request()->route('id'),
             'projectId' => request()->route('projectId') ?? 1,
-            'currentPageId' => $currentPageId ?? 'dashboard-home'
+            'currentPageId' => request()->route('pageId') ?? ($currentPageId ?? null)
         ])
     </div>
 
