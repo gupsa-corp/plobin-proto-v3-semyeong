@@ -131,11 +131,21 @@
                                         </p>
                                     </div>
                                     <div class="flex-shrink-0 flex items-center space-x-2">
-                                        @if($member->permission_level >= 300)
+                                        @php
+                                            $userRoles = $member->user->roles->pluck('name')->toArray();
+                                            $isAdmin = in_array('organization_admin', $userRoles) || in_array('platform_admin', $userRoles);
+                                            $isProjectManager = in_array('project_manager', $userRoles);
+                                        @endphp
+                                        
+                                        @if(in_array('platform_admin', $userRoles))
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                플랫폼 관리자
+                                            </span>
+                                        @elseif(in_array('organization_admin', $userRoles))
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                                 조직 목록자
                                             </span>
-                                        @elseif($member->permission_level >= 200)
+                                        @elseif($isProjectManager)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 프로젝트 관리자
                                             </span>
@@ -144,7 +154,8 @@
                                                 일반 멤버
                                             </span>
                                         @endif
-                                        @if($member->permission_level < 300)
+                                        
+                                        @if(!$isAdmin)
                                         <button class="text-gray-400 hover:text-gray-600" title="멤버 제거">
                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

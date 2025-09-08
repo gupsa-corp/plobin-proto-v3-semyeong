@@ -35,6 +35,50 @@ foreach ($routes as $path => $config) {
                     ->orderBy('organizations.created_at', 'desc')
                     ->get();
 
+                // 대시보드 페이지에는 프로젝트 목록도 함께 전달
+                if ($path === '/dashboard') {
+                    // 1. 내가 소유한 프로젝트들
+                    $ownedProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
+                        ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+                        ->where('projects.user_id', auth()->id());
+
+                    // 2. 조직 멤버십을 통해 접근 가능한 프로젝트들 (내가 소유한 프로젝트 제외)
+                    $memberProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
+                        ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+                        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+                        ->where('organization_members.user_id', auth()->id())
+                        ->where('organization_members.invitation_status', 'accepted')
+                        ->where('projects.user_id', '!=', auth()->id());
+
+                    // 3. 두 결과를 합치기
+                    $projects = $ownedProjects->union($memberProjects)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(10)
+                        ->get();
+
+                    // 4. 최근 페이지들 조회 (내가 접근 가능한 프로젝트의 페이지들)
+                    $pages = \App\Models\ProjectPage::select(['project_pages.id', 'project_pages.title', 'project_pages.description', 'project_pages.updated_at', 'projects.name as project_name', 'projects.id as project_id', 'organizations.name as organization_name', 'organizations.id as organization_id'])
+                        ->join('projects', 'project_pages.project_id', '=', 'projects.id')
+                        ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+                        ->where(function($query) {
+                            // 내가 소유한 프로젝트의 페이지들
+                            $query->where('projects.user_id', auth()->id())
+                                  // 또는 내가 멤버인 조직의 프로젝트 페이지들
+                                  ->orWhereExists(function($subQuery) {
+                                      $subQuery->select(\DB::raw(1))
+                                               ->from('organization_members')
+                                               ->whereColumn('organization_members.organization_id', 'organizations.id')
+                                               ->where('organization_members.user_id', auth()->id())
+                                               ->where('organization_members.invitation_status', 'accepted');
+                                  });
+                        })
+                        ->orderBy('project_pages.updated_at', 'desc')
+                        ->limit(8)
+                        ->get();
+
+                    return view($viewName, compact('organizations', 'projects', 'pages'));
+                }
+
                 return view($viewName, compact('organizations'));
             }
 
@@ -126,8 +170,8 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/users', function (
     // 프로젝트 정보 조회
     $project = \App\Models\Project::with('user')->findOrFail($projectId);
 
-    // 조직의 모든 멤버 조회
-    $organizationMembers = \App\Models\OrganizationMember::with('user')
+    // 조직의 모든 멤버 조회 (역할 정보 포함)
+    $organizationMembers = \App\Models\OrganizationMember::with(['user.roles'])
         ->where('organization_id', $id)
         ->where('invitation_status', 'accepted')
         ->get();
