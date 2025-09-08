@@ -171,7 +171,7 @@ class PermissionRoles extends Component
 
     public function render()
     {
-        return view('800-page-organization-admin.806-page-permissions-roles.000-index', [
+        return view('livewire.organization.admin.permission-roles', [
             'roles' => $this->getRolesProperty(),
             'permissions' => $this->getPermissionsProperty()
         ]);

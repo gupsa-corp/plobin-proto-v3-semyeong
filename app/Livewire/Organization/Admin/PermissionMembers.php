@@ -143,7 +143,7 @@ class PermissionMembers extends Component
 
     public function render()
     {
-        return view('800-page-organization-admin.807-page-permissions-management.000-index', [
+        return view('livewire.organization.admin.permission-members', [
             'members' => $this->getMembersProperty(),
             'roles' => $this->getRolesProperty()
         ]);

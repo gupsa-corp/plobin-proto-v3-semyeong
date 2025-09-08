@@ -1,0 +1,9 @@
+Hello World from Monaco Editor!
+
+This is a test file for the file manager and Monaco Editor integration.
+
+Variables:
+- name: John Doe
+- email: john@example.com
+
+Let us test the file loading functionality.
