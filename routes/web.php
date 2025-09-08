@@ -90,7 +90,34 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function (
     return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => 'overview']);
 })->name('project.dashboard.page');
 
-// 동적 프로젝트 페이지의 탭들 (2뎁스)
+// 페이지 설정 관련 라우트들 (더 구체적인 라우트를 먼저 등록)
+// 페이지 설정 탭별 라우트들
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/name', function ($id, $projectId, $pageId) {
+    return view('300-page-service.309-page-settings-name.000-index', ['currentPageId' => $pageId, 'activeTab' => 'name']);
+})->name('project.dashboard.page.settings.name');
+
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
+    return view('300-page-service.310-page-settings-sandbox.000-index', ['currentPageId' => $pageId, 'activeTab' => 'sandbox']);
+})->name('project.dashboard.page.settings.sandbox');
+
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
+    return view('300-page-service.311-page-settings-custom-screen.000-index', ['currentPageId' => $pageId, 'activeTab' => 'custom-screen']);
+})->name('project.dashboard.page.settings.custom-screen');
+
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
+    return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
+})->name('project.dashboard.page.settings.deployment');
+
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/delete', function ($id, $projectId, $pageId) {
+    return view('300-page-service.312-page-settings-delete.000-index', ['currentPageId' => $pageId, 'activeTab' => 'delete']);
+})->name('project.dashboard.page.settings.delete');
+
+// 페이지 설정 기본 라우트 - 기본적으로 페이지 이름 변경 탭으로 리다이렉트
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', function ($id, $projectId, $pageId) {
+    return redirect()->route('project.dashboard.page.settings.name', ['id' => $id, 'projectId' => $projectId, 'pageId' => $pageId]);
+})->name('project.dashboard.page.settings');
+
+// 동적 프로젝트 페이지의 탭들 (2뎁스) - 가장 일반적인 라우트는 마지막에
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/{tab}', function ($id, $projectId, $pageId, $tab) {
     return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => $tab]);
 })->name('project.dashboard.page.tab');

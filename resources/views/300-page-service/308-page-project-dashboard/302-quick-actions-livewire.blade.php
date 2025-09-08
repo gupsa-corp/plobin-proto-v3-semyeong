@@ -9,10 +9,10 @@
         <span style="font-size: 14px;">프로젝트 설정</span>
     </button>
 
-    <button
-            style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; color: #6B7280; border: none; background: none; border-radius: 6px; cursor: pointer;"
-            onmouseover="this.style.background='white'"
-            onmouseout="this.style.background='none'">
-        <span style="font-size: 14px;">페이지 수정</span>
-    </button>
+    <a href="{{ route('project.dashboard.page.settings', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}"
+       style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; color: #6B7280; text-decoration: none; border-radius: 6px; cursor: pointer;"
+       onmouseover="this.style.background='white'"
+       onmouseout="this.style.background='none'">
+        <span style="font-size: 14px;">페이지 설정</span>
+    </a>
 </div>
