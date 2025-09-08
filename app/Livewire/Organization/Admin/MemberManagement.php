@@ -404,11 +404,11 @@ class MemberManagement extends Component
                 'level_name' => '서비스 매니저'
             ],
             'organization_admin' => [
-                'label' => '조직 목록자',
+                'label' => '조직 관리자',
                 'short_label' => '관리자',
                 'badge_color' => 'purple',
                 'level' => 3,
-                'level_name' => '조직 목록자'
+                'level_name' => '조직 관리자'
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',

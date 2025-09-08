@@ -65,7 +65,7 @@ class RoleSeeder extends Seeder
             ]
         ));
 
-        // 조직 목록자
+        // 조직 관리자
         $organizationAdmin = Role::firstOrCreate(['name' => 'organization_admin']);
         $organizationAdmin->syncPermissions([
             'view projects',
@@ -98,7 +98,7 @@ class RoleSeeder extends Seeder
             'access admin panel',
         ]);
 
-        // 선임 조직 목록자
+        // 선임 조직 관리자
         $seniorOrgAdmin = Role::firstOrCreate(['name' => 'senior_organization_admin']);
         $seniorOrgAdmin->syncPermissions($organizationAdmin->permissions->pluck('name')->toArray());
 

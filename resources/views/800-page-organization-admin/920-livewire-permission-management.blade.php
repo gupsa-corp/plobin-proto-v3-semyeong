@@ -1,4 +1,4 @@
-{{-- 조직 목록자용 권한 관리 메인 컴포넌트 --}}
+{{-- 조직 관리자용 권한 관리 메인 컴포넌트 --}}
 <div class="permission-management-container" style="padding: 24px;" x-data="organizationPermissionManagement">
 
     {{-- 탭 네비게이션 --}}

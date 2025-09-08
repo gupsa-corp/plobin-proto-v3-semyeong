@@ -25,6 +25,14 @@
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.deployment') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 배포 상태
             </a>
+            <a href="{{ route('project.dashboard.page.settings.permissions', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.permissions') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
+                보기 권한
+            </a>
+            <a href="{{ route('project.dashboard.page.settings.history', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.history') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
+                변경 이력
+            </a>
             <a href="{{ route('project.dashboard.page.settings.delete', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" 
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.delete') ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-red-700 hover:border-red-300' }} font-medium text-sm">
                 페이지 삭제

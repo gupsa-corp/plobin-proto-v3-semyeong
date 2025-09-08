@@ -42,7 +42,7 @@
                                 };
                                 $roleText = match($role->name) {
                                     'platform_admin' => '플랫폼 관리자',
-                                    'organization_admin' => '조직 목록자',
+                                    'organization_admin' => '조직 관리자',
                                     'organization_member' => '조직 멤버',
                                     default => $role->name
                                 };

@@ -102,7 +102,15 @@ foreach ($routes as $path => $config) {
 
 // 매개변수가 있는 특수 라우트들을 수동으로 등록 (개발용 - 인증 제거)
 Route::get('/organizations/{id}/dashboard', function ($id) {
-    return view('300-page-service.302-page-organization-dashboard.000-index');
+    // 조직 선택 드롭다운을 위한 조직 목록 전달
+    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+        ->where('organization_members.user_id', 1)
+        ->where('organization_members.invitation_status', 'accepted')
+        ->orderBy('organizations.created_at', 'desc')
+        ->get();
+    
+    return view('300-page-service.302-page-organization-dashboard.000-index', compact('organizations'));
 })->name('organization.dashboard');
 
 // 프로젝트 대시보드 라우트들 - 첫 번째 페이지로 리다이렉트
@@ -168,6 +176,22 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/de
     return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
 })->name('project.dashboard.page.settings.deployment.post');
 
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/permissions', function ($id, $projectId, $pageId) {
+    return view('300-page-service.320-page-settings-permissions.000-index', ['currentPageId' => $pageId, 'activeTab' => 'permissions']);
+})->name('project.dashboard.page.settings.permissions');
+
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/permissions', function ($id, $projectId, $pageId) {
+    return view('300-page-service.320-page-settings-permissions.000-index', ['currentPageId' => $pageId, 'activeTab' => 'permissions']);
+})->name('project.dashboard.page.settings.permissions.post');
+
+Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/history', function ($id, $projectId, $pageId) {
+    return view('300-page-service.321-page-settings-history.000-index', ['currentPageId' => $pageId, 'activeTab' => 'history']);
+})->name('project.dashboard.page.settings.history');
+
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/history', function ($id, $projectId, $pageId) {
+    return view('300-page-service.321-page-settings-history.000-index', ['currentPageId' => $pageId, 'activeTab' => 'history']);
+})->name('project.dashboard.page.settings.history.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/delete', function ($id, $projectId, $pageId) {
     return view('300-page-service.312-page-settings-delete.000-index', ['currentPageId' => $pageId, 'activeTab' => 'delete']);
 })->name('project.dashboard.page.settings.delete');
@@ -193,7 +217,7 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($
 
 Route::post('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
     return view('300-page-service.314-page-project-settings-name.000-index', [
-        'currentProjectId' => $projectId, 
+        'currentProjectId' => $projectId,
         'activeTab' => 'name',
         'organizationId' => $id,
         'projectId' => $projectId
@@ -286,13 +310,13 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/{tab}', func
     return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => $tab]);
 })->name('project.dashboard.page.tab');
 
-// 조직 목록자 페이지 라우트들 (개발용 - 인증 제거) - 권한 300 이상인 조직만 표시
+// 조직 관리자 페이지 라우트들 (개발용 - 인증 제거) - 권한 300 이상인 조직만 표시
 Route::get('/organizations/{id}/admin', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 

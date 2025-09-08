@@ -306,7 +306,7 @@ class RoleManagement extends Component
                 'level' => 2
             ],
             'organization_admin' => [
-                'label' => '조직 목록자',
+                'label' => '조직 관리자',
                 'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'color' => 'purple',
                 'level' => 3

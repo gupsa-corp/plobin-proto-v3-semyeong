@@ -22,7 +22,7 @@
                             <select id="newRole" name="newRole" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="">역할 선택</option>
                                 <option value="platform_admin">플랫폼 관리자</option>
-                                <option value="organization_admin">조직 목록자</option>
+                                <option value="organization_admin">조직 관리자</option>
                                 <option value="organization_member">조직 멤버</option>
                             </select>
                         </div>

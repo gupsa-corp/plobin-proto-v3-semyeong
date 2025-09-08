@@ -10,9 +10,15 @@ class ProjectPageDeploymentLog extends Model
     protected $fillable = [
         'project_page_id',
         'user_id', 
+        'change_type',
         'from_status',
         'to_status',
-        'reason'
+        'reason',
+        'change_data'
+    ];
+
+    protected $casts = [
+        'change_data' => 'json',
     ];
     
     public function projectPage(): BelongsTo

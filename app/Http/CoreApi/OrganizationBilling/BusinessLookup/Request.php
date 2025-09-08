@@ -13,7 +13,7 @@ class Request extends FormRequest
             return true;
         }
 
-        // 조직 목록자나 소유자만 사업자 조회 가능
+        // 조직 관리자나 소유자만 사업자 조회 가능
         return $this->user() && $this->user()->can('manage', $this->route('organization'));
     }
 

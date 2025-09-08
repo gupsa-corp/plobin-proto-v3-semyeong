@@ -49,8 +49,8 @@
                                             <option value="150">고급 사용자</option>
                                             <option value="200">서비스 매니저</option>
                                             <option value="250">선임 서비스 매니저</option>
-                                            <option value="300">조직 목록자</option>
-                                            <option value="350">선임 조직 목록자</option>
+                                            <option value="300">조직 관리자</option>
+                                            <option value="350">선임 조직 관리자</option>
                                             <option value="400">조직 소유자</option>
                                             <option value="450">조직 창립자</option>
                                         </select>

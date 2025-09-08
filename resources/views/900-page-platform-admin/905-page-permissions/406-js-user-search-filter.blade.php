@@ -35,7 +35,7 @@ function filterByRole(role) {
                      (roleElements.length === 1 && roleElements[0].textContent.includes('역할 없음'));
         } else {
             const roleText = role === 'platform_admin' ? '플랫폼 관리자' :
-                           role === 'organization_admin' ? '조직 목록자' :
+                           role === 'organization_admin' ? '조직 관리자' :
                            role === 'organization_member' ? '조직 멤버' : role;
 
             Array.from(roleElements).forEach(elem => {

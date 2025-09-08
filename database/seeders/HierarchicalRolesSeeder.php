@@ -100,7 +100,7 @@ class HierarchicalRolesSeeder extends Seeder
                 'organization_id' => $organization->id,
                 'parent_role_id' => $orgOwner->id,
                 'created_by' => $adminUser->id,
-                'description' => '조직 목록자 권한',
+                'description' => '조직 관리자 권한',
                 'is_active' => true,
             ]
         );
@@ -194,7 +194,7 @@ class HierarchicalRolesSeeder extends Seeder
             'view_dashboard', 'manage_users', 'manage_projects', 'manage_billing'
         ]);
 
-        // 조직 목록자는 제한된 권한
+        // 조직 관리자는 제한된 권한
         $orgAdmin->syncPermissions([
             'view_dashboard', 'manage_projects', 'manage_pages'
         ]);
