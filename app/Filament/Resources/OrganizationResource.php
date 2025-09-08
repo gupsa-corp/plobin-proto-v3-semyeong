@@ -18,11 +18,11 @@ class OrganizationResource extends Resource
     protected static ?string $model = Organization::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-    
-    protected static ?string $navigationGroup = '조직 관리';
-    
+
+    protected static ?string $navigationGroup = '조직 목록';
+
     protected static ?string $modelLabel = '조직';
-    
+
     protected static ?string $pluralModelLabel = '조직';
 
     public static function form(Form $form): Form

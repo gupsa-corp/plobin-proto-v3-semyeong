@@ -160,7 +160,7 @@ class Controller extends ApiController
             return $currentUser->hasRole('organization_owner') || $currentUser->hasRole('platform_admin');
         }
 
-        // 조직 관리자 이상은 조직 관리자까지 부여 가능
+        // 조직 목록자 이상은 조직 목록자까지 부여 가능
         if ($targetRole === 'organization_admin') {
             return $currentUser->hasAnyRole(['organization_admin', 'organization_owner', 'platform_admin']);
         }
@@ -201,7 +201,7 @@ class Controller extends ApiController
         return match($roleName) {
             'user' => ['label' => '사용자'],
             'service_manager' => ['label' => '서비스 매니저'],
-            'organization_admin' => ['label' => '조직 관리자'],
+            'organization_admin' => ['label' => '조직 목록자'],
             'organization_owner' => ['label' => '조직 소유자'],
             'platform_admin' => ['label' => '플랫폼 관리자'],
             default => ['label' => $roleName]

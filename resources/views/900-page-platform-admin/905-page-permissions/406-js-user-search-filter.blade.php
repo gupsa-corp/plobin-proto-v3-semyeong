@@ -4,67 +4,67 @@
 function searchUsers(searchTerm) {
     const rows = document.querySelectorAll('#usersTableBody tr');
     const term = searchTerm.toLowerCase();
-    
+
     rows.forEach(row => {
         if (row.querySelector('td[colspan]')) return; // 빈 행은 제외
-        
+
         const name = row.querySelector('.text-sm.font-medium.text-gray-900')?.textContent.toLowerCase() || '';
         const email = row.querySelector('.text-sm.text-gray-500')?.textContent.toLowerCase() || '';
         const organization = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
-        
+
         const matches = name.includes(term) || email.includes(term) || organization.includes(term);
         row.style.display = matches ? '' : 'none';
     });
-    
+
     updateEmptyState();
 }
 
 function filterByRole(role) {
     const rows = document.querySelectorAll('#usersTableBody tr');
-    
+
     rows.forEach(row => {
         if (row.querySelector('td[colspan]')) return; // 빈 행은 제외
-        
+
         const roleElements = row.querySelectorAll('td:nth-child(2) .inline-flex');
         let hasRole = false;
-        
+
         if (role === '') {
             hasRole = true; // 모든 역할 표시
         } else if (role === 'no_role') {
-            hasRole = roleElements.length === 0 || 
+            hasRole = roleElements.length === 0 ||
                      (roleElements.length === 1 && roleElements[0].textContent.includes('역할 없음'));
         } else {
             const roleText = role === 'platform_admin' ? '플랫폼 관리자' :
-                           role === 'organization_admin' ? '조직 관리자' :
+                           role === 'organization_admin' ? '조직 목록자' :
                            role === 'organization_member' ? '조직 멤버' : role;
-            
+
             Array.from(roleElements).forEach(elem => {
                 if (elem.textContent.includes(roleText)) {
                     hasRole = true;
                 }
             });
         }
-        
+
         row.style.display = hasRole ? '' : 'none';
     });
-    
+
     updateEmptyState();
 }
 
 function filterByOrganization(orgId) {
     const rows = document.querySelectorAll('#usersTableBody tr');
-    
+
     rows.forEach(row => {
         if (row.querySelector('td[colspan]')) return; // 빈 행은 제외
-        
+
         if (orgId === '') {
             row.style.display = ''; // 모든 조직 표시
             return;
         }
-        
+
         const orgPermissionCell = row.querySelector('td:nth-child(3)');
         let hasOrganization = false;
-        
+
         if (orgId === 'no_org') {
             // 조직 소속 없음 체크
             hasOrganization = orgPermissionCell.textContent.includes('조직 소속 없음');
@@ -79,27 +79,27 @@ function filterByOrganization(orgId) {
                 }
             });
         }
-        
+
         row.style.display = hasOrganization ? '' : 'none';
     });
-    
+
     updateEmptyState();
 }
 
 function filterByPermission(permissionLevel) {
     const rows = document.querySelectorAll('#usersTableBody tr');
-    
+
     rows.forEach(row => {
         if (row.querySelector('td[colspan]')) return; // 빈 행은 제외
-        
+
         if (permissionLevel === '') {
             row.style.display = ''; // 모든 권한 표시
             return;
         }
-        
+
         const orgPermissionCell = row.querySelector('td:nth-child(3)');
         let hasPermission = false;
-        
+
         // 권한 레벨에 따른 텍스트 매핑
         const permissionText = {
             '0': '초대됨',
@@ -114,15 +114,15 @@ function filterByPermission(permissionLevel) {
             '500': '플랫폼 관리자',
             '550': '최고 관리자'
         };
-        
+
         const targetPermission = permissionText[permissionLevel];
         if (targetPermission) {
             hasPermission = orgPermissionCell.textContent.includes(targetPermission);
         }
-        
+
         row.style.display = hasPermission ? '' : 'none';
     });
-    
+
     updateEmptyState();
 }
 
@@ -132,22 +132,22 @@ function clearFilters() {
     document.getElementById('roleFilter').value = '';
     document.getElementById('organizationFilter').value = '';
     document.getElementById('permissionFilter').value = '';
-    
+
     // 모든 행 표시
     const rows = document.querySelectorAll('#usersTableBody tr');
     rows.forEach(row => {
         row.style.display = '';
     });
-    
+
     updateEmptyState();
 }
 
 function updateEmptyState() {
     const rows = document.querySelectorAll('#usersTableBody tr');
-    const visibleRows = Array.from(rows).filter(row => 
+    const visibleRows = Array.from(rows).filter(row =>
         row.style.display !== 'none' && !row.querySelector('td[colspan]')
     );
-    
+
     const emptyRow = document.querySelector('#usersTableBody tr td[colspan]');
     if (emptyRow) {
         emptyRow.closest('tr').style.display = visibleRows.length === 0 ? '' : 'none';

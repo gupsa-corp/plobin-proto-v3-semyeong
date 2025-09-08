@@ -1,8 +1,8 @@
-{{-- 조직 관리 대시보드 메인 컨텐츠 --}}
+{{-- 조직 목록 대시보드 메인 컨텐츠 --}}
 <div class="p-6">
     {{-- 관리 개요 --}}
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">조직 관리 대시보드</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">조직 목록 대시보드</h2>
         <p class="text-gray-600">Tech Corp 조직의 전반적인 현황을 확인하고 관리하세요</p>
     </div>
 

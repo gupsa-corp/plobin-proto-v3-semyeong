@@ -20,7 +20,7 @@ class MemberManagement extends Component
     public $searchTerm = '';
     public $permissionFilter = '';
     public $statusFilter = '';
-    
+
     // 새 멤버 초대 관련 속성
     public $showInviteModal = false;
     public $inviteEmail = '';
@@ -43,10 +43,10 @@ class MemberManagement extends Component
     {
         // 조직 정보 로드
         $this->organization = Organization::find($this->organizationId);
-        
+
         // 실제 DB에서 조직 멤버 로드
         $this->members = $this->getActualMembers();
-        
+
         // 통계 계산
         $this->calculateStats();
     }
@@ -68,7 +68,7 @@ class MemberManagement extends Component
                     $userRoles = $member->user->getRoleNames();
                     $primaryRole = $userRoles->first() ?? 'user';
                     $role = Role::findByName($primaryRole);
-                    
+
                     $statusName = match($member->invitation_status) {
                         'pending' => '대기 중',
                         'accepted' => '활성',
@@ -76,8 +76,8 @@ class MemberManagement extends Component
                         default => '알 수 없음'
                     };
 
-                    $lastActive = $member->invitation_status === 'accepted' ? 
-                        ($member->joined_at ? $member->joined_at->diffForHumans() : '알 수 없음') : 
+                    $lastActive = $member->invitation_status === 'accepted' ?
+                        ($member->joined_at ? $member->joined_at->diffForHumans() : '알 수 없음') :
                         '-';
 
                     // 역할 기반 권한 정보 구성
@@ -100,7 +100,7 @@ class MemberManagement extends Component
                         ],
                         'status' => $member->invitation_status,
                         'status_name' => $statusName,
-                        'joined_at' => $member->joined_at ? $member->joined_at->format('Y.m.d') : 
+                        'joined_at' => $member->joined_at ? $member->joined_at->format('Y.m.d') :
                                       ($member->invited_at ? $member->invited_at->format('Y.m.d') : '-'),
                         'last_active' => $lastActive,
                         'avatar_color' => $roleInfo['badge_color'],
@@ -123,11 +123,11 @@ class MemberManagement extends Component
         if (!is_array($this->members)) {
             $this->members = [];
         }
-        
+
         $totalMembers = count($this->members);
         $activeMembers = count(array_filter($this->members, fn($member) => $member['status'] === 'active'));
         $pendingMembers = count(array_filter($this->members, fn($member) => $member['status'] === 'pending'));
-        $adminMembers = count(array_filter($this->members, fn($member) => 
+        $adminMembers = count(array_filter($this->members, fn($member) =>
             in_array($member['role'], ['organization_admin', 'organization_owner', 'platform_admin'])
         ));
 
@@ -174,7 +174,7 @@ class MemberManagement extends Component
         try {
             $member = OrganizationMember::findOrFail($memberId);
             $user = $member->user;
-            
+
             // 조직 소유자의 권한을 낮추려고 하는 경우 방지
             if ($user->hasRole('organization_owner') && $newRoleName !== 'organization_owner') {
                 $this->dispatch('error', [
@@ -182,7 +182,7 @@ class MemberManagement extends Component
                 ]);
                 return;
             }
-            
+
             // 현재 사용자가 멤버 관리 권한이 있는지 체크
             if (!auth()->user()->can('manage members')) {
                 $this->dispatch('error', [
@@ -193,19 +193,19 @@ class MemberManagement extends Component
 
             // 기존 역할 제거 후 새 역할 할당
             $user->syncRoles([$newRoleName]);
-            
+
             // 동적 권한 서비스를 통한 기본 권한 할당
             app(DynamicPermissionService::class)->assignBasicPermissions($user, $newRoleName);
 
             $this->loadData(); // 데이터 새로고침
-            
+
             $roleInfo = $this->getRoleDisplayInfo($newRoleName);
             $this->dispatch('permissionChanged', [
                 'memberId' => $memberId,
                 'newPermission' => $roleInfo['label'],
                 'message' => '역할이 성공적으로 변경되었습니다.'
             ]);
-            
+
         } catch (\Exception $e) {
             $this->dispatch('error', [
                 'message' => '역할 변경 중 오류가 발생했습니다: ' . $e->getMessage()
@@ -218,7 +218,7 @@ class MemberManagement extends Component
         try {
             $member = OrganizationMember::findOrFail($memberId);
             $userName = $member->user->name ?? $member->user->email;
-            
+
             // 조직 소유자는 삭제할 수 없도록 보호
             if ($member->user->hasRole('organization_owner')) {
                 $this->dispatch('error', [
@@ -226,21 +226,21 @@ class MemberManagement extends Component
                 ]);
                 return;
             }
-            
+
             $member->delete();
-            
+
             // 조직의 멤버 수 업데이트
             $this->organization->update([
                 'members_count' => $this->organization->members()->count()
             ]);
-            
+
             $this->loadData(); // 데이터 새로고침
-            
+
             $this->dispatch('memberRemoved', [
                 'memberId' => $memberId,
                 'message' => "{$userName} 님이 조직에서 제거되었습니다."
             ]);
-            
+
         } catch (\Exception $e) {
             $this->dispatch('error', [
                 'message' => '멤버 제거 중 오류가 발생했습니다: ' . $e->getMessage()
@@ -252,7 +252,7 @@ class MemberManagement extends Component
     {
         try {
             $member = OrganizationMember::findOrFail($memberId);
-            
+
             // 초대 상태가 아닌 경우 에러
             if ($member->invitation_status !== 'pending') {
                 $this->dispatch('error', [
@@ -260,20 +260,20 @@ class MemberManagement extends Component
                 ]);
                 return;
             }
-            
+
             // 초대 재전송 시간 업데이트
             $member->update([
                 'invited_at' => now()
             ]);
-            
+
             // 실제로는 여기에서 이메일 전송 로직이 들어갑니다
             // Mail::to($member->user->email)->send(new OrganizationInvitation($member));
-            
+
             $this->dispatch('invitationResent', [
                 'memberId' => $memberId,
                 'message' => $member->user->email . '로 초대가 재전송되었습니다.'
             ]);
-            
+
         } catch (\Exception $e) {
             $this->dispatch('error', [
                 'message' => '초대 재전송 중 오류가 발생했습니다: ' . $e->getMessage()
@@ -333,10 +333,10 @@ class MemberManagement extends Component
 
             // 사용자에게 역할 할당
             $user->assignRole($this->inviteRole);
-            
+
             // 동적 권한 서비스를 통한 기본 권한 할당
             app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->inviteRole);
-            
+
             // 조직 멤버 추가 (호환성 유지를 위해 permission_level도 설정)
             $legacyPermissionLevel = $this->getLegacyPermissionLevel($this->inviteRole);
             OrganizationMember::create([
@@ -382,7 +382,7 @@ class MemberManagement extends Component
             ];
         })->toArray();
     }
-    
+
     /**
      * 역할별 표시 정보 반환
      */
@@ -404,11 +404,11 @@ class MemberManagement extends Component
                 'level_name' => '서비스 매니저'
             ],
             'organization_admin' => [
-                'label' => '조직 관리자',
+                'label' => '조직 목록자',
                 'short_label' => '관리자',
                 'badge_color' => 'purple',
                 'level' => 3,
-                'level_name' => '조직 관리자'
+                'level_name' => '조직 목록자'
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',
@@ -433,7 +433,7 @@ class MemberManagement extends Component
             ]
         };
     }
-    
+
     /**
      * 호환성을 위한 레거시 권한 레벨 반환
      */

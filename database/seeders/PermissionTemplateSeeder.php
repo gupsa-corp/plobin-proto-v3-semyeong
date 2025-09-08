@@ -68,7 +68,7 @@ class PermissionTemplateSeeder extends Seeder
             ],
             [
                 'name' => 'organization_admin',
-                'display_name' => '조직 관리자',
+                'display_name' => '조직 목록자',
                 'description' => '조직 전반적인 관리 권한 (결제 제외)',
                 'permissions_config' => [
                     'roles' => ['organization_admin'],

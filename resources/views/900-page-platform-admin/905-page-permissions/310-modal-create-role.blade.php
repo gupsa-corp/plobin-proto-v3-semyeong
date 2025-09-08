@@ -13,12 +13,12 @@
             <form class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">역할명</label>
-                    <input type="text" placeholder="예: 프로젝트 관리자" 
+                    <input type="text" placeholder="예: 프로젝트 관리자"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
-                    <textarea rows="3" placeholder="역할에 대한 설명을 입력하세요" 
+                    <textarea rows="3" placeholder="역할에 대한 설명을 입력하세요"
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
                 <div>
@@ -30,7 +30,7 @@
                         </label>
                         <label class="flex items-center">
                             <input type="checkbox" class="rounded border-gray-300 text-indigo-600">
-                            <span class="ml-2 text-sm text-gray-700">조직 관리</span>
+                            <span class="ml-2 text-sm text-gray-700">조직 목록</span>
                         </label>
                         <label class="flex items-center">
                             <input type="checkbox" class="rounded border-gray-300 text-indigo-600">
@@ -39,11 +39,11 @@
                     </div>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeCreateRoleModal()" 
+                    <button type="button" onclick="closeCreateRoleModal()"
                             class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                         취소
                     </button>
-                    <button type="submit" 
+                    <button type="submit"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
                         생성
                     </button>

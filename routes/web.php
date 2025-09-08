@@ -125,13 +125,13 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($
 Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
     // 프로젝트 정보 조회
     $project = \App\Models\Project::with('user')->findOrFail($projectId);
-    
+
     // 조직의 모든 멤버 조회
     $organizationMembers = \App\Models\OrganizationMember::with('user')
         ->where('organization_id', $id)
         ->where('invitation_status', 'accepted')
         ->get();
-    
+
     return view('300-page-service.315-page-project-settings-users.000-index', [
         'currentProjectId' => $projectId,
         'activeTab' => 'users',
@@ -149,7 +149,7 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/delete', function 
 })->name('project.dashboard.project.settings.delete');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId) {
-    return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);  
+    return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
 })->name('project.dashboard.project.settings.sandboxes');
 
 // 기본 프로젝트 설정 경로 (settings로 접근시 name으로 리다이렉트)
@@ -162,7 +162,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/{tab}', func
     return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => $tab]);
 })->name('project.dashboard.page.tab');
 
-// 조직 관리자 페이지 라우트들 (개발용 - 인증 제거) - 권한 300 이상인 조직만 표시
+// 조직 목록자 페이지 라우트들 (개발용 - 인증 제거) - 권한 300 이상인 조직만 표시
 Route::get('/organizations/{id}/admin', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
@@ -300,7 +300,7 @@ Route::get('/platform/admin/dashboard', function () {
     return view('900-page-platform-admin.901-page-dashboard.000-index');
 })->name('platform.admin.dashboard.full');
 
-// 플랫폼 관리자 - 조직 관리
+// 플랫폼 관리자 - 조직 목록
 Route::get('/platform/admin/organizations', function () {
     return view('900-page-platform-admin.902-page-organizations.000-index');
 })->name('platform.admin.organizations');

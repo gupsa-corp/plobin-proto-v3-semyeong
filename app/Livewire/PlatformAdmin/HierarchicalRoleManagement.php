@@ -17,18 +17,18 @@ class HierarchicalRoleManagement extends Component
     public $showCreateModal = false;
     public $showEditModal = false;
     public $showDeleteModal = false;
-    
+
     // 필터 속성들
     public $filterScopeLevel = '';
     public $filterOrganization = '';
     public $filterStatus = '';
     public $searchTerm = '';
-    
+
     // 폼 필드
     public $name = '';
     public $guard_name = 'web';
     public $selectedPermissions = [];
-    
+
     // 계층형 필드들
     public $scope_level = 'platform';
     public $organization_id = null;
@@ -37,7 +37,7 @@ class HierarchicalRoleManagement extends Component
     public $parent_role_id = null;
     public $description = '';
     public $is_active = true;
-    
+
     // 편집 중인 역할
     public $editingRole = null;
 
@@ -63,11 +63,11 @@ class HierarchicalRoleManagement extends Component
     public function loadRoles()
     {
         $this->roles = Role::with([
-                'permissions', 
+                'permissions',
                 'users',
-                'parentRole', 
-                'childRoles', 
-                'creator', 
+                'parentRole',
+                'childRoles',
+                'creator',
                 'organization'
             ])
             ->get()
@@ -89,7 +89,7 @@ class HierarchicalRoleManagement extends Component
                     'permissions' => $role->permissions->pluck('name')->toArray(),
                     'created_at' => $role->created_at,
                     'updated_at' => $role->updated_at,
-                    
+
                     // 관계 정보
                     'organization' => $role->organization ? [
                         'id' => $role->organization->id,
@@ -106,7 +106,7 @@ class HierarchicalRoleManagement extends Component
                         'name' => $role->creator->name,
                         'email' => $role->creator->email,
                     ] : null,
-                    
+
                     // 계층 정보
                     'hierarchy_path' => $role->getHierarchyPath(),
                     'inheritance_chain' => collect($role->getInheritanceChain())->map(function ($r) {
@@ -116,7 +116,7 @@ class HierarchicalRoleManagement extends Component
                             'scope_level' => $r->scope_level,
                         ];
                     }),
-                    
+
                     // 디스플레이 정보
                     'display_info' => $this->getScopeLevelDisplayInfo($role->scope_level),
                 ];
@@ -127,9 +127,9 @@ class HierarchicalRoleManagement extends Component
             })
             ->values()
             ->toArray();
-            
+
     }
-    
+
     public function getFilteredRolesProperty()
     {
         $filtered = collect($this->roles);
@@ -333,7 +333,7 @@ class HierarchicalRoleManagement extends Component
                 'scope_level' => $this->editingRole->scope_level,
                 'permissions' => $this->editingRole->permissions->pluck('name')->toArray()
             ];
-            
+
             $this->editingRole->update([
                 'name' => $this->name,
                 'guard_name' => $this->guard_name,
@@ -462,7 +462,7 @@ class HierarchicalRoleManagement extends Component
     {
         if (str_contains($permissionName, 'dashboard')) return '대시보드';
         if (str_contains($permissionName, 'user')) return '사용자 관리';
-        if (str_contains($permissionName, 'organization')) return '조직 관리';
+        if (str_contains($permissionName, 'organization')) return '조직 목록';
         if (str_contains($permissionName, 'project')) return '프로젝트 관리';
         if (str_contains($permissionName, 'page')) return '페이지 관리';
         if (str_contains($permissionName, 'permission')) return '권한 관리';
@@ -503,7 +503,7 @@ class HierarchicalRoleManagement extends Component
                 'level' => 4
             ]
         ];
-        
+
         return $displayMap[$scopeLevel] ?? [
             'label' => $scopeLevel,
             'description' => '사용자 정의 범위',
@@ -512,7 +512,7 @@ class HierarchicalRoleManagement extends Component
             'level' => 999
         ];
     }
-    
+
     public function getAvailableOrganizationsProperty()
     {
         try {
@@ -522,7 +522,7 @@ class HierarchicalRoleManagement extends Component
             return collect([]);
         }
     }
-    
+
     public function getAvailableParentRolesProperty()
     {
         return Role::where('is_active', true)

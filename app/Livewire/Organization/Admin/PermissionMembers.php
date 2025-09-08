@@ -38,7 +38,7 @@ class PermissionMembers extends Component
         return $this->organization->users->map(function ($user) {
             $roles = $user->roles->pluck('name')->toArray();
             $permissions = $user->getAllPermissions()->pluck('name')->toArray();
-            
+
             return [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -69,9 +69,9 @@ class PermissionMembers extends Component
 
             // 기존 역할 제거
             $user->syncRoles([$roleName]);
-            
+
             $this->loadData();
-            
+
             session()->flash('success', '멤버 역할이 성공적으로 변경되었습니다.');
         } catch (\Exception $e) {
             session()->flash('error', '역할 변경 중 오류가 발생했습니다: ' . $e->getMessage());
@@ -115,14 +115,14 @@ class PermissionMembers extends Component
                 'level' => 2
             ],
             'organization_admin' => [
-                'label' => '조직 관리자',
-                'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
+                'label' => '조직 목록자',
+                'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'color' => 'purple',
                 'level' => 3
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',
-                'description' => '조직 소유자, 모든 조직 관리 권한',
+                'description' => '조직 소유자, 모든 조직 목록 권한',
                 'color' => 'red',
                 'level' => 4
             ],

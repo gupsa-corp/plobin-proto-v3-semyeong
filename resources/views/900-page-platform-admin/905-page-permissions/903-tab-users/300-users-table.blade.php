@@ -36,13 +36,13 @@
                             @php
                                 $roleColor = match($role->name) {
                                     'platform_admin' => 'bg-red-100 text-red-800',
-                                    'organization_admin' => 'bg-blue-100 text-blue-800', 
+                                    'organization_admin' => 'bg-blue-100 text-blue-800',
                                     'organization_member' => 'bg-green-100 text-green-800',
                                     default => 'bg-gray-100 text-gray-800'
                                 };
                                 $roleText = match($role->name) {
                                     'platform_admin' => '플랫폼 관리자',
-                                    'organization_admin' => '조직 관리자',
+                                    'organization_admin' => '조직 목록자',
                                     'organization_member' => '조직 멤버',
                                     default => $role->name
                                 };
@@ -84,7 +84,7 @@
                         @empty
                             <span class="text-xs text-gray-400">조직 소속 없음</span>
                         @endforelse
-                        
+
                         @if($user->organizationMemberships->count() > 2)
                             <div class="text-xs text-gray-400">
                                 +{{ $user->organizationMemberships->count() - 2 }}개 더

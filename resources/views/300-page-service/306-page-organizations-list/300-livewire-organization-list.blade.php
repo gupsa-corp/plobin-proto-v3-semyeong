@@ -3,7 +3,7 @@
     {{-- 헤더 --}}
     <div class="flex justify-between items-center mb-8">
         <div class="flex-1">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">조직 관리</h1>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">조직 목록</h1>
             <p class="text-lg text-gray-500">소속된 조직을 관리하고 새로운 조직을 생성할 수 있습니다.</p>
         </div>
         <button wire:click="$dispatch('openCreateModal')" class="flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold text-sm rounded-lg">
@@ -53,7 +53,7 @@
                                 {{ $org->name ? mb_substr($org->name, 0, 1) : 'G' }}
                             </span>
                         </div>
-                        
+
                         {{-- 옵션 버튼 --}}
                         <button onclick="event.preventDefault(); event.stopPropagation();" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg">
                             <div class="flex flex-col gap-1">
@@ -71,7 +71,7 @@
                                 {{ $org->name ?? '이름 없음' }}
                             </h3>
                         </div>
-                        
+
                         <div class="flex items-center text-gray-600">
                             {{-- 복사 아이콘 --}}
                             <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

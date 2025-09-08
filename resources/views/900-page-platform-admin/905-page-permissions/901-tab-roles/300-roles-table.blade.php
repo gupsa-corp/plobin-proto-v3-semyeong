@@ -50,7 +50,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">조직 관리자</div>
+                            <div class="text-sm font-medium text-gray-900">조직 목록자</div>
                             <div class="text-sm text-gray-500">organization_admin</div>
                         </div>
                     </div>

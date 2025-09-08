@@ -1,4 +1,4 @@
-{{-- 조직 관리자용 권한 관리 메인 컴포넌트 --}}
+{{-- 조직 목록자용 권한 관리 메인 컴포넌트 --}}
 <div class="permission-management-container" style="padding: 24px;" x-data="organizationPermissionManagement">
 
     {{-- 탭 네비게이션 --}}
@@ -235,8 +235,8 @@
     </div>
 
     {{-- 역할 변경 모달 --}}
-    <div x-show="showRoleChangeModal" 
-         class="fixed inset-0 z-50 overflow-y-auto" 
+    <div x-show="showRoleChangeModal"
+         class="fixed inset-0 z-50 overflow-y-auto"
          x-cloak
          style="display: none;">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -244,15 +244,15 @@
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">멤버 역할 변경</h3>
-                    
+
                     <div class="mb-4">
                         <p class="text-sm text-gray-600" x-text="'멤버: ' + selectedMember.name"></p>
                         <p class="text-sm text-gray-600" x-text="'현재 역할: ' + selectedMember.currentRole"></p>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">새 역할</label>
-                        <select x-model="selectedMember.newRole" 
+                        <select x-model="selectedMember.newRole"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">역할을 선택하세요</option>
                             @foreach($roles as $role)
@@ -261,14 +261,14 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" 
+                    <button type="button"
                             @click="confirmRoleChange()"
                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                         변경
                     </button>
-                    <button type="button" 
+                    <button type="button"
                             @click="showRoleChangeModal = false"
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         취소
@@ -279,8 +279,8 @@
     </div>
 
     {{-- 새 역할 추가 모달 --}}
-    <div x-show="showCreateRoleModal" 
-         class="fixed inset-0 z-50 overflow-y-auto" 
+    <div x-show="showCreateRoleModal"
+         class="fixed inset-0 z-50 overflow-y-auto"
          x-cloak
          style="display: none;">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -288,16 +288,16 @@
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">새 역할 추가</h3>
-                    
+
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">역할 이름</label>
-                            <input type="text" 
+                            <input type="text"
                                    x-model="newRole.name"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="역할 이름을 입력하세요">
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">역할 설명</label>
                             <textarea x-model="newRole.description"
@@ -305,7 +305,7 @@
                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                      placeholder="역할에 대한 설명을 입력하세요"></textarea>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">권한 선택</label>
                             <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
@@ -315,7 +315,7 @@
                                     </div>
                                     @foreach($categoryPermissions as $permission)
                                         <label class="flex items-center space-x-2 text-sm">
-                                            <input type="checkbox" 
+                                            <input type="checkbox"
                                                    :value="'{{ $permission['name'] }}'"
                                                    x-model="newRole.permissions"
                                                    class="rounded border-gray-300">
@@ -327,14 +327,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" 
+                    <button type="button"
                             @click="createNewRole()"
                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                         생성
                     </button>
-                    <button type="button" 
+                    <button type="button"
                             @click="showCreateRoleModal = false"
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         취소

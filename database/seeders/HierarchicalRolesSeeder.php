@@ -69,7 +69,7 @@ class HierarchicalRolesSeeder extends Seeder
         $platformManager = Role::firstOrCreate(
             ['name' => 'Platform Manager'],
             [
-                'guard_name' => 'web', 
+                'guard_name' => 'web',
                 'scope_level' => 'platform',
                 'parent_role_id' => $platformAdmin->id,
                 'created_by' => $adminUser->id,
@@ -100,7 +100,7 @@ class HierarchicalRolesSeeder extends Seeder
                 'organization_id' => $organization->id,
                 'parent_role_id' => $orgOwner->id,
                 'created_by' => $adminUser->id,
-                'description' => '조직 관리자 권한',
+                'description' => '조직 목록자 권한',
                 'is_active' => true,
             ]
         );
@@ -180,37 +180,37 @@ class HierarchicalRolesSeeder extends Seeder
 
         // 권한 할당
         $allPermissions = Permission::all();
-        
+
         // 플랫폼 관리자는 모든 권한
         $platformAdmin->syncPermissions($allPermissions);
-        
+
         // 플랫폼 매니저는 일부 권한
         $platformManager->syncPermissions([
             'view_dashboard', 'manage_users', 'manage_organizations', 'view_reports'
         ]);
-        
+
         // 조직 소유자는 조직 관련 권한
         $orgOwner->syncPermissions([
             'view_dashboard', 'manage_users', 'manage_projects', 'manage_billing'
         ]);
-        
-        // 조직 관리자는 제한된 권한
+
+        // 조직 목록자는 제한된 권한
         $orgAdmin->syncPermissions([
             'view_dashboard', 'manage_projects', 'manage_pages'
         ]);
-        
+
         // 일반 멤버는 기본 권한
         $orgMember->syncPermissions(['view_dashboard']);
-        
+
         // 프로젝트 매니저는 프로젝트 관련 권한
         $projectManager->syncPermissions(['view_dashboard', 'manage_pages']);
-        
+
         // 개발자는 페이지 관리 권한
         $projectDeveloper->syncPermissions(['view_dashboard', 'manage_pages']);
-        
+
         // 페이지 편집자는 페이지 편집 권한
         $pageEditor->syncPermissions(['view_dashboard']);
-        
+
         // 페이지 뷰어는 열람 권한만
         $pageViewer->syncPermissions(['view_dashboard']);
 

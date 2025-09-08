@@ -17,13 +17,13 @@ class OrganizationPermissionMigrationSeeder extends Seeder
     {
         // 1. 권한 카테고리 생성
         $this->createPermissionCategories();
-        
+
         // 2. 기본 권한들 생성
         $this->createPermissions();
-        
+
         // 3. 역할 생성
         $this->createRoles();
-        
+
         // 4. 역할별 권한 할당
         $this->assignPermissionsToRoles();
     }
@@ -128,7 +128,7 @@ class OrganizationPermissionMigrationSeeder extends Seeder
         // 플랫폼 관리 권한
         $platformCategory = PermissionCategory::where('name', 'platform_management')->first();
         $platformPermissions = [
-            ['name' => 'manage_all_organizations', 'display_name' => '모든 조직 관리', 'description' => '플랫폼의 모든 조직을 관리할 수 있습니다'],
+            ['name' => 'manage_all_organizations', 'display_name' => '모든 조직 목록', 'description' => '플랫폼의 모든 조직을 관리할 수 있습니다'],
             ['name' => 'manage_all_users', 'display_name' => '모든 사용자 관리', 'description' => '플랫폼의 모든 사용자를 관리할 수 있습니다'],
             ['name' => 'manage_system_settings', 'display_name' => '시스템 설정 관리', 'description' => '플랫폼 시스템 설정을 관리할 수 있습니다'],
             ['name' => 'view_system_logs', 'display_name' => '시스템 로그 보기', 'description' => '시스템 로그를 볼 수 있습니다'],
@@ -190,25 +190,25 @@ class OrganizationPermissionMigrationSeeder extends Seeder
                 'description' => '선임 서비스 매니저, 고급 프로젝트 관리 권한',
                 'guard_name' => 'web',
             ],
-            // 조직 관리자 (기존 ORGANIZATION_ADMIN)
+            // 조직 목록자 (기존 ORGANIZATION_ADMIN)
             [
                 'name' => 'organization_admin',
-                'display_name' => '조직 관리자',
-                'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
+                'display_name' => '조직 목록자',
+                'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'guard_name' => 'web',
             ],
-            // 선임 조직 관리자 (기존 ORGANIZATION_ADMIN_SENIOR)
+            // 선임 조직 목록자 (기존 ORGANIZATION_ADMIN_SENIOR)
             [
                 'name' => 'organization_admin_senior',
-                'display_name' => '선임 조직 관리자',
-                'description' => '선임 조직 관리자, 고급 조직 관리 권한',
+                'display_name' => '선임 조직 목록자',
+                'description' => '선임 조직 목록자, 고급 조직 목록 권한',
                 'guard_name' => 'web',
             ],
             // 조직 소유자 (기존 ORGANIZATION_OWNER)
             [
                 'name' => 'organization_owner',
                 'display_name' => '조직 소유자',
-                'description' => '조직 소유자, 모든 조직 관리 권한',
+                'description' => '조직 소유자, 모든 조직 목록 권한',
                 'guard_name' => 'web',
             ],
             // 조직 창립자 (기존 ORGANIZATION_OWNER_FOUNDER)
@@ -283,7 +283,7 @@ class OrganizationPermissionMigrationSeeder extends Seeder
             'invite_members',
         ]);
 
-        // 조직 관리자
+        // 조직 목록자
         $organizationAdminRole = Role::where('name', 'organization_admin')->first();
         $organizationAdminRole->syncPermissions([
             // 프로젝트 관리
@@ -297,7 +297,7 @@ class OrganizationPermissionMigrationSeeder extends Seeder
             'invite_members',
             'manage_member_roles',
             'remove_members',
-            // 조직 관리
+            // 조직 목록
             'view_organization',
             'edit_organization',
             'manage_organization_settings',
@@ -307,10 +307,10 @@ class OrganizationPermissionMigrationSeeder extends Seeder
             'view_permissions',
         ]);
 
-        // 선임 조직 관리자
+        // 선임 조직 목록자
         $organizationAdminSeniorRole = Role::where('name', 'organization_admin_senior')->first();
         $organizationAdminSeniorRole->syncPermissions([
-            // 모든 조직 관리자 권한 + 추가 권한
+            // 모든 조직 목록자 권한 + 추가 권한
             'view_projects',
             'create_projects',
             'edit_projects',

@@ -113,7 +113,7 @@ class Controller extends ApiController
             ],
             'organization_admin' => [
                 'name' => 'organization_admin',
-                'label' => '조직 관리자',
+                'label' => '조직 목록자',
                 'badge_color' => 'purple'
             ],
             'organization_owner' => [

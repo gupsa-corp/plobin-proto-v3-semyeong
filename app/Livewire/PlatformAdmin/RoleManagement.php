@@ -15,12 +15,12 @@ class RoleManagement extends Component
     public $showCreateModal = false;
     public $showEditModal = false;
     public $showDeleteModal = false;
-    
+
     // 폼 필드
     public $name = '';
     public $guard_name = 'web';
     public $selectedPermissions = [];
-    
+
     // 편집 중인 역할
     public $editingRole = null;
 
@@ -169,7 +169,7 @@ class RoleManagement extends Component
         try {
             $oldName = $this->editingRole->name;
             $oldPermissions = $this->editingRole->permissions->pluck('name')->toArray();
-            
+
             $this->editingRole->update([
                 'name' => $this->name,
                 'guard_name' => $this->guard_name
@@ -306,14 +306,14 @@ class RoleManagement extends Component
                 'level' => 2
             ],
             'organization_admin' => [
-                'label' => '조직 관리자',
-                'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
+                'label' => '조직 목록자',
+                'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'color' => 'purple',
                 'level' => 3
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',
-                'description' => '조직 소유자, 모든 조직 관리 권한',
+                'description' => '조직 소유자, 모든 조직 목록 권한',
                 'color' => 'red',
                 'level' => 4
             ],

@@ -44,7 +44,7 @@ class RoleSeeder extends Seeder
         $serviceManager = Role::firstOrCreate(['name' => 'service_manager']);
         $serviceManager->syncPermissions([
             'view projects',
-            'create projects', 
+            'create projects',
             'edit projects',
             'assign project members',
             'view pages',
@@ -65,7 +65,7 @@ class RoleSeeder extends Seeder
             ]
         ));
 
-        // 조직 관리자
+        // 조직 목록자
         $organizationAdmin = Role::firstOrCreate(['name' => 'organization_admin']);
         $organizationAdmin->syncPermissions([
             'view projects',
@@ -98,7 +98,7 @@ class RoleSeeder extends Seeder
             'access admin panel',
         ]);
 
-        // 선임 조직 관리자
+        // 선임 조직 목록자
         $seniorOrgAdmin = Role::firstOrCreate(['name' => 'senior_organization_admin']);
         $seniorOrgAdmin->syncPermissions($organizationAdmin->permissions->pluck('name')->toArray());
 
@@ -107,7 +107,7 @@ class RoleSeeder extends Seeder
         $organizationOwner->syncPermissions([
             'view projects',
             'create projects',
-            'edit projects', 
+            'edit projects',
             'delete projects',
             'assign project members',
             'manage project settings',

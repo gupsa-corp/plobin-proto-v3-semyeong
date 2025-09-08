@@ -1,7 +1,7 @@
 <?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
-@include('900-page-platform-admin.900-common.901-layout-head', ['title' => '조직 관리'])
+@include('900-page-platform-admin.900-common.901-layout-head', ['title' => '조직 목록'])
 <body class="bg-gray-100">
     <div class="min-h-screen" style="position: relative;">
         @include('900-page-platform-admin.902-page-organizations.200-sidebar-main')

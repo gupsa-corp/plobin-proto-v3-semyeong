@@ -22,7 +22,7 @@ class OrganizationPermissionService
         return match($enumValue) {
             0 => null, // INVITED
             100 => 'user',
-            150 => 'user_advanced', 
+            150 => 'user_advanced',
             200 => 'service_manager',
             250 => 'service_manager_senior',
             300 => 'organization_admin',
@@ -70,7 +70,7 @@ class OrganizationPermissionService
 
         // 조직 컨텍스트에서 사용자의 역할 가져오기
         $roles = $user->getRoleNames(); // Spatie 메소드
-        
+
         // 가장 높은 권한 레벨 찾기
         $maxLevel = 0;
         foreach ($roles as $roleName) {
@@ -92,14 +92,14 @@ class OrganizationPermissionService
 
     public static function canManageMembers(User $user, Organization $organization): bool
     {
-        return $user->hasPermissionTo('manage_member_roles') || 
+        return $user->hasPermissionTo('manage_member_roles') ||
                $user->hasPermissionTo('remove_members') ||
                self::hasPermission($user, $organization, OrganizationPermission::ORGANIZATION_ADMIN->value);
     }
 
     public static function canManagePermissions(User $user, Organization $organization): bool
     {
-        return $user->hasPermissionTo('manage_roles') || 
+        return $user->hasPermissionTo('manage_roles') ||
                $user->hasPermissionTo('assign_roles') ||
                self::hasPermission($user, $organization, OrganizationPermission::ORGANIZATION_ADMIN->value);
     }
@@ -112,7 +112,7 @@ class OrganizationPermissionService
 
     public static function canManageProjects(User $user, Organization $organization): bool
     {
-        return $user->hasPermissionTo('create_projects') || 
+        return $user->hasPermissionTo('create_projects') ||
                $user->hasPermissionTo('edit_projects') ||
                self::hasPermission($user, $organization, OrganizationPermission::SERVICE_MANAGER->value);
     }
@@ -158,23 +158,23 @@ class OrganizationPermissionService
                 'level' => 2,
             ],
             'organization_admin' => [
-                'label' => '조직 관리자',
+                'label' => '조직 목록자',
                 'short_label' => '관리자',
-                'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
+                'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'color' => 'purple',
                 'level' => 3,
             ],
             'organization_admin_senior' => [
-                'label' => '선임 조직 관리자',
+                'label' => '선임 조직 목록자',
                 'short_label' => '관리자+',
-                'description' => '선임 조직 관리자, 고급 조직 관리 권한',
+                'description' => '선임 조직 목록자, 고급 조직 목록 권한',
                 'color' => 'purple',
                 'level' => 3,
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',
                 'short_label' => '소유자',
-                'description' => '조직 소유자, 모든 조직 관리 권한',
+                'description' => '조직 소유자, 모든 조직 목록 권한',
                 'color' => 'red',
                 'level' => 4,
             ],
@@ -231,7 +231,7 @@ class OrganizationPermissionService
     {
         $options = [];
         $roles = Role::all();
-        
+
         foreach ($roles as $role) {
             $displayInfo = self::getRoleDisplayInfo($role->name);
             $options[$role->name] = $displayInfo['label'];
@@ -247,7 +247,7 @@ class OrganizationPermissionService
     {
         $user = $member->user;
         $roleName = self::enumToRole($member->permission_level);
-        
+
         if ($roleName && !$user->hasRole($roleName)) {
             $user->assignRole($roleName);
         }

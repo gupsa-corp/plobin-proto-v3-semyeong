@@ -1,4 +1,4 @@
-{{-- 조직 관리 페이지 헤더 --}}
+{{-- 조직 목록 페이지 헤더 --}}
 <div class="bg-white border-b border-gray-200">
     <div class="px-6 py-4">
         <div class="flex items-center justify-between">
@@ -28,13 +28,13 @@
                     <svg class="w-4 h-4 mx-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    <span class="text-gray-900 font-medium">조직 관리</span>
+                    <span class="text-gray-900 font-medium">조직 목록</span>
                 </nav>
             </div>
 
             {{-- 페이지 타이틀 --}}
             <div>
-                <h1 class="text-xl font-semibold text-gray-900">조직 관리</h1>
+                <h1 class="text-xl font-semibold text-gray-900">조직 목록</h1>
                 <p class="text-sm text-gray-500 mt-1">조직의 구성원, 권한, 결제 및 프로젝트를 관리합니다</p>
             </div>
 

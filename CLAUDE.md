@@ -62,7 +62,7 @@ resources/views/
 ├── 200-page-auth/             # 인증 페이지 (200-299)
 ├── 300-page-service/          # 본 서비스 (300-399)
 ├── 700-page-sandbox/          # 샌드박스 (700-799)
-├── 800-page-organization-admin/ # 조직 관리자 (800-899)
+├── 800-page-organization-admin/ # 조직 목록자 (800-899)
 └── 900-page-platform-admin/    # 플랫폼 관리자 (900-999)
 ```
 

@@ -3,7 +3,7 @@
     $navItems = $sidebarData['navigation_items'];
 @endphp
 
-{{-- 조직 관리 사이드바 --}}
+{{-- 조직 목록 사이드바 --}}
 <nav class="sidebar" style="position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #ffffff; border-right: 1px solid #E1E1E4; display: flex; flex-direction: column; z-index: 10; box-sizing: border-box;">
     @include('000-common-assets.100-logo')
 

@@ -17,7 +17,7 @@
                                 <span id="selectedUserNameTenant"></span>의 조직별 권한을 관리합니다.
                             </p>
                         </div>
-                        
+
                         <div class="mt-4 space-y-4">
                             {{-- 기존 조직 권한 목록 --}}
                             <div>
@@ -26,7 +26,7 @@
                                     {{-- 동적으로 채워짐 --}}
                                 </div>
                             </div>
-                            
+
                             {{-- 새 조직 권한 추가 --}}
                             <div class="border-t pt-4">
                                 <h4 class="text-sm font-medium text-gray-700 mb-2">새 조직 권한 추가</h4>
@@ -49,8 +49,8 @@
                                             <option value="150">고급 사용자</option>
                                             <option value="200">서비스 매니저</option>
                                             <option value="250">선임 서비스 매니저</option>
-                                            <option value="300">조직 관리자</option>
-                                            <option value="350">선임 조직 관리자</option>
+                                            <option value="300">조직 목록자</option>
+                                            <option value="350">선임 조직 목록자</option>
                                             <option value="400">조직 소유자</option>
                                             <option value="450">조직 창립자</option>
                                         </select>

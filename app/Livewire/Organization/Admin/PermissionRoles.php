@@ -42,7 +42,7 @@ class PermissionRoles extends Component
             }
 
             $this->loadData();
-            
+
             session()->flash('success', '새 역할이 성공적으로 생성되었습니다.');
         } catch (\Exception $e) {
             session()->flash('error', '역할 생성 중 오류가 발생했습니다: ' . $e->getMessage());
@@ -61,9 +61,9 @@ class PermissionRoles extends Component
             }
 
             $role->syncPermissions($permissions);
-            
+
             $this->loadData();
-            
+
             session()->flash('success', '역할 권한이 성공적으로 업데이트되었습니다.');
         } catch (\Exception $e) {
             session()->flash('error', '권한 업데이트 중 오류가 발생했습니다: ' . $e->getMessage());
@@ -75,9 +75,9 @@ class PermissionRoles extends Component
         return Role::all()->map(function ($role) {
             $permissions = $role->permissions->pluck('name')->toArray();
             $info = $this->getRoleDisplayInfo($role->name);
-            
+
             // 조직 내 해당 역할을 가진 멤버 수 계산
-            $memberCount = $this->organization ? 
+            $memberCount = $this->organization ?
                 $this->organization->users()->whereHas('roles', function ($query) use ($role) {
                     $query->where('name', $role->name);
                 })->count() : 0;
@@ -130,14 +130,14 @@ class PermissionRoles extends Component
                 'level' => 2
             ],
             'organization_admin' => [
-                'label' => '조직 관리자',
-                'description' => '조직 관리 권한, 멤버 관리 및 조직 설정',
+                'label' => '조직 목록자',
+                'description' => '조직 목록 권한, 멤버 관리 및 조직 설정',
                 'color' => 'purple',
                 'level' => 3
             ],
             'organization_owner' => [
                 'label' => '조직 소유자',
-                'description' => '조직 소유자, 모든 조직 관리 권한',
+                'description' => '조직 소유자, 모든 조직 목록 권한',
                 'color' => 'red',
                 'level' => 4
             ],

@@ -20,7 +20,7 @@ return [
                       </svg>'
         ],
         [
-            'title' => '조직 관리자',
+            'title' => '조직 목록자',
             'url' => '/organizations/' . request()->route('id') . '/admin',
             'active' => request()->is('organizations/*/admin') || request()->is('organizations/*/admin/*'),
             'icon' => '<svg width="20" height="20" viewBox="0 0 20 20">
