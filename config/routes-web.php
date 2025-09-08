@@ -62,4 +62,5 @@ return [
     '/sandbox/function-dependencies' => ['view' => '700-page-sandbox.710-page-function-dependencies.000-index', 'name' => 'sandbox.function-dependencies'],
     '/sandbox/function-automation' => ['view' => '700-page-sandbox.711-page-function-automation.000-index', 'name' => 'sandbox.function-automation'],
     '/sandbox/function-templates' => ['view' => '700-page-sandbox.712-page-function-templates.000-index', 'name' => 'sandbox.function-templates'],
+    '/sandbox/scenario-manager' => ['view' => '700-page-sandbox.711-page-scenario-manager.000-index', 'name' => 'sandbox.scenario-manager'],
 ];

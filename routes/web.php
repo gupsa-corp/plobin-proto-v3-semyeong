@@ -539,6 +539,11 @@ Route::get('/sandbox/function-browser', function () {
     return view('700-page-sandbox.708-page-function-browser.000-index');
 })->name('sandbox.function-browser');
 
+// Scenario Manager
+Route::get('/sandbox/scenario-manager', function () {
+    return view('700-page-sandbox.711-page-scenario-manager.000-index');
+})->name('sandbox.scenario-manager');
+
 // Documentation Manager
 Route::get('/sandbox/documentation-manager', function () {
     return view('700-page-sandbox.710-page-documentation-manager.000-index');

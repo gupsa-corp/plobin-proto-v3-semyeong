@@ -119,6 +119,9 @@
                     <a href="/sandbox/form-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors font-medium">
                         Form Creator
                     </a>
+                    <a href="/sandbox/scenario-manager" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium">
+                        📋 시나리오 관리자
+                    </a>
                 </div>
             </div>
         </div>

@@ -90,6 +90,11 @@
                     <h3 class="text-lg font-semibold text-indigo-900 mb-2">📚 개발자 문서 관리</h3>
                     <p class="text-indigo-700">프로젝트 문서 작성, 편집 및 관리 - GlobalFunctions, API 가이드 등</p>
                 </a>
+
+                <a href="/sandbox/scenario-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-blue-200 bg-blue-50">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">📋 시나리오 관리자</h3>
+                    <p class="text-blue-700">개발 시나리오 및 요구사항을 체계적으로 관리하고 추적합니다</p>
+                </a>
             </div>
         </div>
     </div>
