@@ -84,20 +84,22 @@
             <div class="mt-6">
                 <div class="flow-root">
                     <ul role="list" class="-my-5 divide-y divide-gray-200">
-                        <!-- 예시 멤버 리스트 -->
+                        <!-- 프로젝트 소유자 (항상 첫 번째로 표시) -->
                         <li class="py-4">
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
                                     <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                        <span class="text-sm font-medium text-gray-700">JD</span>
+                                        <span class="text-sm font-medium text-gray-700">
+                                            {{ strtoupper(substr($project->user->name ?? 'U', 0, 1)) }}{{ strtoupper(substr($project->user->name ?? 'ser', 1, 1)) }}
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900 truncate">
-                                        John Doe
+                                        {{ $project->user->name ?? '이름 없음' }}
                                     </p>
                                     <p class="text-sm text-gray-500 truncate">
-                                        john.doe@example.com
+                                        {{ $project->user->email ?? '이메일 없음' }}
                                     </p>
                                 </div>
                                 <div class="flex-shrink-0">
@@ -108,33 +110,64 @@
                             </div>
                         </li>
                         
-                        <li class="py-4">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex-shrink-0">
-                                    <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                        <span class="text-sm font-medium text-gray-700">JS</span>
+                        <!-- 조직 멤버들 (프로젝트 소유자 제외) -->
+                        @foreach($organizationMembers as $member)
+                            @if($member->user_id !== $project->user_id)
+                            <li class="py-4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-gray-700">
+                                                {{ strtoupper(substr($member->user->name ?? 'U', 0, 1)) }}{{ strtoupper(substr($member->user->name ?? 'ser', 1, 1)) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                            {{ $member->user->name ?? '이름 없음' }}
+                                        </p>
+                                        <p class="text-sm text-gray-500 truncate">
+                                            {{ $member->user->email ?? '이메일 없음' }}
+                                        </p>
+                                    </div>
+                                    <div class="flex-shrink-0 flex items-center space-x-2">
+                                        @if($member->permission_level >= 300)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                조직 관리자
+                                            </span>
+                                        @elseif($member->permission_level >= 200)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                프로젝트 관리자
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                일반 멤버
+                                            </span>
+                                        @endif
+                                        @if($member->permission_level < 300)
+                                        <button class="text-gray-400 hover:text-gray-600" title="멤버 제거">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate">
-                                        Jane Smith
-                                    </p>
-                                    <p class="text-sm text-gray-500 truncate">
-                                        jane.smith@example.com
-                                    </p>
-                                </div>
-                                <div class="flex-shrink-0 flex items-center space-x-2">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        관리자
-                                    </span>
-                                    <button class="text-gray-400 hover:text-gray-600">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                            </li>
+                            @endif
+                        @endforeach
+                        
+                        @if($organizationMembers->where('user_id', '!=', $project->user_id)->count() === 0)
+                        <li class="py-8 text-center">
+                            <div class="text-gray-500">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M17 20H7m10 0v-2c0-1.654-.188-3.254-.599-4.75M7 20v-2c0-1.654.188-3.254.599-4.75M17 20v-2a3 3 0 00-3-3H9a3 3 0 00-3 3v2m8-16a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900">프로젝트 멤버가 없습니다</h3>
+                                <p class="mt-1 text-sm text-gray-500">프로젝트에 참여할 멤버를 초대해보세요.</p>
                             </div>
                         </li>
+                        @endif
                     </ul>
                 </div>
             </div>

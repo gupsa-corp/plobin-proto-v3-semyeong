@@ -123,7 +123,21 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($
 })->name('project.dashboard.project.settings.name');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
-    return view('300-page-service.315-page-project-settings-users.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'users']);
+    // 프로젝트 정보 조회
+    $project = \App\Models\Project::with('user')->findOrFail($projectId);
+    
+    // 조직의 모든 멤버 조회
+    $organizationMembers = \App\Models\OrganizationMember::with('user')
+        ->where('organization_id', $id)
+        ->where('invitation_status', 'accepted')
+        ->get();
+    
+    return view('300-page-service.315-page-project-settings-users.000-index', [
+        'currentProjectId' => $projectId,
+        'activeTab' => 'users',
+        'project' => $project,
+        'organizationMembers' => $organizationMembers
+    ]);
 })->name('project.dashboard.project.settings.users');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/permissions', function ($id, $projectId) {
