@@ -4,7 +4,6 @@
     <div class="min-h-screen" style="position: relative;">
         @include('300-page-service.308-page-project-dashboard.200-sidebar-main')
         <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
-            @include('300-page-service.308-page-project-dashboard.100-header-main')
             @include('300-page-service.309-page-settings-name.200-content-main')
         </div>
     </div>
