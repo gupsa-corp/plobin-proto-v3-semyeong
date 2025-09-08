@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\PageAccessLevel;
 use App\Enums\ProjectRole;
+use App\Services\ProjectLogService;
 
 class ProjectPage extends Model
 {
@@ -27,6 +28,32 @@ class ProjectPage extends Model
     protected $casts = [
         'allowed_roles' => 'json',
     ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::created(function ($page) {
+            ProjectLogService::logPageCreated($page->project_id, $page->id, $page->title);
+        });
+
+        static::updated(function ($page) {
+            if ($page->wasChanged()) {
+                $changes = $page->getChanges();
+                // timestamps와 soft delete는 제외
+                unset($changes['updated_at'], $changes['created_at'], $changes['deleted_at']);
+                
+                if (!empty($changes)) {
+                    ProjectLogService::logPageUpdated($page->project_id, $page->id, $page->title, $changes);
+                }
+            }
+        });
+
+        static::deleted(function ($page) {
+            ProjectLogService::logPageDeleted($page->project_id, $page->id, $page->title);
+        });
+    }
 
     public function project(): BelongsTo
     {

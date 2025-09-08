@@ -1,9 +1,9 @@
 {{-- 재귀적 페이지 트리 아이템 --}}
 <div style="margin-left: {{ $level * 16 }}px;">
-    <a href="{{ route('project.dashboard.page', ['id' => $orgId, 'projectId' => $projectId, 'pageId' => $page['id']]) }}"
-       style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: pointer; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }}"
-         onmouseover="this.style.background='#F9FAFB'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='flex';"
-         onmouseout="this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='none';">
+    <div @if($editingPageId != $page['id']) onclick="window.location.href='{{ route('project.dashboard.page', ['id' => $orgId, 'projectId' => $projectId, 'pageId' => $page['id']]) }}'" @endif
+       style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: {{ $editingPageId == $page['id'] ? 'default' : 'pointer' }}; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }}"
+         onmouseover="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='#F9FAFB'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='flex'; }"
+         onmouseout="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; const btn = document.querySelector('.add-child-btn-{{ $page['id'] }}'); if(btn) btn.style.display='none'; }">
         <div style="display: flex; align-items: center; gap: 8px;">
             @if($level > 0)
                 <div style="width: 16px; height: 1px; background: #E5E7EB; margin-right: -8px;"></div>
@@ -19,9 +19,37 @@
                     <path d="M5 7H11M5 9H9" stroke="currentColor" stroke-width="1"/>
                 @endif
             </svg>
-            <span style="font-size: 14px; color: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#10B981' : '#6B7280' }}; font-weight: {{ $currentPage && $currentPage['id'] == $page['id'] ? '500' : 'normal' }};">
-                {{ $page['title'] }}
-            </span>
+            @if($editingPageId == $page['id'])
+                <!-- 편집 모드 -->
+                <input type="text" 
+                       wire:model.defer="editingTitle"
+                       wire:keydown.enter="updatePageTitle"
+                       wire:keydown.escape="cancelEditing"
+                       wire:click.stop
+                       id="edit-input-{{ $page['id'] }}"
+                       style="font-size: 14px; color: #374151; font-weight: 500; background: white; border: 1px solid #D1D5DB; border-radius: 4px; padding: 2px 6px; width: 150px; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);"
+                       onclick="event.preventDefault(); event.stopPropagation();"
+                       onload="this.focus(); this.select();">
+                <script>
+                    // 편집 입력창에 자동 포커스 및 텍스트 선택
+                    setTimeout(() => {
+                        const input = document.getElementById('edit-input-{{ $page['id'] }}');
+                        if (input) {
+                            input.focus();
+                            input.select();
+                        }
+                    }, 100);
+                </script>
+            @else
+                <!-- 일반 모드 -->
+                <span wire:click.stop="startEditing({{ $page['id'] }}, '{{ addslashes($page['title']) }}')"
+                      style="font-size: 14px; color: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#10B981' : '#6B7280' }}; font-weight: {{ $currentPage && $currentPage['id'] == $page['id'] ? '500' : 'normal' }}; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: background-color 0.15s;"
+                      onmouseover="this.style.background='#F3F4F6'"
+                      onmouseout="this.style.background='transparent'"
+                      title="클릭하여 이름 변경">
+                    {{ $page['title'] }}
+                </span>
+            @endif
         </div>
         <div style="display: flex; gap: 4px; align-items: center;">
             {{-- 하위 페이지 추가 버튼 --}}
@@ -34,7 +62,7 @@
                 +
             </button>
         </div>
-    </a>
+    </div>
 
     {{-- 자식 페이지들 재귀적으로 표시 --}}
     @if(isset($page['children']) && count($page['children']) > 0)

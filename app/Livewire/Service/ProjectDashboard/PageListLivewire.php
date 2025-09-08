@@ -5,6 +5,7 @@ namespace App\Livewire\Service\ProjectDashboard;
 use App\Models\Page;
 use App\Models\Project;
 use App\Models\ProjectPage;
+use App\Services\ProjectLogService;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -15,10 +16,13 @@ class PageListLivewire extends Component
     public $pages = [];
     public $currentPage = null;
     public $isLoading = false;
+    public $editingPageId = null;
+    public $editingTitle = '';
 
     protected $listeners = [
         'pageCreated' => 'loadPages',
-        'add-parent-page' => 'addParentPage'
+        'add-parent-page' => 'addParentPage',
+        'page-title-updated' => 'onPageTitleUpdated'
     ];
 
     public function mount($orgId, $projectId, $currentPageId = null)
@@ -173,6 +177,75 @@ class PageListLivewire extends Component
         
         $this->loadPages();
         $this->dispatch('pageCreated', $childPage->id);
+    }
+
+    /**
+     * 인라인 편집 시작
+     */
+    public function startEditing($pageId, $currentTitle)
+    {
+        $this->editingPageId = $pageId;
+        $this->editingTitle = $currentTitle;
+    }
+
+    /**
+     * 인라인 편집 취소
+     */
+    public function cancelEditing()
+    {
+        $this->editingPageId = null;
+        $this->editingTitle = '';
+    }
+
+    /**
+     * 페이지 제목 업데이트 (엔터키 또는 포커스 아웃)
+     */
+    public function updatePageTitle()
+    {
+        if ($this->editingPageId && trim($this->editingTitle) !== '') {
+            $page = ProjectPage::find($this->editingPageId);
+            
+            if ($page && $page->title !== trim($this->editingTitle)) {
+                $oldTitle = $page->title;
+                $newTitle = trim($this->editingTitle);
+                
+                $page->update(['title' => $newTitle]);
+                
+                // 로그 기록
+                ProjectLogService::logPageUpdated(
+                    $page->project_id,
+                    $page->id,
+                    $newTitle,
+                    ['title' => [$oldTitle, $newTitle]]
+                );
+                
+                // 페이지 목록 새로고침
+                $this->loadPages();
+                
+                // 현재 페이지가 편집된 페이지라면 정보 업데이트
+                if ($this->currentPage && $this->currentPage['id'] == $this->editingPageId) {
+                    $this->currentPage['title'] = $newTitle;
+                    $this->currentPage['breadcrumb'] = $newTitle;
+                }
+                
+                // 다른 컴포넌트에 업데이트 알림
+                $this->dispatch('page-title-updated', [
+                    'pageId' => $this->editingPageId,
+                    'newTitle' => $newTitle
+                ]);
+            }
+        }
+        
+        $this->cancelEditing();
+    }
+
+    /**
+     * 페이지 제목 업데이트 이벤트 리스너
+     */
+    public function onPageTitleUpdated($data)
+    {
+        // 페이지 목록을 새로고침하여 변경사항 반영
+        $this->loadPages();
     }
 
     public function render()

@@ -140,21 +140,41 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/nam
     return view('300-page-service.309-page-settings-name.000-index', ['currentPageId' => $pageId, 'activeTab' => 'name']);
 })->name('project.dashboard.page.settings.name');
 
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/name', function ($id, $projectId, $pageId) {
+    return view('300-page-service.309-page-settings-name.000-index', ['currentPageId' => $pageId, 'activeTab' => 'name']);
+})->name('project.dashboard.page.settings.name.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
     return view('300-page-service.310-page-settings-sandbox.000-index', ['currentPageId' => $pageId, 'activeTab' => 'sandbox']);
 })->name('project.dashboard.page.settings.sandbox');
+
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
+    return view('300-page-service.310-page-settings-sandbox.000-index', ['currentPageId' => $pageId, 'activeTab' => 'sandbox']);
+})->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
     return view('300-page-service.311-page-settings-custom-screen.000-index', ['currentPageId' => $pageId, 'activeTab' => 'custom-screen']);
 })->name('project.dashboard.page.settings.custom-screen');
 
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
+    return view('300-page-service.311-page-settings-custom-screen.000-index', ['currentPageId' => $pageId, 'activeTab' => 'custom-screen']);
+})->name('project.dashboard.page.settings.custom-screen.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
     return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
 })->name('project.dashboard.page.settings.deployment');
 
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
+    return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
+})->name('project.dashboard.page.settings.deployment.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/delete', function ($id, $projectId, $pageId) {
     return view('300-page-service.312-page-settings-delete.000-index', ['currentPageId' => $pageId, 'activeTab' => 'delete']);
 })->name('project.dashboard.page.settings.delete');
+
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/delete', function ($id, $projectId, $pageId) {
+    return view('300-page-service.312-page-settings-delete.000-index', ['currentPageId' => $pageId, 'activeTab' => 'delete']);
+})->name('project.dashboard.page.settings.delete.post');
 
 // 페이지 설정 기본 라우트 - 기본적으로 페이지 이름 변경 탭으로 리다이렉트
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', function ($id, $projectId, $pageId) {
@@ -170,6 +190,15 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($
         'projectId' => $projectId
     ]);
 })->name('project.dashboard.project.settings.name');
+
+Route::post('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
+    return view('300-page-service.314-page-project-settings-name.000-index', [
+        'currentProjectId' => $projectId, 
+        'activeTab' => 'name',
+        'organizationId' => $id,
+        'projectId' => $projectId
+    ]);
+})->name('project.dashboard.project.settings.name.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
     // 프로젝트 정보 조회
@@ -189,25 +218,63 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/users', function (
     ]);
 })->name('project.dashboard.project.settings.users');
 
+Route::post('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
+    // 프로젝트 정보 조회
+    $project = \App\Models\Project::with('user')->findOrFail($projectId);
+
+    // 조직의 모든 멤버 조회 (역할 정보 포함)
+    $organizationMembers = \App\Models\OrganizationMember::with(['user.roles'])
+        ->where('organization_id', $id)
+        ->where('invitation_status', 'accepted')
+        ->get();
+
+    return view('300-page-service.315-page-project-settings-users.000-index', [
+        'currentProjectId' => $projectId,
+        'activeTab' => 'users',
+        'project' => $project,
+        'organizationMembers' => $organizationMembers
+    ]);
+})->name('project.dashboard.project.settings.users.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/settings/permissions', function ($id, $projectId) {
     return view('300-page-service.316-page-project-settings-permissions.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'permissions']);
 })->name('project.dashboard.project.settings.permissions');
+
+Route::post('/organizations/{id}/projects/{projectId}/settings/permissions', function ($id, $projectId) {
+    return view('300-page-service.316-page-project-settings-permissions.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'permissions']);
+})->name('project.dashboard.project.settings.permissions.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/delete', function ($id, $projectId) {
     return view('300-page-service.317-page-project-settings-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'delete']);
 })->name('project.dashboard.project.settings.delete');
 
+Route::post('/organizations/{id}/projects/{projectId}/settings/delete', function ($id, $projectId) {
+    return view('300-page-service.317-page-project-settings-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'delete']);
+})->name('project.dashboard.project.settings.delete.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId) {
     return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
 })->name('project.dashboard.project.settings.sandboxes');
+
+Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId) {
+    return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
+})->name('project.dashboard.project.settings.sandboxes.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/page-delete', function ($id, $projectId) {
     return view('300-page-service.318-page-project-settings-page-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'page-delete']);
 })->name('project.dashboard.project.settings.page-delete');
 
+Route::post('/organizations/{id}/projects/{projectId}/settings/page-delete', function ($id, $projectId) {
+    return view('300-page-service.318-page-project-settings-page-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'page-delete']);
+})->name('project.dashboard.project.settings.page-delete.post');
+
 Route::get('/organizations/{id}/projects/{projectId}/settings/logs', function ($id, $projectId) {
     return view('300-page-service.319-page-project-settings-logs.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'logs']);
 })->name('project.dashboard.project.settings.logs');
+
+Route::post('/organizations/{id}/projects/{projectId}/settings/logs', function ($id, $projectId) {
+    return view('300-page-service.319-page-project-settings-logs.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'logs']);
+})->name('project.dashboard.project.settings.logs.post');
 
 // 기본 프로젝트 설정 경로 (settings로 접근시 name으로 리다이렉트)
 Route::get('/organizations/{id}/projects/{projectId}/settings', function ($id, $projectId) {

@@ -12,7 +12,7 @@
     </div>
 
     <!-- Livewire 변경 로그 컴포넌트 -->
-    @livewire('project-change-logs', ['projectId' => request()->route('projectId'), 'organizationId' => request()->route('id')])
+    @livewire('project-settings-logs', ['projectId' => request()->route('projectId')])
 
     <!-- 로그 정보 -->
     <div class="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
