@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use App\Http\Sandbox\GlobalFunctions\BaseGlobalFunction;
+use App\Http\Sandbox\GlobalFunctions\PHPExcelGenerator;
 
 class FunctionBrowser extends Component implements HasForms
 {
@@ -22,6 +24,12 @@ class FunctionBrowser extends Component implements HasForms
     public array $currentFolderFiles = [];
     public string $selectedFile = '';
     public string $selectedFileContent = '';
+    
+    // Global Functions 관련 프로퍼티
+    public array $availableGlobalFunctions = [];
+    public string $selectedGlobalFunction = '';
+    public string $globalFunctionParams = '{}';
+    public array $globalFunctionResults = [];
 
     public ?array $data = [];
 
@@ -29,6 +37,7 @@ class FunctionBrowser extends Component implements HasForms
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
         $this->loadAvailableFunctions();
+        $this->loadGlobalFunctions();
         
         // 첫 번째 함수를 자동으로 로드
         $functions = $this->getAvailableFunctions();
@@ -388,6 +397,120 @@ class FunctionBrowser extends Component implements HasForms
     private function loadAvailableFunctions()
     {
         // 컴포넌트 초기화 시 필요한 설정
+    }
+
+    /**
+     * Global Functions 로드
+     */
+    public function loadGlobalFunctions()
+    {
+        $this->availableGlobalFunctions = [];
+        
+        // 사용 가능한 Global Function 클래스들을 등록
+        $globalFunctionClasses = [
+            PHPExcelGenerator::class,
+            // 향후 추가할 Global Functions들
+        ];
+
+        foreach ($globalFunctionClasses as $class) {
+            try {
+                $instance = new $class();
+                if ($instance instanceof BaseGlobalFunction) {
+                    $this->availableGlobalFunctions[] = [
+                        'name' => $instance->getName(),
+                        'description' => $instance->getDescription(),
+                        'parameters' => $instance->getParameters(),
+                        'class' => $class
+                    ];
+                }
+            } catch (\Exception $e) {
+                // 클래스 로드 실패는 무시
+            }
+        }
+    }
+
+    /**
+     * Global Function 정보 조회
+     */
+    public function getGlobalFunctionInfo($functionName)
+    {
+        foreach ($this->availableGlobalFunctions as $func) {
+            if ($func['name'] === $functionName) {
+                return $func;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Global Function 실행
+     */
+    public function executeGlobalFunction()
+    {
+        if (empty($this->selectedGlobalFunction)) {
+            $this->addGlobalFunctionResult(false, 'Global Function이 선택되지 않았습니다.');
+            return;
+        }
+
+        try {
+            // JSON 파라미터 검증
+            $params = json_decode($this->globalFunctionParams, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('잘못된 JSON 형식입니다: ' . json_last_error_msg());
+            }
+
+            // 함수 정보 조회
+            $functionInfo = $this->getGlobalFunctionInfo($this->selectedGlobalFunction);
+            if (!$functionInfo) {
+                throw new \Exception('선택된 Global Function을 찾을 수 없습니다.');
+            }
+
+            // 함수 인스턴스 생성 및 실행
+            $functionClass = $functionInfo['class'];
+            $instance = new $functionClass();
+            $result = $instance->execute($params);
+
+            $this->addGlobalFunctionResult(
+                $result['success'],
+                $result['message'],
+                $result
+            );
+
+        } catch (\Exception $e) {
+            $this->addGlobalFunctionResult(false, 'Global Function 실행 중 오류: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Global Function 실행 결과 추가
+     */
+    private function addGlobalFunctionResult($success, $message, $fullResult = null)
+    {
+        $result = [
+            'timestamp' => now()->format('H:i:s'),
+            'function' => $this->selectedGlobalFunction,
+            'success' => $success,
+            'message' => $message
+        ];
+
+        // 파일 다운로드 정보가 있으면 추가
+        if ($fullResult && isset($fullResult['file_path'])) {
+            $result['file_path'] = $fullResult['file_path'];
+        }
+
+        // 추가 데이터가 있으면 포함
+        if ($fullResult && isset($fullResult['data'])) {
+            $result['data'] = $fullResult['data'];
+        }
+
+        $this->globalFunctionResults[] = $result;
+
+        // 최근 10개 결과만 유지
+        if (count($this->globalFunctionResults) > 10) {
+            $this->globalFunctionResults = array_slice($this->globalFunctionResults, -10);
+        }
+
+        $this->dispatch('global-function-executed');
     }
 
     public function render()

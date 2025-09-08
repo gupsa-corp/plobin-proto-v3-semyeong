@@ -85,6 +85,11 @@
                     <h3 class="text-lg font-semibold text-purple-900 mb-2">Form Publisher</h3>
                     <p class="text-purple-700">JSON 기반 폼 생성기 - 코드로 폼 구조 정의</p>
                 </a>
+
+                <a href="/sandbox/documentation-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-indigo-200 bg-indigo-50">
+                    <h3 class="text-lg font-semibold text-indigo-900 mb-2">📚 개발자 문서 관리</h3>
+                    <p class="text-indigo-700">프로젝트 문서 작성, 편집 및 관리 - GlobalFunctions, API 가이드 등</p>
+                </a>
             </div>
         </div>
     </div>

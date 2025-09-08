@@ -515,6 +515,36 @@ Route::get('/sandbox/function-browser', function () {
     return view('700-page-sandbox.708-page-function-browser.000-index');
 })->name('sandbox.function-browser');
 
+// Documentation Manager
+Route::get('/sandbox/documentation-manager', function () {
+    return view('700-page-sandbox.710-page-documentation-manager.000-index');
+})->name('sandbox.documentation-manager');
+
+// Global Functions 파일 다운로드
+Route::get('/sandbox/download/{filename}', function ($filename) {
+    $filePath = storage_path('app/sandbox-exports/' . $filename);
+    
+    // 파일 존재 여부 확인
+    if (!file_exists($filePath)) {
+        abort(404, '파일을 찾을 수 없습니다.');
+    }
+    
+    // 파일명 검증 (보안)
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[a-zA-Z0-9._-]+\.(xlsx|csv|pdf|txt)$/', $filename)) {
+        abort(403, '잘못된 파일 형식입니다.');
+    }
+    
+    // 원본 파일명 추출 (타임스탬프 제거)
+    $originalFilename = preg_replace('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_/', '', $filename);
+    
+    return response()->download($filePath, $originalFilename, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Cache-Control' => 'no-store, no-cache, must-revalidate',
+        'Pragma' => 'no-cache',
+        'Expires' => '0'
+    ]);
+})->name('sandbox.download');
+
 // Form Publisher - 샌드박스 폼 생성 및 관리 도구 (Livewire + Filament)
 Route::prefix('sandbox/form-publisher')->group(function () {
     Route::get('/', function () {
