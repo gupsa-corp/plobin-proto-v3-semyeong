@@ -8,11 +8,9 @@
     <div class="min-h-screen sandbox-container">
         <div class="sandbox-card">
             <h1 class="text-3xl font-bold text-gray-900 mb-6">샌드박스 대시보드</h1>
-            <p class="text-gray-600 mb-8">시스템 현황 및 관리</p>
+            <p class="text-gray-600 mb-8">프로젝트 및 페이지 현황을 확인하세요</p>
             
-            <div class="text-center py-20 text-gray-500">
-                구현필요
-            </div>
+            @livewire('sandbox-dashboard')
         </div>
     </div>
     <!-- Livewire Scripts -->

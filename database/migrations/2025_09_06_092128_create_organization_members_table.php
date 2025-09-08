@@ -15,14 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('permission_level')->default(0); // OrganizationPermission enum value
             $table->timestamp('joined_at')->nullable();
             $table->timestamp('invited_at')->nullable();
             $table->string('invitation_status')->default('pending'); // pending, accepted, declined
             $table->timestamps();
             
             $table->unique(['organization_id', 'user_id']);
-            $table->index(['organization_id', 'permission_level']);
         });
     }
 

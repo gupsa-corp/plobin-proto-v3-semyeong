@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('organization_members', function (Blueprint $table) {
-            $table->string('role_name')->default('member')->after('permission_level');
-            // permission_level은 유지하되 deprecated로 표시
+            $table->string('role_name')->default('member')->after('user_id');
         });
     }
 

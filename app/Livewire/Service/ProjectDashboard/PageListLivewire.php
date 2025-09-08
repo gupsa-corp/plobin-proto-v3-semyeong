@@ -248,6 +248,112 @@ class PageListLivewire extends Component
         $this->loadPages();
     }
 
+    /**
+     * 페이지 제목 업데이트 (alert 프롬프트)
+     */
+    public function updatePageTitleWithPrompt($pageId)
+    {
+        $page = ProjectPage::find($pageId);
+        if ($page) {
+            $this->dispatch('show-rename-prompt', [
+                'pageId' => $pageId,
+                'currentTitle' => $page->title
+            ]);
+        }
+    }
+
+    /**
+     * alert 프롬프트에서 받은 제목으로 업데이트
+     */
+    public function updatePageTitleFromPrompt($pageId, $newTitle)
+    {
+        if (!$newTitle || trim($newTitle) === '') {
+            return;
+        }
+
+        $page = ProjectPage::find($pageId);
+        if ($page && $page->title !== trim($newTitle)) {
+            $oldTitle = $page->title;
+            $newTitle = trim($newTitle);
+            
+            $page->update(['title' => $newTitle]);
+            
+            // 로그 기록
+            ProjectLogService::logPageUpdated(
+                $page->project_id,
+                $page->id,
+                $newTitle,
+                ['title' => [$oldTitle, $newTitle]]
+            );
+            
+            // 페이지 목록 새로고침
+            $this->loadPages();
+            
+            // 현재 페이지가 편집된 페이지라면 정보 업데이트
+            if ($this->currentPage && $this->currentPage['id'] == $pageId) {
+                $this->currentPage['title'] = $newTitle;
+                $this->currentPage['breadcrumb'] = $newTitle;
+            }
+            
+            // 다른 컴포넌트에 업데이트 알림
+            $this->dispatch('page-title-updated', [
+                'pageId' => $pageId,
+                'newTitle' => $newTitle
+            ]);
+        }
+    }
+
+    /**
+     * 페이지 삭제
+     */
+    public function deletePage($pageId)
+    {
+        try {
+            $page = ProjectPage::find($pageId);
+            if (!$page) {
+                return;
+            }
+
+            // 하위 페이지가 있는지 확인
+            $hasChildren = ProjectPage::where('parent_id', $pageId)->exists();
+            if ($hasChildren) {
+                $this->dispatch('show-error', '하위 페이지가 있는 페이지는 삭제할 수 없습니다. 먼저 하위 페이지를 삭제하세요.');
+                return;
+            }
+
+            // 현재 페이지가 삭제될 페이지인 경우 첫 번째 페이지로 리다이렉트
+            $shouldRedirect = $this->currentPage && $this->currentPage['id'] == $pageId;
+
+            // 페이지 삭제
+            $page->delete();
+
+            // 로그 기록
+            ProjectLogService::logPageDeleted(
+                $page->project_id,
+                $pageId,
+                $page->title
+            );
+
+            // 페이지 목록 새로고침
+            $this->loadPages();
+
+            if ($shouldRedirect) {
+                // 첫 번째 페이지로 리다이렉트
+                $firstPage = collect($this->pages)->first();
+                if ($firstPage) {
+                    $this->dispatch('redirect-to-page', $firstPage['id']);
+                } else {
+                    $this->dispatch('redirect-to-dashboard');
+                }
+            }
+
+            $this->dispatch('show-success', '페이지가 삭제되었습니다.');
+            
+        } catch (\Exception $e) {
+            $this->dispatch('show-error', '페이지 삭제 중 오류가 발생했습니다.');
+        }
+    }
+
     public function render()
     {
         return view('300-page-service.308-page-project-dashboard.301-page-list-livewire');

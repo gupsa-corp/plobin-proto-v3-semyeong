@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Organization;
 use App\Models\OrganizationMember;
 use App\Models\Project;
-use App\Enums\OrganizationPermission;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -61,7 +60,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $admin->id,
             ],
             [
-                'permission_level' => OrganizationPermission::ORGANIZATION_OWNER->value,
+                'role_name' => 'owner',
                 'invitation_status' => 'accepted',
                 'joined_at' => now(),
                 'invited_at' => now(),

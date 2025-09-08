@@ -324,11 +324,11 @@ Route::get('/organizations/{id}/admin', function ($id) {
 })->name('organization.admin');
 
 Route::get('/organizations/{id}/admin/members', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
@@ -342,11 +342,11 @@ Route::get('/organizations/{id}/admin/permissions', function ($id) {
 
 // 권한 개요 탭
 Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
@@ -355,11 +355,11 @@ Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
 
 // 역할 관리 탭
 Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
@@ -368,11 +368,11 @@ Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
 
 // 권한 관리 탭
 Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
@@ -381,11 +381,11 @@ Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
 
 // 동적 규칙 탭
 Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300)
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 
@@ -424,11 +424,11 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
         ->orderBy('created_at', 'desc')
         ->get();
 
-    // 사용자가 권한 300 이상인 조직만 가져오기
+    // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
         ->where('organization_members.user_id', 1)
-        ->where('organization_members.permission_level', '>=', 300) // ORGANIZATION_ADMIN 이상
+        ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
 

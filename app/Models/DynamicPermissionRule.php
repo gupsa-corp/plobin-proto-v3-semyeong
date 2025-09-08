@@ -116,12 +116,14 @@ class DynamicPermissionRule extends Model
 
     private function getUserMaxRoleLevel($user)
     {
-        // 기존 OrganizationMember 시스템과 연동
+        // 기존 OrganizationMember 시스템과 연동 - permission_level 제거됨
         $organizationMember = $user->organizationMemberships()
             ->where('organization_id', request()->route('organization'))
             ->first();
             
-        return $organizationMember ? $organizationMember->permission_level : 0;
+        // permission_level 제거됨 - role_name을 기반으로 한 권한 체크로 변경 필요
+        // 임시로 모든 조직 멤버에게 기본 권한 부여
+        return $organizationMember ? 100 : 0;
     }
 
     private function evaluateCustomLogic($user, $context)
@@ -190,7 +192,7 @@ class DynamicPermissionRule extends Model
                 return $user->id == ($condition['value'] ?? null);
             case 'organization_owner':
                 return $user->organizations()->where('organization_id', $context['organization_id'] ?? 0)
-                    ->wherePivot('permission_level', '>=', 400)->exists();
+                    ->wherePivot('role_name', 'owner')->exists();
             case 'context_match':
                 return ($context[$condition['key']] ?? null) == ($condition['value'] ?? null);
             default:
