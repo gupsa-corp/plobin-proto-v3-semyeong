@@ -4,6 +4,7 @@ namespace App\Http\CoreApi\Organization\CreateOrganization;
 
 use App\Http\CoreApi\ApiController;
 use App\Models\Organization;
+use App\Models\OrganizationMember;
 use Illuminate\Http\Request;
 
 class Controller extends ApiController
@@ -47,6 +48,17 @@ class Controller extends ApiController
             ]);
 
             \Log::info('Organization created', ['organization_id' => $organization->id]);
+
+            // 생성자를 조직의 소유자로 추가
+            OrganizationMember::create([
+                'user_id' => auth()->id(),
+                'organization_id' => $organization->id,
+                'role_name' => 'owner',
+                'invitation_status' => 'accepted',
+                'joined_at' => now()
+            ]);
+
+            \Log::info('Organization owner added', ['user_id' => auth()->id(), 'organization_id' => $organization->id]);
 
             return $this->created([
                 'id' => $organization->id,

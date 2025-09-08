@@ -30,7 +30,7 @@ foreach ($routes as $path => $config) {
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-                    ->where('organization_members.user_id', 1)
+                    ->where('organization_members.user_id', Auth::id())
                     ->where('organization_members.invitation_status', 'accepted')
                     ->orderBy('organizations.created_at', 'desc')
                     ->get();
@@ -40,15 +40,15 @@ foreach ($routes as $path => $config) {
                     // 1. 내가 소유한 프로젝트들
                     $ownedProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
-                        ->where('projects.user_id', 1);
+                        ->where('projects.user_id', Auth::id());
 
                     // 2. 조직 멤버십을 통해 접근 가능한 프로젝트들 (내가 소유한 프로젝트 제외)
                     $memberProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
                         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-                        ->where('organization_members.user_id', 1)
+                        ->where('organization_members.user_id', Auth::id())
                         ->where('organization_members.invitation_status', 'accepted')
-                        ->where('projects.user_id', '!=', 1);
+                        ->where('projects.user_id', '!=', Auth::id());
 
                     // 3. 두 결과를 합치기
                     $projects = $ownedProjects->union($memberProjects)
@@ -62,13 +62,13 @@ foreach ($routes as $path => $config) {
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
                         ->where(function($query) {
                             // 내가 소유한 프로젝트의 페이지들
-                            $query->where('projects.user_id', 1)
+                            $query->where('projects.user_id', Auth::id())
                                   // 또는 내가 멤버인 조직의 프로젝트 페이지들
                                   ->orWhereExists(function($subQuery) {
                                       $subQuery->select(\DB::raw(1))
                                                ->from('organization_members')
                                                ->whereColumn('organization_members.organization_id', 'organizations.id')
-                                               ->where('organization_members.user_id', 1)
+                                               ->where('organization_members.user_id', Auth::id())
                                                ->where('organization_members.invitation_status', 'accepted');
                                   });
                         })
@@ -91,13 +91,13 @@ foreach ($routes as $path => $config) {
         $route->name($routeName);
     }
 
-    // 인증 미들웨어 적용
-    $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
+    // // 인증 미들웨어 적용
+    // $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
+    // $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
 
-    if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
-        $route->middleware(\App\Http\Middleware\SimpleAuth::class);
-    }
+    // if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
+    //     $route->middleware(\App\Http\Middleware\SimpleAuth::class);
+    // }
 }
 
 // 매개변수가 있는 특수 라우트들을 수동으로 등록 (개발용 - 인증 제거)
@@ -105,11 +105,11 @@ Route::get('/organizations/{id}/dashboard', function ($id) {
     // 조직 선택 드롭다운을 위한 조직 목록 전달
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
-    
+
     return view('300-page-service.302-page-organization-dashboard.000-index', compact('organizations'));
 })->name('organization.dashboard');
 
@@ -315,7 +315,7 @@ Route::get('/organizations/{id}/admin', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -327,7 +327,7 @@ Route::get('/organizations/{id}/admin/members', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -345,7 +345,7 @@ Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -358,7 +358,7 @@ Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -371,7 +371,7 @@ Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -384,7 +384,7 @@ Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -427,7 +427,7 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
     // 조직 선택 드롭다운을 위한 모든 조직 목록
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', 1)
+        ->where('organization_members.user_id', Auth::id())
         ->where('organization_members.invitation_status', 'accepted')
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -552,20 +552,20 @@ Route::get('/sandbox/documentation-manager', function () {
 // Global Functions 파일 다운로드
 Route::get('/sandbox/download/{filename}', function ($filename) {
     $filePath = storage_path('app/sandbox-exports/' . $filename);
-    
+
     // 파일 존재 여부 확인
     if (!file_exists($filePath)) {
         abort(404, '파일을 찾을 수 없습니다.');
     }
-    
+
     // 파일명 검증 (보안)
     if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[a-zA-Z0-9._-]+\.(xlsx|csv|pdf|txt)$/', $filename)) {
         abort(403, '잘못된 파일 형식입니다.');
     }
-    
+
     // 원본 파일명 추출 (타임스탬프 제거)
     $originalFilename = preg_replace('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_/', '', $filename);
-    
+
     return response()->download($filePath, $originalFilename, [
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Cache-Control' => 'no-store, no-cache, must-revalidate',
@@ -609,14 +609,14 @@ Route::prefix('sandbox/form-publisher')->group(function () {
 // 로그인 처리 라우트 추가 (모달용)
 Route::post('/login', function () {
     $credentials = request()->only('email', 'password');
-    
+
     if (Auth::attempt($credentials)) {
         request()->session()->regenerate();
         return response()->json(['success' => true]);
     }
-    
+
     return response()->json([
-        'success' => false, 
+        'success' => false,
         'message' => '이메일 또는 비밀번호가 일치하지 않습니다.'
     ], 401);
 })->name('login.post');

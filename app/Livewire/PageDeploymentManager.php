@@ -43,7 +43,7 @@ class PageDeploymentManager extends Component
         // 배포 로그 기록
         ProjectPageDeploymentLog::create([
             'project_page_id' => $this->pageId,
-            'user_id' => 1, // 개발용 - 실제로는 Auth::id() 사용
+            'user_id' => Auth::id(),
             'from_status' => $oldStatus,
             'to_status' => $this->deploymentStatus,
             'reason' => $this->changeReason

@@ -46,7 +46,7 @@ class Controller extends BaseController
             'slug' => $slug,
             'content' => $content,
             'status' => 'published',
-            'user_id' => auth()->id() ?? 1,
+            'user_id' => auth()->id(),
             'parent_id' => $parentId,
             'sort_order' => $lastOrder + 1
         ]);

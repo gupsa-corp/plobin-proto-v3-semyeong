@@ -4,6 +4,7 @@ namespace App\Livewire\Organization;
 
 use Livewire\Component;
 use App\Models\Organization;
+use App\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
 
 class CreateOrganization extends Component
@@ -45,12 +46,21 @@ class CreateOrganization extends Component
         $this->validate();
 
         // 조직 생성
-        Organization::create([
+        $organization = Organization::create([
             'name' => $this->name,
             'description' => $this->description,
             'user_id' => Auth::id(),
             'status' => 'active',
             'members_count' => 1,
+        ]);
+
+        // 생성자를 조직의 소유자로 추가
+        OrganizationMember::create([
+            'user_id' => Auth::id(),
+            'organization_id' => $organization->id,
+            'role_name' => 'owner',
+            'invitation_status' => 'accepted',
+            'joined_at' => now()
         ]);
 
         session()->flash('message', '조직이 성공적으로 생성되었습니다.');

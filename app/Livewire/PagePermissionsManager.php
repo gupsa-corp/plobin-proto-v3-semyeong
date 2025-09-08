@@ -74,7 +74,7 @@ class PagePermissionsManager extends Component
     {
         ProjectPageDeploymentLog::create([
             'project_page_id' => $this->pageId,
-            'user_id' => 1, // 현재는 하드코딩, 실제로는 auth()->id() 사용
+            'user_id' => auth()->id(),
             'change_type' => 'permission',
             'from_status' => $oldAccessLevel,
             'to_status' => $newAccessLevel,
