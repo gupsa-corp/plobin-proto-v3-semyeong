@@ -46,18 +46,7 @@
         </div>
 
         {{-- Main Content --}}
-        <div class="h-full p-6 overflow-auto" style="height: calc(100vh - 140px);">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center py-12">
-                    <div class="text-6xl mb-4">⚡</div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">자동화 워크플로우</h3>
-                    <p class="text-gray-600 mb-6">함수들을 연결하여 자동화 워크플로우를 생성합니다.</p>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">🚧 이 기능은 곧 출시될 예정입니다.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @livewire('sandbox.function-automation')
     </div>
     
     <!-- Livewire Scripts (includes Alpine.js) -->
@@ -84,6 +73,51 @@
                     Alpine.start();
                 }
             }
+        });
+
+        // Livewire 이벤트 리스너들
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('workflow-success', (event) => {
+                alert('✅ ' + event.message);
+            });
+
+            Livewire.on('workflow-error', (event) => {
+                alert('❌ ' + event.message);
+            });
+
+            Livewire.on('template-loaded', (event) => {
+                alert('📝 ' + event.message);
+            });
+
+            Livewire.on('workflow-loaded', (event) => {
+                alert('📂 ' + event.message);
+            });
+
+            Livewire.on('workflow-saved', (event) => {
+                alert('💾 ' + event.message);
+            });
+
+            Livewire.on('workflow-reset', (event) => {
+                if (confirm('워크플로우를 초기화하시겠습니까?')) {
+                    alert('🔄 ' + event.message);
+                }
+            });
+
+            Livewire.on('insert-function-code', (event) => {
+                // 코드 에디터에 함수 코드 삽입 (기본 구현)
+                const textarea = document.querySelector('textarea[wire\\:model\\.defer="workflowCode"]');
+                if (textarea) {
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = textarea.value.substring(0, cursorPos);
+                    const textAfter = textarea.value.substring(cursorPos);
+                    
+                    textarea.value = textBefore + '\n        ' + event.code + '\n' + textAfter;
+                    textarea.focus();
+                    
+                    // Livewire 컴포넌트에 변경사항 알림
+                    textarea.dispatchEvent(new Event('input'));
+                }
+            });
         });
     </script>
 </body>
