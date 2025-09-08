@@ -109,6 +109,11 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function organization()
+    {
+        return $this->organizations()->first();
+    }
+
     /**
      * 동적 권한 체크 - 편리한 메소드
      */

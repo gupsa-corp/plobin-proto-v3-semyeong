@@ -185,7 +185,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
                     </svg>
                     <p class="mt-4 text-lg font-medium text-gray-900">멤버가 없습니다</p>
                     <p class="mt-2 text-sm text-gray-500">
-                        @if($search || $roleFilter || $statusFilter)
+                        @if($searchTerm || $permissionFilter || $statusFilter)
                             검색 조건에 맞는 멤버가 없습니다.
                         @else
                             아직 조직에 멤버가 없습니다.
