@@ -40,8 +40,8 @@ DB에서 관리되는 권한 규칙
 
 ### 기존 방식 (여전히 작동)
 기존 코드 호환성 유지
-- $user->permission_level >= 300
-- OrganizationPermission enum 사용
+- $user->organizationMemberships->role_name === 'organization_admin'
+- role_name 기반 권한 체크
 
 ### 새로운 동적 방식
 완전 동적 권한 체크
@@ -119,9 +119,9 @@ JSON 기반 커스텀 로직
 - 로그 기록 및 오류 처리
 
 ### 호환성 유지
-기존 코드와의 완벽한 호환성
-- OrganizationPermission enum 유지
-- permission_level 기반 체크 지원
-- 점진적 마이그레이션 가능
+role_name + Spatie Permission 시스템으로 통일
+- OrganizationMember.role_name 컬럼 사용
+- Spatie Permission 기반 체크
+- Laravel 표준 권한 시스템 활용
 
 권한 관리가 완전 동적으로 변경되어 유연성과 확장성이 대폭 향상됨

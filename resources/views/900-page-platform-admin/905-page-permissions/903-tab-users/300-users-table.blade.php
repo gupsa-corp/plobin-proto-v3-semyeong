@@ -62,15 +62,22 @@
                     <div class="space-y-1">
                         @forelse($user->organizationMemberships as $membership)
                             @php
-                                $permission = \App\Enums\OrganizationPermission::from($membership->permission_level);
-                                $badgeColor = match($permission->getBadgeColor()) {
-                                    'yellow' => 'bg-yellow-100 text-yellow-800',
-                                    'blue' => 'bg-blue-100 text-blue-800',
-                                    'green' => 'bg-green-100 text-green-800',
-                                    'purple' => 'bg-purple-100 text-purple-800',
-                                    'red' => 'bg-red-100 text-red-800',
-                                    'gray' => 'bg-gray-100 text-gray-800',
+                                $roleName = $membership->role_name ?? 'user';
+                                $badgeColor = match($roleName) {
+                                    'user' => 'bg-blue-100 text-blue-800',
+                                    'service_manager' => 'bg-green-100 text-green-800',
+                                    'organization_admin' => 'bg-purple-100 text-purple-800',
+                                    'organization_owner' => 'bg-red-100 text-red-800',
+                                    'platform_admin' => 'bg-gray-100 text-gray-800',
                                     default => 'bg-gray-100 text-gray-800'
+                                };
+                                $roleLabel = match($roleName) {
+                                    'user' => '사용자',
+                                    'service_manager' => '서비스 매니저',
+                                    'organization_admin' => '조직 관리자',
+                                    'organization_owner' => '조직 소유자',
+                                    'platform_admin' => '플랫폼 관리자',
+                                    default => $roleName
                                 };
                             @endphp
                             <div class="flex items-center space-x-2">
@@ -78,7 +85,7 @@
                                     {{ $membership->organization->name }}
                                 </span>
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $badgeColor }}">
-                                    {{ $permission->getShortLabel() }}
+                                    {{ $roleLabel }}
                                 </span>
                             </div>
                         @empty

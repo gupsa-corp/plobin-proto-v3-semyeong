@@ -98,7 +98,7 @@ class Controller extends BaseController
             'user_id' => 'required|exists:users,id',
             'permissions' => 'required|array',
             'permissions.*.organization_id' => 'required|exists:organizations,id',
-            'permissions.*.permission_level' => 'required|integer|min:0|max:550'
+            'permissions.*.role_name' => 'required|string|exists:roles,name'
         ]);
 
         try {
@@ -114,18 +114,21 @@ class Controller extends BaseController
                 if ($existingMembership) {
                     // 기존 권한 업데이트
                     $existingMembership->update([
-                        'permission_level' => $permission['permission_level']
+                        'role_name' => $permission['role_name']
                     ]);
                 } else {
                     // 새로운 권한 생성
                     \App\Models\OrganizationMember::create([
                         'user_id' => $user->id,
                         'organization_id' => $permission['organization_id'],
-                        'permission_level' => $permission['permission_level'],
+                        'role_name' => $permission['role_name'],
                         'joined_at' => now(),
                         'invitation_status' => 'accepted'
                     ]);
                 }
+                
+                // 사용자에게 역할 할당
+                $user->assignRole($permission['role_name']);
             }
             
             return response()->json([

@@ -28,7 +28,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
                 <input 
                     type="text" 
                     id="search"
-                    wire:model.live="search"
+                    wire:model.live="searchTerm"
                     placeholder="이름, 이메일로 검색..."
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
@@ -37,7 +37,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
                 <label for="roleFilter" class="block text-sm font-medium text-gray-700 mb-2">역할 필터</label>
                 <select 
                     id="roleFilter"
-                    wire:model.live="roleFilter"
+                    wire:model.live="permissionFilter"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">모든 역할</option>
                     @foreach($availableRoles as $role)
@@ -166,7 +166,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
                                     </button>
                                     @if($member['permission']['level'] < 4)
                                         <button 
-                                            wire:click="removeMember({{ $member['user_id'] }})"
+                                            wire:click="removeMember({{ $member['id'] }})"
                                             class="text-red-600 hover:text-red-900">
                                             제거
                                         </button>
@@ -205,5 +205,128 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
 
 </div>
 
-{{-- 멤버 편집 모달 (향후 추가) --}}
-{{-- 멤버 초대 모달 (향후 추가) --}}
+{{-- 멤버 편집 모달 --}}
+@if($showEditModal && $editingMember)
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" wire:click="closeEditModal">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white" wire:click.stop>
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">멤버 편집</h3>
+            <div class="mt-4 text-left">
+                {{-- 멤버 정보 --}}
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                            <span class="text-white font-medium text-sm">
+                                {{ strtoupper(substr($editingMember->user->name ?? $editingMember->user->email, 0, 1)) }}
+                            </span>
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-sm font-medium text-gray-900">{{ $editingMember->user->name ?? $editingMember->user->email }}</div>
+                            <div class="text-sm text-gray-500">{{ $editingMember->user->email }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 역할 선택 --}}
+                <div class="mb-4">
+                    <label for="editRole" class="block text-sm font-medium text-gray-700 mb-2">역할</label>
+                    <select 
+                        id="editRole"
+                        wire:model="editingMemberRole"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        @foreach($availableRoles as $role)
+                            @if($role['name'] !== 'organization_owner' || (auth()->check() && auth()->user()->hasRole('organization_owner')))
+                                <option value="{{ $role['name'] }}">{{ $role['display_name'] }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- 권한 관리 --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">권한</label>
+                    <div class="max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
+                        @foreach($availablePermissions as $permission => $label)
+                            <label class="flex items-center mb-2">
+                                <input 
+                                    type="checkbox" 
+                                    value="{{ $permission }}"
+                                    @if(in_array($permission, $editingMemberPermissions)) checked @endif
+                                    wire:click="togglePermission('{{ $permission }}')"
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-gray-700">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- 버튼 --}}
+            <div class="flex justify-end space-x-2 mt-4">
+                <button 
+                    wire:click="closeEditModal"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    취소
+                </button>
+                <button 
+                    wire:click="updateMember"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    저장
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- 멤버 초대 모달 --}}
+@if($showInviteModal)
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" wire:click="closeInviteModal">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white" wire:click.stop>
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">멤버 초대</h3>
+            <div class="mt-4 text-left">
+                {{-- 이메일 입력 --}}
+                <div class="mb-4">
+                    <label for="inviteEmail" class="block text-sm font-medium text-gray-700 mb-2">이메일 주소</label>
+                    <input 
+                        type="email" 
+                        id="inviteEmail"
+                        wire:model="inviteEmail"
+                        placeholder="초대할 사용자의 이메일 주소"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                {{-- 역할 선택 --}}
+                <div class="mb-4">
+                    <label for="inviteRole" class="block text-sm font-medium text-gray-700 mb-2">역할</label>
+                    <select 
+                        id="inviteRole"
+                        wire:model="inviteRole"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        @foreach($availableRoles as $role)
+                            @if($role['name'] !== 'organization_owner' || (auth()->check() && auth()->user()->hasRole('organization_owner')))
+                                <option value="{{ $role['name'] }}">{{ $role['display_name'] }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{-- 버튼 --}}
+            <div class="flex justify-end space-x-2 mt-4">
+                <button 
+                    wire:click="closeInviteModal"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    취소
+                </button>
+                <button 
+                    wire:click="inviteMember"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    초대 전송
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif

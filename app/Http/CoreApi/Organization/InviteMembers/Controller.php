@@ -104,12 +104,11 @@ class Controller extends ApiController
                 // 동적 권한 서비스를 통한 기본 권한 할당
                 app(DynamicPermissionService::class)->assignBasicPermissions($user, $roleName);
 
-                // 멤버 초대 생성 (호환성 유지)
-                $legacyPermissionLevel = $this->getLegacyPermissionLevel($roleName);
+                // 멤버 초대 생성
                 OrganizationMember::create([
                     'organization_id' => $organizationId,
                     'user_id' => $user->id,
-                    'permission_level' => $legacyPermissionLevel,
+                    'role_name' => $roleName,
                     'invitation_status' => 'pending',
                     'invited_at' => now()
                 ]);
@@ -178,20 +177,6 @@ class Controller extends ApiController
         return false;
     }
 
-    /**
-     * 호환성을 위한 레거시 권한 레벨 반환
-     */
-    private function getLegacyPermissionLevel($roleName)
-    {
-        return match($roleName) {
-            'user' => 100,
-            'service_manager' => 200,
-            'organization_admin' => 300,
-            'organization_owner' => 400,
-            'platform_admin' => 500,
-            default => 0
-        };
-    }
 
     /**
      * 역할별 표시 정보 반환

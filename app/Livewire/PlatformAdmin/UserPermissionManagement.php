@@ -190,14 +190,14 @@ class UserPermissionManagement extends Component
         // Load user's organization permissions
         // This is a simplified version - you'll need to implement based on your organization permission system
         $this->tenantPermissions = $this->selectedUser->organizations()
-            ->withPivot('permission_level', 'role')
+            ->withPivot('role_name')
             ->get()
             ->map(function ($org) {
                 return [
                     'organization_id' => $org->id,
                     'organization_name' => $org->name,
-                    'permission_level' => $org->pivot->permission_level ?? 100,
-                    'role' => $org->pivot->role ?? 'member'
+                    'role_name' => $org->pivot->role_name ?? 'user',
+                    'role' => $org->pivot->role_name ?? 'user'
                 ];
             })
             ->toArray();

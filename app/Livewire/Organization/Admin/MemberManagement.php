@@ -26,6 +26,13 @@ class MemberManagement extends Component
     public $inviteEmail = '';
     public $inviteRole = 'user'; // 기본 사용자 역할
 
+    // 멤버 편집 관련 속성
+    public $showEditModal = false;
+    public $editingMember = null;
+    public $editingMemberId = null;
+    public $editingMemberRole = '';
+    public $editingMemberPermissions = [];
+
     public function mount($organizationId = 1)
     {
         $this->organizationId = $organizationId;
@@ -56,7 +63,7 @@ class MemberManagement extends Component
         try {
             $members = OrganizationMember::with('user')
                 ->where('organization_id', $this->organizationId)
-                ->orderBy('permission_level', 'desc')
+                ->orderBy('role_name')
                 ->orderBy('joined_at', 'desc')
                 ->get();
 
@@ -153,9 +160,8 @@ class MemberManagement extends Component
 
         // 권한 필터
         if ($this->permissionFilter && $this->permissionFilter !== '') {
-            $filterLevel = (int) $this->permissionFilter;
-            $members = array_filter($members, function ($member) use ($filterLevel) {
-                return $member['permission']['level'] === $filterLevel;
+            $members = array_filter($members, function ($member) {
+                return $member['role'] === $this->permissionFilter;
             });
         }
 
@@ -183,8 +189,8 @@ class MemberManagement extends Component
                 return;
             }
 
-            // 현재 사용자가 멤버 관리 권한이 있는지 체크
-            if (!auth()->user()->can('manage members')) {
+            // 현재 사용자가 로그인되어 있고 멤버 관리 권한이 있는지 체크
+            if (!auth()->check() || !auth()->user()->can('manage members')) {
                 $this->dispatch('error', [
                     'message' => '멤버 관리 권한이 없습니다.'
                 ]);
@@ -286,6 +292,13 @@ class MemberManagement extends Component
         // 검색어가 변경될 때 실행
     }
 
+    public function resetFilters()
+    {
+        $this->searchTerm = '';
+        $this->permissionFilter = '';
+        $this->statusFilter = '';
+    }
+
     public function openInviteModal()
     {
         $this->showInviteModal = true;
@@ -337,12 +350,11 @@ class MemberManagement extends Component
             // 동적 권한 서비스를 통한 기본 권한 할당
             app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->inviteRole);
 
-            // 조직 멤버 추가 (호환성 유지를 위해 permission_level도 설정)
-            $legacyPermissionLevel = $this->getLegacyPermissionLevel($this->inviteRole);
+            // 조직 멤버 추가
             OrganizationMember::create([
                 'organization_id' => $this->organizationId,
                 'user_id' => $user->id,
-                'permission_level' => $legacyPermissionLevel,
+                'role_name' => $this->inviteRole,
                 'invitation_status' => 'pending',
                 'invited_at' => now()
             ]);
@@ -370,6 +382,153 @@ class MemberManagement extends Component
                 'message' => '멤버 초대 중 오류가 발생했습니다: ' . $e->getMessage()
             ]);
         }
+    }
+
+    public function editMember($userId)
+    {
+        try {
+            // 멤버 정보 가져오기
+            $member = OrganizationMember::with('user')
+                ->where('organization_id', $this->organizationId)
+                ->where('user_id', $userId)
+                ->firstOrFail();
+
+            // 편집 가능한 멤버인지 확인 (조직 소유자는 편집 불가)
+            if ($member->user->hasRole('organization_owner')) {
+                $this->dispatch('error', [
+                    'message' => '조직 소유자의 정보는 편집할 수 없습니다.'
+                ]);
+                return;
+            }
+
+            // 현재 사용자가 로그인되어 있고 멤버 관리 권한이 있는지 체크
+            if (!auth()->check() || !auth()->user()->can('manage members')) {
+                $this->dispatch('error', [
+                    'message' => '멤버 편집 권한이 없습니다.'
+                ]);
+                return;
+            }
+
+            // 편집 모달 데이터 설정
+            $this->editingMember = $member;
+            $this->editingMemberId = $member->id;
+            
+            // 현재 역할 가져오기
+            $userRoles = $member->user->getRoleNames();
+            $this->editingMemberRole = $userRoles->first() ?? 'user';
+            
+            // 현재 권한 목록 가져오기
+            $this->editingMemberPermissions = $member->user->getAllPermissions()->pluck('name')->toArray();
+            
+            $this->showEditModal = true;
+
+        } catch (\Exception $e) {
+            $this->dispatch('error', [
+                'message' => '멤버 정보를 불러오는 중 오류가 발생했습니다: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function closeEditModal()
+    {
+        $this->showEditModal = false;
+        $this->editingMember = null;
+        $this->editingMemberId = null;
+        $this->editingMemberRole = '';
+        $this->editingMemberPermissions = [];
+    }
+
+    public function updateMember()
+    {
+        $this->validate([
+            'editingMemberRole' => 'required|string|exists:roles,name'
+        ]);
+
+        try {
+            if (!$this->editingMember) {
+                $this->dispatch('error', [
+                    'message' => '편집할 멤버 정보가 없습니다.'
+                ]);
+                return;
+            }
+
+            $member = $this->editingMember;
+            $user = $member->user;
+
+            // 조직 소유자의 권한을 낮추려고 하는 경우 방지
+            if ($user->hasRole('organization_owner') && $this->editingMemberRole !== 'organization_owner') {
+                $this->dispatch('error', [
+                    'message' => '조직 소유자의 권한은 낮출 수 없습니다.'
+                ]);
+                return;
+            }
+
+            // 역할 변경
+            $user->syncRoles([$this->editingMemberRole]);
+
+            // 동적 권한 서비스를 통한 기본 권한 할당
+            app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->editingMemberRole);
+
+            // role_name 업데이트
+            $member->update([
+                'role_name' => $this->editingMemberRole
+            ]);
+
+            $this->loadData(); // 데이터 새로고침
+            $this->closeEditModal();
+
+            $roleInfo = $this->getRoleDisplayInfo($this->editingMemberRole);
+            $this->dispatch('memberUpdated', [
+                'memberId' => $member->id,
+                'newRole' => $roleInfo['label'],
+                'message' => '멤버 정보가 성공적으로 업데이트되었습니다.'
+            ]);
+
+        } catch (\Exception $e) {
+            $this->dispatch('error', [
+                'message' => '멤버 정보 업데이트 중 오류가 발생했습니다: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function togglePermission($permissionName)
+    {
+        try {
+            if (!$this->editingMember) {
+                return;
+            }
+
+            $user = $this->editingMember->user;
+
+            if ($user->hasPermissionTo($permissionName)) {
+                $user->revokePermissionTo($permissionName);
+                $this->editingMemberPermissions = array_diff($this->editingMemberPermissions, [$permissionName]);
+            } else {
+                $user->givePermissionTo($permissionName);
+                $this->editingMemberPermissions[] = $permissionName;
+            }
+
+            $this->editingMemberPermissions = array_values(array_unique($this->editingMemberPermissions));
+
+        } catch (\Exception $e) {
+            $this->dispatch('error', [
+                'message' => '권한 변경 중 오류가 발생했습니다: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getAvailablePermissionsProperty()
+    {
+        // 조직에서 관리 가능한 권한 목록 반환
+        return [
+            'manage members' => '멤버 관리',
+            'manage projects' => '프로젝트 관리',
+            'manage services' => '서비스 관리', 
+            'view reports' => '보고서 조회',
+            'manage settings' => '설정 관리',
+            'access api' => 'API 접근',
+            'manage billing' => '결제 관리'
+        ];
     }
 
     public function getAvailableRolesProperty()
@@ -434,26 +593,13 @@ class MemberManagement extends Component
         };
     }
 
-    /**
-     * 호환성을 위한 레거시 권한 레벨 반환
-     */
-    private function getLegacyPermissionLevel($roleName)
-    {
-        return match($roleName) {
-            'user' => 100,
-            'service_manager' => 200,
-            'organization_admin' => 300,
-            'organization_owner' => 400,
-            'platform_admin' => 500,
-            default => 0
-        };
-    }
 
     public function render()
     {
         return view('livewire.organization.admin.300-member-management', [
             'filteredMembers' => $this->getFilteredMembersProperty(),
-            'availableRoles' => $this->getAvailableRolesProperty()
+            'availableRoles' => $this->getAvailableRolesProperty(),
+            'availablePermissions' => $this->getAvailablePermissionsProperty()
         ]);
     }
 }

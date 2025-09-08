@@ -1,5 +1,5 @@
 @php
-    $sidebarData = include resource_path('views/300-page-service/300-common/600-data-sidebar.blade.php');
+    $sidebarData = include resource_path('views/300-page-service/301-page-dashboard/600-data-sidebar.blade.php');
     $navItems = $sidebarData['navigation_items'];
     
     // Closure를 실제 URL 문자열로 변환

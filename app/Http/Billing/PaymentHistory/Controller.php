@@ -15,7 +15,7 @@ class Controller extends BaseController
         $organizations = Organization::select(['organizations.id', 'organizations.name'])
             ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
             ->where('organization_members.user_id', auth()->id())
-            ->where('organization_members.permission_level', '>=', 300)
+            ->whereIn('organization_members.role_name', ['organization_admin', 'organization_owner', 'platform_admin'])
             ->orderBy('organizations.created_at', 'desc')
             ->get();
 

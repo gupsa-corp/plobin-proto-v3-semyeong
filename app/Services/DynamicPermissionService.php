@@ -76,15 +76,65 @@ class DynamicPermissionService
     }
 
     /**
-     * 기존 PermissionService::canPerformAction과 호환되는 래퍼 메소드
+     * role_name을 이용한 기본 권한 할당 (역할 기반 시스템)
      */
-    public function canPerformLegacyAction($userPermission, string $category, string $action): bool
+    public function assignBasicPermissions($user, string $roleName)
     {
-        // 임시 사용자 객체 생성 (기존 코드와의 호환성)
-        $user = new \App\Models\User();
-        $user->permission_level = $userPermission->value ?? $userPermission;
-
-        return $this->canPerformAction($user, $category, $action);
+        // 역할 할당
+        $user->assignRole($roleName);
+        
+        // 역할에 따른 기본 권한 할당
+        $defaultPermissions = $this->getDefaultPermissionsForRole($roleName);
+        
+        foreach ($defaultPermissions as $permission) {
+            $user->givePermissionTo($permission);
+        }
+        
+        return $user->getRoleNames()->toArray();
+    }
+    
+    /**
+     * 역할별 기본 권한 반환
+     */
+    private function getDefaultPermissionsForRole(string $roleName): array
+    {
+        return match($roleName) {
+            'user' => [
+                'view dashboard',
+                'view projects'
+            ],
+            'service_manager' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members'
+            ],
+            'organization_admin' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members',
+                'manage members',
+                'manage settings'
+            ],
+            'organization_owner' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members',
+                'manage members',
+                'manage settings',
+                'manage billing',
+                'manage organization'
+            ],
+            'platform_admin' => [
+                'view dashboard',
+                'manage platform',
+                'manage all organizations',
+                'manage all users'
+            ],
+            default => []
+        };
     }
 
     /**
@@ -118,8 +168,15 @@ class DynamicPermissionService
             ->where('organization_id', request()->route('organization'))
             ->first();
 
-        if ($organizationMember) {
-            return $organizationMember->permission_level;
+        if ($organizationMember && $organizationMember->role_name) {
+            return match($organizationMember->role_name) {
+                'user' => 100,
+                'service_manager' => 200,
+                'organization_admin' => 300,
+                'organization_owner' => 400,
+                'platform_admin' => 500,
+                default => 0
+            };
         }
 
         // 역할 기반 레벨 계산 (대략적)

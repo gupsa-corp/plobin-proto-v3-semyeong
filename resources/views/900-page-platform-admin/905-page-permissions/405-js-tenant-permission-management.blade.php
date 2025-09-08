@@ -123,7 +123,7 @@ function removeTenantPermission(index) {
 function saveTenantPermissions() {
     const permissions = currentUserTenantPermissions.map(p => ({
         organization_id: p.orgId,
-        permission_level: p.permissionLevel,
+        role_name: p.roleName || p.permissionLevel, // role_name 사용
         is_new: p.isNew || false
     }));
     

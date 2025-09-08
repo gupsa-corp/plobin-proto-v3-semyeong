@@ -73,7 +73,7 @@ foreach ($routes as $path => $config) {
                                   });
                         })
                         ->orderBy('project_pages.updated_at', 'desc')
-                        ->limit(8)
+                        ->limit(4)
                         ->get();
 
                     return view($viewName, compact('organizations', 'projects', 'pages'));
