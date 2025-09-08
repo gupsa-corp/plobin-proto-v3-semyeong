@@ -2,8 +2,8 @@
 <div style="margin-left: {{ $level * 16 }}px;" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
     <div @if($editingPageId != $page['id']) @click="if(!$event.target.closest('.page-dropdown-{{ $page['id'] }}')) { window.location.href='{{ route('project.dashboard.page', ['id' => $orgId, 'projectId' => $projectId, 'pageId' => $page['id']]) }}' }" @endif
        style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}; border-radius: 6px; cursor: {{ $editingPageId == $page['id'] ? 'default' : 'pointer' }}; text-decoration: none; {{ $currentPage && $currentPage['id'] == $page['id'] ? 'border-left: 2px solid #10B981;' : '' }}"
-         onmouseover="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='#F9FAFB'; const dropdown = document.querySelector('.page-dropdown-{{ $page['id'] }}'); if(dropdown) dropdown.style.display='flex'; }"
-         onmouseout="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; const dropdown = document.querySelector('.page-dropdown-{{ $page['id'] }}'); if(dropdown) dropdown.style.display='none'; }">
+         onmouseover="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='#F9FAFB'; }"
+         onmouseout="if({{ $editingPageId == $page['id'] ? 'false' : 'true' }}) { this.style.background='{{ $currentPage && $currentPage['id'] == $page['id'] ? '#F0FDF4' : 'white' }}'; }">
         <div style="display: flex; align-items: center; gap: 8px;">
             @if($level > 0)
                 <div style="width: 16px; height: 1px; background: #E5E7EB; margin-right: -8px;"></div>
@@ -49,7 +49,7 @@
         </div>
         <div style="display: flex; gap: 4px; align-items: center;">
             {{-- 드롭다운 메뉴 버튼 --}}
-            <div class="page-dropdown-{{ $page['id'] }}" style="display: none; position: relative;">
+            <div class="page-dropdown-{{ $page['id'] }}" style="display: flex; position: relative;">
                 <button @click.stop="dropdownOpen = !dropdownOpen"
                         style="width: 20px; height: 20px; border: none; border-radius: 3px; background: #F3F4F6; color: #6B7280; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
                         onmouseover="this.style.background='#E5E7EB'"
