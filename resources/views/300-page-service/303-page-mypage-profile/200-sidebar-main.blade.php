@@ -1,6 +1,13 @@
 @php
     $sidebarData = include resource_path('views/300-page-service/303-page-mypage-profile/600-sidebar-data.blade.php');
     $navItems = $sidebarData['navigation_items'];
+
+    // Closure를 실제 URL 문자열로 변환
+    foreach ($navItems as &$item) {
+        if (is_callable($item['url'])) {
+            $item['url'] = $item['url']();
+        }
+    }
 @endphp
 
 {{-- 대시보드 사이드바 --}}

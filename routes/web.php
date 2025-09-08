@@ -30,7 +30,7 @@ foreach ($routes as $path => $config) {
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-                    ->where('organization_members.user_id', auth()->id())
+                    ->where('organization_members.user_id', 1)
                     ->where('organization_members.invitation_status', 'accepted')
                     ->orderBy('organizations.created_at', 'desc')
                     ->get();
@@ -40,15 +40,15 @@ foreach ($routes as $path => $config) {
                     // 1. 내가 소유한 프로젝트들
                     $ownedProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
-                        ->where('projects.user_id', auth()->id());
+                        ->where('projects.user_id', 1);
 
                     // 2. 조직 멤버십을 통해 접근 가능한 프로젝트들 (내가 소유한 프로젝트 제외)
                     $memberProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
                         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-                        ->where('organization_members.user_id', auth()->id())
+                        ->where('organization_members.user_id', 1)
                         ->where('organization_members.invitation_status', 'accepted')
-                        ->where('projects.user_id', '!=', auth()->id());
+                        ->where('projects.user_id', '!=', 1);
 
                     // 3. 두 결과를 합치기
                     $projects = $ownedProjects->union($memberProjects)
@@ -57,18 +57,18 @@ foreach ($routes as $path => $config) {
                         ->get();
 
                     // 4. 최근 페이지들 조회 (내가 접근 가능한 프로젝트의 페이지들)
-                    $pages = \App\Models\ProjectPage::select(['project_pages.id', 'project_pages.title', 'project_pages.description', 'project_pages.updated_at', 'projects.name as project_name', 'projects.id as project_id', 'organizations.name as organization_name', 'organizations.id as organization_id'])
+                    $pages = \App\Models\ProjectPage::select(['project_pages.id', 'project_pages.title', 'project_pages.content', 'project_pages.updated_at', 'projects.name as project_name', 'projects.id as project_id', 'organizations.name as organization_name', 'organizations.id as organization_id'])
                         ->join('projects', 'project_pages.project_id', '=', 'projects.id')
                         ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
                         ->where(function($query) {
                             // 내가 소유한 프로젝트의 페이지들
-                            $query->where('projects.user_id', auth()->id())
+                            $query->where('projects.user_id', 1)
                                   // 또는 내가 멤버인 조직의 프로젝트 페이지들
                                   ->orWhereExists(function($subQuery) {
                                       $subQuery->select(\DB::raw(1))
                                                ->from('organization_members')
                                                ->whereColumn('organization_members.organization_id', 'organizations.id')
-                                               ->where('organization_members.user_id', auth()->id())
+                                               ->where('organization_members.user_id', 1)
                                                ->where('organization_members.invitation_status', 'accepted');
                                   });
                         })
@@ -211,7 +211,7 @@ Route::get('/organizations/{id}/admin', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -223,7 +223,7 @@ Route::get('/organizations/{id}/admin/members', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -241,7 +241,7 @@ Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -254,7 +254,7 @@ Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -267,7 +267,7 @@ Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -280,7 +280,7 @@ Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300)
         ->orderBy('organizations.created_at', 'desc')
         ->get();
@@ -323,7 +323,7 @@ Route::get('/organizations/{id}/admin/projects', function ($id) {
     // 사용자가 권한 300 이상인 조직만 가져오기
     $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
         ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', auth()->id())
+        ->where('organization_members.user_id', 1)
         ->where('organization_members.permission_level', '>=', 300) // ORGANIZATION_ADMIN 이상
         ->orderBy('organizations.created_at', 'desc')
         ->get();
