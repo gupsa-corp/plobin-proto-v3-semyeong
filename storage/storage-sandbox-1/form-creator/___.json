@@ -1,0 +1,25 @@
+{
+    "name": "ㅁㄴㅇ",
+    "description": "",
+    "components": [
+        {
+            "id": "comp_1",
+            "type": "dropdown",
+            "properties": []
+        },
+        {
+            "id": "comp_2",
+            "type": "patternformat",
+            "properties": []
+        },
+        {
+            "id": "comp_3",
+            "type": "tagpicker",
+            "properties": []
+        }
+    ],
+    "settings": [],
+    "saved_at": "2025-09-08T13:09:37.825086Z",
+    "created_at": "2025-09-08T13:09:37.825179Z",
+    "modified_at": "2025-09-08T13:09:37.825205Z"
+}

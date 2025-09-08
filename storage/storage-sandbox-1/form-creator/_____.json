@@ -1,0 +1,19 @@
+{
+    "name": "ㅁㄴㅇㅁㄴ",
+    "description": "",
+    "components": [
+        {
+            "id": "comp_1",
+            "type": "input",
+            "properties": {
+                "label": "Text Input",
+                "placeholder": "Enter text...",
+                "name": ""
+            }
+        }
+    ],
+    "settings": [],
+    "saved_at": "2025-09-08T13:05:52.727224Z",
+    "created_at": "2025-09-08T13:05:52.727338Z",
+    "modified_at": "2025-09-08T13:05:52.727364Z"
+}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Sandbox\FormCreator\Save;
 
+use App\Models\SandboxForm;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
@@ -18,13 +19,6 @@ class Controller extends BaseController
         ]);
 
         try {
-            $directory = storage_path('storage-sandbox-1/form-creator');
-            if (!is_dir($directory)) {
-                mkdir($directory, 0755, true);
-            }
-            
-            $filePath = $directory . '/' . $request->filename;
-            
             // Parse JSON data to validate it
             $formData = json_decode($request->data, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -36,7 +30,27 @@ class Controller extends BaseController
             $formData['created_at'] = $formData['created_at'] ?? now()->toISOString();
             $formData['modified_at'] = now()->toISOString();
 
+            // Save to file system (existing behavior)
+            $directory = storage_path('storage-sandbox-1/form-creator');
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            
+            $filePath = $directory . '/' . $request->filename;
             file_put_contents($filePath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+            // Save to database for Form Publisher
+            SandboxForm::updateOrCreate(
+                ['title' => $request->name],
+                [
+                    'title' => $request->name,
+                    'description' => $request->description,
+                    'form_fields' => $formData['components'] ?? [],
+                    'form_settings' => $formData['settings'] ?? [],
+                    'sandbox_id' => 'storage-sandbox-1',
+                    'is_active' => true,
+                ]
+            );
 
             return response()->json([
                 'success' => true,

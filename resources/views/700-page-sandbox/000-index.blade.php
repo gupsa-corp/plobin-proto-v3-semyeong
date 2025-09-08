@@ -31,6 +31,11 @@
                     <p class="text-gray-600">코드 파일 편집</p>
                 </a>
                 
+                <a href="/sandbox/function-browser" class="block bg-white border border-orange-200 rounded-lg p-6 hover:bg-orange-50 transition-colors bg-orange-50">
+                    <h3 class="text-lg font-semibold text-orange-900 mb-2">함수 브라우저</h3>
+                    <p class="text-orange-700">마이크로서비스 함수 관리 및 테스트</p>
+                </a>
+                
                 <a href="/sandbox/database-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">데이터베이스 매니저</h3>
                     <p class="text-gray-600">데이터베이스 관리</p>

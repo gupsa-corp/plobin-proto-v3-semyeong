@@ -443,6 +443,11 @@ Route::get('/sandbox/form-creator', function () {
     return view('700-page-sandbox.709-page-form-creator.000-index');
 })->name('sandbox.form-creator');
 
+// Function Browser
+Route::get('/sandbox/function-browser', function () {
+    return view('700-page-sandbox.708-page-function-browser.000-index');
+})->name('sandbox.function-browser');
+
 // Form Publisher - 샌드박스 폼 생성 및 관리 도구 (Livewire + Filament)
 Route::prefix('sandbox/form-publisher')->group(function () {
     Route::get('/', function () {

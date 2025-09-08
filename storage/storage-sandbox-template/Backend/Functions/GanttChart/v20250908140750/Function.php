@@ -1,6 +1,6 @@
 <?php
 namespace App\Functions\GanttChart;
-##
+
 require_once 'ProjectsApiHandler.php';
 require_once 'TasksApiHandler.php';
 require_once 'GanttDataApiHandler.php';
