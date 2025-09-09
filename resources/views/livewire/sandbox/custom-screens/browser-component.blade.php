@@ -9,6 +9,10 @@
         </div>
         
         <div class="flex space-x-3">
+            <button wire:click="syncAllTemplates"
+                    class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center">
+                🔄 템플릿 일괄 동기화
+            </button>
             <a href="{{ route('sandbox.custom-screen-creator') }}" 
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                 ✨ 새 화면 만들기
@@ -88,7 +92,7 @@
                                 @if($screen['is_template'])
                                     <button wire:click.stop="copyTemplateToCustomScreen({{ "'" . $screen['id'] . "'" }})"
                                             class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50">
-                                        📋 배포하기
+                                        🔄 동기화
                                     </button>
                                 @else
                                     <button wire:click.stop="editScreen({{ $screen['id'] }})"

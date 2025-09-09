@@ -63,15 +63,23 @@ class Component extends LivewireComponent
                 })
                 ->toArray();
 
-            // template 스토리지의 frontend 폴더에서 템플릿 화면들 가져오기
-            $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+            // template 스토리지의 frontend 폴더에서 템플릿 화면들 가져오기 (아직 동기화되지 않은 것만)
+            $templatePath = storage_path('sandbox-template/storage-sandbox-template/frontend');
             if (File::exists($templatePath)) {
                 $templateScreens = [];
                 $folders = File::directories($templatePath);
                 
+                // 이미 동기화된 화면들의 folder_name 목록
+                $syncedFolderNames = collect($screens)->pluck('folder_name')->toArray();
+                
                 foreach ($folders as $folder) {
                     $folderName = basename($folder);
                     $contentFile = $folder . '/000-content.blade.php';
+                    
+                    // 이미 동기화된 템플릿이면 건너뛰기
+                    if (in_array($folderName, $syncedFolderNames)) {
+                        continue;
+                    }
                     
                     if (File::exists($contentFile)) {
                         // 폴더명에서 화면 정보 추출
@@ -126,12 +134,12 @@ class Component extends LivewireComponent
                 return;
             }
 
-            // 새로운 폴더명 생성 (템플릿을 복사하여 커스텀 화면으로)
-            $newFolderName = $template['folder_name'] . '-deployed-' . time();
-            $newFileName = 'custom-screens/' . $newFolderName . '/000-content.blade.php';
+            // frontend/ 경로에 직접 저장 (동일한 폴더명 사용)
+            $folderName = $template['folder_name'];
+            $fileName = 'frontend/' . $folderName . '/000-content.blade.php';
             
-            // 현재 스토리지의 custom-screens 경로에 저장
-            $targetPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/" . $newFileName);
+            // 현재 스토리지의 frontend 경로에 저장
+            $targetPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/" . $fileName);
             
             // 새 폴더 생성
             $targetDir = dirname($targetPath);
@@ -147,20 +155,103 @@ class Component extends LivewireComponent
                 return;
             }
 
-            // DB에 메타데이터 추가
-            SandboxCustomScreen::create([
-                'title' => $template['title'] . ' (배포됨)',
-                'description' => $template['description'] . ' - 템플릿에서 배포된 화면',
-                'type' => $template['type'],
-                'folder_name' => $newFolderName,
-                'file_path' => $newFileName,
-                'sandbox_type' => $this->currentStorage,
-            ]);
+            // 기존에 같은 제목의 화면이 있는지 확인하고 업데이트 또는 생성
+            $existingScreen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)
+                ->where('folder_name', $folderName)
+                ->first();
+
+            if ($existingScreen) {
+                // 기존 화면 업데이트
+                $existingScreen->update([
+                    'title' => $template['title'],
+                    'description' => $template['description'],
+                    'type' => $template['type'],
+                    'updated_at' => now(),
+                ]);
+                session()->flash('message', "'{$template['title']}' 화면이 업데이트되었습니다.");
+            } else {
+                // 새 화면 생성
+                SandboxCustomScreen::create([
+                    'title' => $template['title'],
+                    'description' => $template['description'],
+                    'type' => $template['type'],
+                    'folder_name' => $folderName,
+                    'file_path' => $fileName,
+                    'sandbox_type' => $this->currentStorage,
+                ]);
+                session()->flash('message', "'{$template['title']}' 화면이 동기화되었습니다.");
+            }
 
             $this->loadScreens();
-            session()->flash('message', '템플릿이 커스텀 화면으로 배포되었습니다.');
         } catch (\Exception $e) {
-            session()->flash('error', '템플릿 배포 중 오류가 발생했습니다: ' . $e->getMessage());
+            session()->flash('error', '템플릿 동기화 중 오류가 발생했습니다: ' . $e->getMessage());
+        }
+    }
+
+    public function syncAllTemplates()
+    {
+        try {
+            $templateScreens = collect($this->screens)->where('is_template', true);
+            $syncedCount = 0;
+            $updatedCount = 0;
+            
+            foreach ($templateScreens as $template) {
+                // frontend/ 경로에 직접 저장
+                $folderName = $template['folder_name'];
+                $fileName = 'frontend/' . $folderName . '/000-content.blade.php';
+                $targetPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/" . $fileName);
+                
+                // 폴더 생성
+                $targetDir = dirname($targetPath);
+                if (!File::exists($targetDir)) {
+                    File::makeDirectory($targetDir, 0755, true);
+                }
+                
+                // 파일 복사
+                if (File::exists($template['full_path'])) {
+                    File::copy($template['full_path'], $targetPath);
+                    
+                    // DB 업데이트 또는 생성
+                    $existingScreen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)
+                        ->where('folder_name', $folderName)
+                        ->first();
+
+                    if ($existingScreen) {
+                        $existingScreen->update([
+                            'title' => $template['title'],
+                            'description' => $template['description'],
+                            'type' => $template['type'],
+                            'updated_at' => now(),
+                        ]);
+                        $updatedCount++;
+                    } else {
+                        SandboxCustomScreen::create([
+                            'title' => $template['title'],
+                            'description' => $template['description'],
+                            'type' => $template['type'],
+                            'folder_name' => $folderName,
+                            'file_path' => $fileName,
+                            'sandbox_type' => $this->currentStorage,
+                        ]);
+                        $syncedCount++;
+                    }
+                }
+            }
+
+            $this->loadScreens();
+            
+            $message = [];
+            if ($syncedCount > 0) $message[] = "{$syncedCount}개 화면 새로 동기화";
+            if ($updatedCount > 0) $message[] = "{$updatedCount}개 화면 업데이트";
+            
+            if (!empty($message)) {
+                session()->flash('message', '템플릿 일괄 동기화 완료: ' . implode(', ', $message));
+            } else {
+                session()->flash('message', '모든 템플릿이 이미 최신 상태입니다.');
+            }
+            
+        } catch (\Exception $e) {
+            session()->flash('error', '일괄 동기화 중 오류가 발생했습니다: ' . $e->getMessage());
         }
     }
 

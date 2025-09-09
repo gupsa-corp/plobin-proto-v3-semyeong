@@ -191,19 +191,55 @@ window.currentSandboxType = @json($currentSandboxType ?? '');
                                 </div>
                             </template>
                             
-                            <!-- 샌드박스로 이동해서 새 화면 만들기 -->
-                            <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
-                                <div class="flex-1">
-                                    <div class="font-medium text-gray-700">새 커스텀 화면 만들기</div>
-                                    <div class="text-sm text-gray-500">샌드박스에서 새로운 커스텀 화면을 생성할 수 있습니다.</div>
+                            <!-- 샌드박스로 이동해서 새 화면 만들기 및 템플릿 선택 -->
+                            <div class="space-y-3">
+                                <!-- 새 화면 만들기 -->
+                                <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-700">새 커스텀 화면 만들기</div>
+                                        <div class="text-sm text-gray-500">샌드박스에서 새로운 커스텀 화면을 생성할 수 있습니다.</div>
+                                    </div>
+                                    <a href="/sandbox/custom-screen-creator" target="_blank"
+                                       class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        생성하기
+                                    </a>
                                 </div>
-                                <a href="/sandbox/custom-screen-creator" target="_blank"
-                                   class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    생성하기
-                                </a>
+                                
+                                <!-- 템플릿에서 선택하기 -->
+                                <div class="flex items-center p-4 border border-dashed border-purple-300 rounded-lg bg-purple-25">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-purple-700 flex items-center">
+                                            🎨 템플릿에서 화면 가져오기
+                                        </div>
+                                        <div class="text-sm text-purple-600">미리 만들어진 템플릿 화면을 선택하여 빠르게 설정할 수 있습니다.</div>
+                                    </div>
+                                    <a href="/sandbox/custom-screens" target="_blank"
+                                       class="ml-3 inline-flex items-center px-3 py-2 border border-purple-300 shadow-sm text-sm leading-4 font-medium rounded-md text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                        </svg>
+                                        템플릿 선택
+                                    </a>
+                                </div>
+                                
+                                <!-- 새로고침 버튼 -->
+                                <div class="flex items-center p-3 border border-blue-200 rounded-lg bg-blue-25">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-blue-700 text-sm">화면을 새로 만들거나 배포했나요?</div>
+                                        <div class="text-xs text-blue-600">새로고침하여 최신 화면 목록을 확인하세요.</div>
+                                    </div>
+                                    <button type="button" 
+                                            @click="location.reload()"
+                                            class="ml-3 inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        새로고침
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
