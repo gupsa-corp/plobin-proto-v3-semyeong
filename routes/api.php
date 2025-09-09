@@ -40,6 +40,8 @@ use App\Http\CoreApi\User\SearchUsers\Controller as SearchUsersController;
 use App\Http\CoreApi\Sandbox\FileList\Controller as SandboxFileListController;
 use App\Http\CoreApi\Sandbox\ListSandboxes\Controller as ListSandboxesController;
 use App\Http\CoreApi\Sandbox\ListScreens\Controller as ListScreensController;
+use App\Http\CoreApi\Sandbox\ProjectSandboxController;
+use App\Http\CoreApi\Sandbox\SandboxTemplateController;
 use App\Http\CoreApi\PlatformAdmin\Pricing\Controller as PlatformAdminPricingController;
 use Illuminate\Support\Facades\Route;
 
@@ -142,6 +144,14 @@ Route::prefix('projects')->group(function () {
     Route::get('/{project}/pages/{page}', ProjectPageShowController::class);
     Route::put('/{project}/pages/{page}', ProjectPageUpdateController::class);
     Route::delete('/{project}/pages/{page}', ProjectPageDestroyController::class);
+    
+    // 프로젝트 샌드박스 관리 API
+    Route::get('/{project}/sandboxes', [ProjectSandboxController::class, 'index']);
+    Route::post('/{project}/sandboxes', [ProjectSandboxController::class, 'store']);
+    Route::get('/{project}/sandboxes/{sandbox}', [ProjectSandboxController::class, 'show']);
+    Route::put('/{project}/sandboxes/{sandbox}', [ProjectSandboxController::class, 'update']);
+    Route::delete('/{project}/sandboxes/{sandbox}', [ProjectSandboxController::class, 'destroy']);
+    Route::post('/{project}/sandboxes/{sandbox}/copy', [ProjectSandboxController::class, 'copy']);
 });
 
 
@@ -183,6 +193,14 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/list', [ListSandboxesController::class, 'listSandboxes']);
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     Route::get('/screens', [ListScreensController::class, 'listScreens']);
+    
+    // 샌드박스 템플릿 관리 API
+    Route::get('/templates', [SandboxTemplateController::class, 'index']);
+    Route::post('/templates', [SandboxTemplateController::class, 'store']);
+    Route::get('/templates/{template}', [SandboxTemplateController::class, 'show']);
+    Route::put('/templates/{template}', [SandboxTemplateController::class, 'update']);
+    Route::delete('/templates/{template}', [SandboxTemplateController::class, 'destroy']);
+    Route::get('/templates/usage/stats', [SandboxTemplateController::class, 'usage']);
     
     // AI Server Callback API
     Route::prefix('storage-sandbox-1/callbacks')->group(function () {
@@ -229,20 +247,20 @@ Route::get('/core/permissions', [\App\Http\CoreApi\Core\Permissions\Controller::
 // E2E 테스트 API (개발용 - 인증 없음)
 Route::prefix('test/e2e')->group(function () {
     // 시스템 상태 조회
-    Route::get('/status', [\App\Http\Controllers\API\TestController::class, 'status']);
+    Route::get('/status', [\App\Http\CoreApi\API\TestController::class, 'status']);
     
     // 함수 실행 테스트
-    Route::post('/execute-function', [\App\Http\Controllers\API\TestController::class, 'executeFunction']);
+    Route::post('/execute-function', [\App\Http\CoreApi\API\TestController::class, 'executeFunction']);
     
     // 파일 조회/쿼리 테스트
-    Route::get('/query-files', [\App\Http\Controllers\API\TestController::class, 'queryFiles']);
+    Route::get('/query-files', [\App\Http\CoreApi\API\TestController::class, 'queryFiles']);
     
     // 파일 수정 테스트
-    Route::post('/modify-files', [\App\Http\Controllers\API\TestController::class, 'modifyFiles']);
+    Route::post('/modify-files', [\App\Http\CoreApi\API\TestController::class, 'modifyFiles']);
     
     // 함수 정보 조회
-    Route::get('/function-info/{functionName}', [\App\Http\Controllers\API\TestController::class, 'getFunctionInfo']);
+    Route::get('/function-info/{functionName}', [\App\Http\CoreApi\API\TestController::class, 'getFunctionInfo']);
     
     // 테스트 함수 생성
-    Route::post('/create-test-function', [\App\Http\Controllers\API\TestController::class, 'createTestFunction']);
+    Route::post('/create-test-function', [\App\Http\CoreApi\API\TestController::class, 'createTestFunction']);
 });

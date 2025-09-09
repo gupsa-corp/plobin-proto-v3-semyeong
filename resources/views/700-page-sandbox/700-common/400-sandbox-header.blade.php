@@ -16,15 +16,15 @@
                         @php
                             $currentStorage = session('sandbox_storage', '1');
                             $storageOptions = [];
-                            $storagePath = storage_path();
+                            $sandboxPath = storage_path('sandbox');
 
-                            if (file_exists($storagePath)) {
-                                $directories = glob($storagePath . '/storage-sandbox-*', GLOB_ONLYDIR);
+                            if (file_exists($sandboxPath)) {
+                                $directories = glob($sandboxPath . '/*', GLOB_ONLYDIR);
                                 foreach ($directories as $directory) {
                                     $basename = basename($directory);
-                                    if (strpos($basename, 'storage-sandbox-') === 0) {
-                                        $name = substr($basename, strlen('storage-sandbox-'));
-                                        $storageOptions[] = $name;
+                                    // sandbox-template 폴더는 제외
+                                    if ($basename !== 'sandbox-template') {
+                                        $storageOptions[] = $basename;
                                     }
                                 }
                                 sort($storageOptions);
@@ -33,10 +33,10 @@
 
                         @forelse($storageOptions as $storage)
                             <option value="{{ $storage }}" {{ $storage == $currentStorage ? 'selected' : '' }}>
-                                storage-sandbox-{{ $storage }}
+                                {{ $storage }}
                             </option>
                         @empty
-                            <option value="1">storage-sandbox-1 (기본)</option>
+                            <option value="1">1 (기본)</option>
                         @endforelse
                     </select>
                 </div>
