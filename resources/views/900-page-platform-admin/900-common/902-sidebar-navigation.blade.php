@@ -57,6 +57,15 @@
                     권한 관리
                 </a>
             </li>
+            <li>
+                <a href="{{ route('platform.admin.sandboxes') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.sandboxes*') ? 'bg-blue-50 text-blue-700' : '' }}">
+                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2 2v6h10V7H5zm2-2h6v2H7V5z" clip-rule="evenodd"/>
+                    </svg>
+                    샌드박스 관리
+                </a>
+            </li>
         </ul>
     </div>
 

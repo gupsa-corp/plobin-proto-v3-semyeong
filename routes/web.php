@@ -709,6 +709,11 @@ Route::get('/platform/admin/pricing', function () {
     return view('900-page-platform-admin.906-page-pricing.000-index');
 })->name('platform.admin.pricing');
 
+// 플랫폼 관리자 - 샌드박스 관리
+Route::get('/platform/admin/sandboxes', function () {
+    return view('900-page-platform-admin.907-page-sandboxes.000-index');
+})->name('platform.admin.sandboxes');
+
 // 플랫폼 관리자 - 권한 관리 (기본적으로 역할 관리 탭으로 리다이렉트)
 Route::get('/platform/admin/permissions', function () {
     return redirect()->route('platform.admin.permissions.roles');
