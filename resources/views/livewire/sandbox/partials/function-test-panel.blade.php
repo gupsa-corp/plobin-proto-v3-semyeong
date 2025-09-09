@@ -1,29 +1,6 @@
 {{-- 함수 테스트 탭 시스템 --}}
 <div
-    x-data="{
-        activeTestTab: 'params',
-        jsonValid: true,
-        validateJson(value) {
-            try {
-                JSON.parse(value || '{}');
-                this.jsonValid = true;
-            } catch (e) {
-                this.jsonValid = false;
-            }
-        },
-        testParams: '{}',
-        parameterExamples: {
-            'filter': '{"data": [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}], "operation": "filter", "criteria": {"age": {">=": 25}}}',
-            'transform': '{"data": [{"name": "John Doe", "email": "john@example.com"}], "operation": "transform", "mapping": {"full_name": "name", "contact_email": "email"}}',
-            'aggregate': '{"data": [{"category": "A", "value": 100}, {"category": "A", "value": 150}, {"category": "B", "value": 200}], "operation": "aggregate", "group_by": "category", "functions": ["sum", "avg"]}',
-            'validate': '{"data": [{"email": "test@example.com", "age": "25"}], "operation": "validate", "rules": {"email": "email", "age": "integer"}}',
-            'process': '{"data": [{"id": 1, "status": "pending"}], "operation": "process"}'
-        }
-    }"
-    x-init="
-        testParams = $el.querySelector('[x-model=\"testParams\"]')?.value || '{}';
-        $watch('testParams', value => validateJson(value));
-    "
+    x-data="functionTestPanel()"
     class="border-b border-gray-200"
 >
     {{-- 탭 헤더 --}}
@@ -280,6 +257,40 @@
 </div>
 
 <script>
+// Function test panel data function
+function functionTestPanel() {
+    return {
+        activeTestTab: 'params',
+        jsonValid: true,
+        testParams: '{}',
+        parameterExamples: {
+            filter: '{"data": [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}], "operation": "filter", "criteria": {"age": {">=": 25}}}',
+            transform: '{"data": [{"name": "John Doe", "email": "john@example.com"}], "operation": "transform", "mapping": {"full_name": "name", "contact_email": "email"}}',
+            aggregate: '{"data": [{"category": "A", "value": 100}, {"category": "A", "value": 150}, {"category": "B", "value": 200}], "operation": "aggregate", "group_by": "category", "functions": ["sum", "avg"]}',
+            validate: '{"data": [{"email": "test@example.com", "age": "25"}], "operation": "validate", "rules": {"email": "email", "age": "integer"}}',
+            process: '{"data": [{"id": 1, "status": "pending"}], "operation": "process"}'
+        },
+        
+        validateJson(value) {
+            if (!value) {
+                this.jsonValid = true;
+                return;
+            }
+            try {
+                JSON.parse(value);
+                this.jsonValid = true;
+            } catch (e) {
+                this.jsonValid = false;
+            }
+        },
+        
+        init() {
+            this.validateJson(this.testParams);
+            this.$watch('testParams', (value) => this.validateJson(value));
+        }
+    };
+}
+
 // Helper functions for parameter re-execution
 function rerunWithParams(button) {
     try {
