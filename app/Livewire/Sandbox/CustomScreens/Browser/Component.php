@@ -103,6 +103,12 @@ class Component extends LivewireComponent
     {
         $this->selectedScreenId = $id;
         $this->selectScreenById($id);
+        
+        // JavaScript를 통해 URL 업데이트
+        $this->dispatch('update-url', [
+            'screen' => $id,
+            'previewMode' => $this->previewMode ? '1' : '0'
+        ]);
     }
     
     protected function selectScreenById($id)
@@ -117,6 +123,14 @@ class Component extends LivewireComponent
     public function togglePreview()
     {
         $this->previewMode = !$this->previewMode;
+        
+        // URL 업데이트
+        if ($this->selectedScreenId) {
+            $this->dispatch('update-url', [
+                'screen' => $this->selectedScreenId,
+                'previewMode' => $this->previewMode ? '1' : '0'
+            ]);
+        }
     }
 
     public function getPreviewUrl($screenId)
@@ -254,31 +268,4 @@ class Component extends LivewireComponent
         $this->screens = array_values($allScreens);
     }
 
-    public function hasLiveScreen($title)
-    {
-        $liveScreens = [
-            'dashboard' => 'sandbox.live-dashboard',
-            'project list' => 'sandbox.live-project-list',
-            'table view' => 'sandbox.live-table-view',
-            'kanban board' => 'sandbox.live-kanban-board',
-            'gantt chart' => 'sandbox.live-gantt-chart',
-            'calendar view' => 'sandbox.live-calendar-view',
-        ];
-
-        return array_key_exists(strtolower($title), $liveScreens);
-    }
-
-    public function getLiveScreenUrl($title)
-    {
-        $liveScreens = [
-            'dashboard' => route('sandbox.live-dashboard'),
-            'project list' => route('sandbox.live-project-list'),
-            'table view' => route('sandbox.live-table-view'),
-            'kanban board' => route('sandbox.live-kanban-board'),
-            'gantt chart' => route('sandbox.live-gantt-chart'),
-            'calendar view' => route('sandbox.live-calendar-view'),
-        ];
-
-        return $liveScreens[strtolower($title)] ?? '#';
-    }
 }

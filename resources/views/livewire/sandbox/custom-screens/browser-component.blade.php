@@ -53,7 +53,7 @@
             <!-- 화면 목록 -->
             <div class="space-y-3 max-h-96 overflow-y-auto">
                 @forelse($screens as $screen)
-                    <div wire:click="selectScreen({{ is_string($screen['id']) ? "'" . $screen['id'] . "'" : $screen['id'] }})"
+                    <div wire:click="selectScreen('{{ $screen['id'] }}')"
                          class="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow
                                 {{ $selectedScreen && $selectedScreen['id'] == $screen['id'] ? 'border-blue-500 bg-blue-50' : '' }}">
                         <div class="flex justify-between items-start">
@@ -82,21 +82,15 @@
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-1 ml-4">
-                                @if($this->hasLiveScreen($screen['title']))
-                                    <a href="{{ $this->getLiveScreenUrl($screen['title']) }}" 
-                                       class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 text-center">
-                                        🚀 라이브 보기
-                                    </a>
-                                @endif
-                                <button wire:click.stop="editScreen({{ "'" . $screen['id'] . "'" }})"
+                                <button wire:click.stop="editScreen('{{ $screen['id'] }}')"
                                         class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
                                     ✏️ 편집
                                 </button>
-                                <button wire:click.stop="duplicateScreen({{ "'" . $screen['id'] . "'" }})"
+                                <button wire:click.stop="duplicateScreen('{{ $screen['id'] }}')"
                                         class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
                                     📄 복사
                                 </button>
-                                <button wire:click.stop="deleteScreen({{ "'" . $screen['id'] . "'" }})"
+                                <button wire:click.stop="deleteScreen('{{ $screen['id'] }}')"
                                         class="text-red-600 hover:text-red-800 text-xs px-2 py-1 rounded hover:bg-red-50"
                                         onclick="return confirm('정말 삭제하시겠습니까? 템플릿 파일이 완전히 제거됩니다.')">
                                     🗑️ 삭제
@@ -223,6 +217,7 @@
 
 <script>
     document.addEventListener('livewire:initialized', () => {
+        // 팝업 창 열기 이벤트
         Livewire.on('openPreviewWindow', (event) => {
             console.log('Opening preview window:', event);
             const url = event.url || event[0]?.url;
@@ -245,6 +240,32 @@
                 // 팝업이 차단된 경우 현재 탭에서 열기
                 window.open(url, '_blank');
             }
+        });
+
+        // URL 업데이트 이벤트
+        Livewire.on('update-url', (event) => {
+            console.log('Updating URL:', event);
+            const params = event[0] || event;
+            
+            const url = new URL(window.location);
+            
+            // URL 파라미터 업데이트
+            if (params.screen) {
+                url.searchParams.set('screen', params.screen);
+            }
+            
+            if (params.previewMode !== undefined) {
+                if (params.previewMode === '1' || params.previewMode === true) {
+                    url.searchParams.set('previewMode', '1');
+                } else {
+                    url.searchParams.delete('previewMode');
+                }
+            }
+            
+            // 브라우저 히스토리에 추가하지 않고 URL만 변경
+            window.history.replaceState({}, '', url);
+            
+            console.log('URL updated to:', url.toString());
         });
     });
 </script>
