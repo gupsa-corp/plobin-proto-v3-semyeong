@@ -1,7 +1,7 @@
 {{-- Livewire 페이지 메뉴 드롭다운 컴포넌트 --}}
-<div class="page-dropdown-container" 
-     style="display: flex; position: relative;">
-    <button onclick="toggleDropdown({{ $page['id'] }})"
+<div class="page-dropdown-container" style="display: flex; position: relative;">
+    <button wire:click="toggleDropdown" 
+            @click.stop
             style="width: 20px; height: 20px; border: none; border-radius: 3px; background: #F3F4F6; color: #6B7280; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.background='#E5E7EB'"
             onmouseout="this.style.background='#F3F4F6'"
@@ -9,14 +9,15 @@
         •••
     </button>
     
-    <div id="dropdown-{{ $page['id'] }}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+    @if($isOpen)
+        <div @click.away="$wire.closeDropdown()"
+             style="position: absolute; right: 0; top: 100%; z-index: 50; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
             
             {{-- 이름 변경 --}}
-            <button onclick="
+            <button @click.stop="
                 const newTitle = prompt('새로운 페이지 이름을 입력하세요:', '{{ addslashes($page['title']) }}');
                 if (newTitle && newTitle.trim() !== '') {
-                    @this.updatePageTitle({{ $page['id'] }}, newTitle.trim());
-                    closeAllDropdowns();
+                    $wire.updatePageTitle({{ $page['id'] }}, newTitle.trim());
                 }
             " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#F9FAFB'"
@@ -28,10 +29,9 @@
             </button>
             
             {{-- 하위 페이지 추가 --}}
-            <button onclick="
-                @this.addChildPage({{ $page['id'] }});
-                closeAllDropdowns();
-            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+            <button wire:click="addChildPage({{ $page['id'] }})"
+                    @click.stop
+                    style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#F9FAFB'"
                     onmouseout="this.style.background='white'">
                 <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,10 +44,9 @@
             <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>
             
             {{-- 삭제 --}}
-            <button onclick="
+            <button @click.stop="
                 if (confirm('{{ addslashes($page['title']) }} 페이지를 정말 삭제하시겠습니까?\\n\\n하위 페이지가 있는 경우 먼저 하위 페이지를 삭제해야 합니다.')) {
-                    @this.deletePage({{ $page['id'] }});
-                    closeAllDropdowns();
+                    $wire.deletePage({{ $page['id'] }});
                 }
             " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#FEF2F2'"
@@ -58,4 +57,5 @@
                 삭제
             </button>
         </div>
+    @endif
 </div>
