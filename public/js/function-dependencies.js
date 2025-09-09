@@ -1,4 +1,12 @@
 function initDependencyGraph(container, data, wire) {
+    // 데이터 검증
+    if (!data || !data.nodes || !Array.isArray(data.nodes) || data.nodes.length === 0) {
+        console.warn('No graph data available:', data);
+        document.getElementById('graph-loading').style.display = 'none';
+        document.querySelector(container).innerHTML = '<div class="flex items-center justify-center h-full text-gray-500"><p>표시할 함수 데이터가 없습니다.</p></div>';
+        return null;
+    }
+    
     // 컨테이너 설정
     const containerElement = d3.select(container);
     const containerRect = containerElement.node().getBoundingClientRect();
@@ -7,6 +15,7 @@ function initDependencyGraph(container, data, wire) {
     
     // 로딩 상태 제거
     d3.select('#graph-loading').style('display', 'none');
+    console.log('Initializing dependency graph with data:', data);
     
     // 기존 SVG 제거
     containerElement.select('svg').remove();
@@ -207,33 +216,36 @@ function initDependencyGraph(container, data, wire) {
         link.style('opacity', 0.6);
     }
 
-    // 툴팁 기능
-    const tooltip = d3.select('body')
-        .append('div')
-        .attr('class', 'graph-tooltip')
-        .style('position', 'absolute')
-        .style('visibility', 'hidden')
-        .style('background', 'rgba(0, 0, 0, 0.8)')
-        .style('color', 'white')
-        .style('padding', '8px 12px')
-        .style('border-radius', '4px')
-        .style('font-size', '12px')
-        .style('pointer-events', 'none')
-        .style('z-index', '1000');
+    // 툴팁 기능 - 기존 툴팁이 있으면 재사용
+    let tooltip = d3.select('.graph-tooltip');
+    if (tooltip.empty()) {
+        tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'graph-tooltip')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden')
+            .style('background', 'rgba(0, 0, 0, 0.8)')
+            .style('color', 'white')
+            .style('padding', '8px 12px')
+            .style('border-radius', '4px')
+            .style('font-size', '12px')
+            .style('pointer-events', 'none')
+            .style('z-index', '1000');
+    }
 
     function showTooltip(event, d) {
-        const dependencyCount = (data.functions && data.functions[d.id] && data.functions[d.id].dependencies) ? 
-            data.functions[d.id].dependencies.length : 0;
+        const dependencyCount = (d.dependencies && Array.isArray(d.dependencies)) ? 
+            d.dependencies.length : 0;
         
         tooltip
             .html(`
                 <strong>${d.name}</strong><br/>
-                <span style="color: #ccc;">${d.description}</span><br/>
+                <span style="color: #ccc;">${d.description || '설명 없음'}</span><br/>
                 <small>의존성: ${dependencyCount}개</small>
             `)
             .style('visibility', 'visible')
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px');
+            .style('left', Math.min(event.pageX + 10, window.innerWidth - 200) + 'px')
+            .style('top', Math.max(event.pageY - 10, 10) + 'px');
     }
 
     function hideTooltip() {

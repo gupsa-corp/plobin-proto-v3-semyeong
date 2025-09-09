@@ -78,6 +78,11 @@ class Project extends Model
         return $this->hasMany(ProjectMemberRole::class);
     }
 
+    public function sandboxes()
+    {
+        return $this->hasMany(ProjectSandbox::class);
+    }
+
     /**
      * 사용자의 프로젝트 내 역할 조회
      */

@@ -276,12 +276,17 @@ Route::post('/organizations/{id}/projects/{projectId}/settings/delete', function
     return view('300-page-service.317-page-project-settings-delete.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'delete']);
 })->name('project.dashboard.project.settings.delete.post');
 
-Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId) {
-    return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
-})->name('project.dashboard.project.settings.sandboxes');
+Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', [\App\Http\ProjectSandbox\Manage\Controller::class, 'index'])->name('project.dashboard.project.settings.sandboxes');
 
-Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId) {
-    return view('300-page-service.318-page-project-settings-sandboxes.000-index', ['currentProjectId' => $projectId, 'activeTab' => 'sandboxes']);
+Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId, Illuminate\Http\Request $request) {
+    $controller = new \App\Http\ProjectSandbox\Manage\Controller();
+    
+    return match($request->input('action')) {
+        'create' => $controller->create($request, $id, $projectId),
+        'delete' => $controller->delete($request, $id, $projectId),
+        'toggle_status' => $controller->toggleStatus($request, $id, $projectId),
+        default => redirect()->back()->with('error', '유효하지 않은 작업입니다.')
+    };
 })->name('project.dashboard.project.settings.sandboxes.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/page-delete', function ($id, $projectId) {

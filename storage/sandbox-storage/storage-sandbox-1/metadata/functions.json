@@ -1,0 +1,356 @@
+{
+    "functions": {
+        "GanttChart": {
+            "versions": [
+                "release",
+                "v20250908140755",
+                "v20250908140750"
+            ],
+            "description": "간트차트 데이터 관리 및 API 제공",
+            "dependencies": [
+                "ProjectsApiHandler",
+                "TasksApiHandler",
+                "GanttDataApiHandler",
+                "TaskProgressApiHandler",
+                "ApiInfoHandler"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "get_projects",
+                        "get_project",
+                        "get_project_overview",
+                        "get_tasks",
+                        "get_task",
+                        "get_tasks_by_status",
+                        "get_tasks_by_priority",
+                        "get_gantt_data",
+                        "get_optimized_gantt_data",
+                        "get_gantt_critical_path",
+                        "update_task_progress",
+                        "batch_update_progress",
+                        "update_task_status",
+                        "get_task_progress_history",
+                        "info",
+                        "functions"
+                    ]
+                },
+                "project_id": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "프로젝트 ID"
+                },
+                "task_id": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "태스크 ID"
+                },
+                "status": {
+                    "type": "string",
+                    "required": false,
+                    "description": "태스크 상태"
+                },
+                "priority": {
+                    "type": "string",
+                    "required": false,
+                    "description": "태스크 우선순위"
+                },
+                "progress": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "진행률 (0-100)"
+                }
+            },
+            "category": "data-management",
+            "created_at": "2025-09-08T14:07:50Z",
+            "updated_at": "2025-09-08T14:07:55Z",
+            "author": "system",
+            "tags": [
+                "gantt",
+                "project",
+                "task",
+                "api"
+            ]
+        },
+        "UserAuth": {
+            "versions": [
+                "Release",
+                "v20250902231151"
+            ],
+            "description": "사용자 인증 및 권한 관리",
+            "dependencies": [],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "login",
+                        "logout",
+                        "register",
+                        "verify",
+                        "reset_password"
+                    ]
+                },
+                "username": {
+                    "type": "string",
+                    "required": false,
+                    "description": "사용자명"
+                },
+                "password": {
+                    "type": "string",
+                    "required": false,
+                    "description": "비밀번호"
+                },
+                "email": {
+                    "type": "string",
+                    "required": false,
+                    "description": "이메일 주소"
+                }
+            },
+            "category": "authentication",
+            "created_at": "2025-09-02T23:11:51Z",
+            "updated_at": "2025-09-02T23:11:51Z",
+            "author": "system",
+            "tags": [
+                "auth",
+                "user",
+                "security"
+            ]
+        },
+        "UserManager": {
+            "versions": [
+                "release"
+            ],
+            "description": "사용자 관리를 위한 API 함수입니다. 사용자 생성, 조회, 수정, 삭제 기능을 제공합니다.",
+            "dependencies": [
+                "DatabaseConnection"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "list",
+                        "create",
+                        "read",
+                        "update",
+                        "delete",
+                        "search"
+                    ]
+                }
+            },
+            "category": "api",
+            "template_used": "api-endpoint",
+            "created_at": "2025-09-08T16:02:45.793190Z",
+            "updated_at": "2025-09-08T16:02:45.793278Z",
+            "author": "user",
+            "tags": [
+                "api",
+                "crud",
+                "database",
+                "rest"
+            ]
+        },
+        "UserAPIHandler": {
+            "versions": [
+                "release"
+            ],
+            "description": "사용자 관리를 위한 RESTful API 엔드포인트 함수입니다. 사용자 생성, 조회, 수정, 삭제 기능을 제공합니다.",
+            "dependencies": [
+                "DatabaseConnection"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "list",
+                        "create",
+                        "read",
+                        "update",
+                        "delete",
+                        "search"
+                    ]
+                }
+            },
+            "category": "api",
+            "template_used": "api-endpoint",
+            "created_at": "2025-09-08T16:27:08.275945Z",
+            "updated_at": "2025-09-08T16:27:08.276051Z",
+            "author": "user",
+            "tags": [
+                "api",
+                "crud",
+                "database",
+                "rest"
+            ]
+        },
+        "TestAPIFunction": {
+            "versions": [
+                "release"
+            ],
+            "description": "테스트용 API 함수입니다. 개선된 템플릿 처리를 검증합니다.",
+            "dependencies": [
+                "DatabaseConnection"
+            ],
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "수행할 액션",
+                    "options": [
+                        "list",
+                        "create",
+                        "read",
+                        "update",
+                        "delete"
+                    ]
+                }
+            },
+            "category": "api",
+            "template_used": "api-endpoint",
+            "created_at": "2025-09-08T16:28:56.198713Z",
+            "updated_at": "2025-09-08T16:28:56.198826Z",
+            "author": "user",
+            "tags": [
+                "api",
+                "crud",
+                "database",
+                "rest"
+            ]
+        },
+        "DataProcessor": {
+            "versions": [
+                "release"
+            ],
+            "description": "고성능 데이터 처리 함수입니다. 필터링, 변환, 집계, 검증 등 다양한 데이터 조작 기능을 제공합니다.",
+            "dependencies": [],
+            "parameters": {
+                "data": {
+                    "type": "array",
+                    "required": true,
+                    "description": "처리할 데이터"
+                },
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "데이터 처리 작업",
+                    "options": [
+                        "process",
+                        "filter",
+                        "transform",
+                        "aggregate",
+                        "validate"
+                    ]
+                }
+            },
+            "category": "data",
+            "template_used": "data-processor",
+            "created_at": "2025-09-08T16:31:41.140070Z",
+            "updated_at": "2025-09-08T16:31:41.140179Z",
+            "author": "user",
+            "tags": [
+                "data",
+                "processing",
+                "filter",
+                "transform",
+                "validation"
+            ]
+        },
+        "StringHelper": {
+            "versions": [
+                "release"
+            ],
+            "description": "문자열 처리와 변환을 위한 유틸리티 함수입니다. 포맷팅, 검증, 변환 등 다양한 문자열 작업을 지원합니다.",
+            "dependencies": [],
+            "parameters": {
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "유틸리티 작업",
+                    "options": [
+                        "main",
+                        "format",
+                        "convert",
+                        "calculate",
+                        "generate"
+                    ]
+                }
+            },
+            "category": "utility",
+            "template_used": "utility-function",
+            "created_at": "2025-09-08T16:36:14.277152Z",
+            "updated_at": "2025-09-08T16:36:14.277256Z",
+            "author": "user",
+            "tags": [
+                "utility",
+                "helper",
+                "format",
+                "convert",
+                "calculate",
+                "generate"
+            ]
+        },
+        "TestProcessor": {
+            "versions": [
+                "release"
+            ],
+            "description": "E2E 테스트용 데이터 프로세서 함수",
+            "dependencies": [],
+            "parameters": {
+                "data": {
+                    "type": "array",
+                    "required": true,
+                    "description": "처리할 데이터"
+                },
+                "operation": {
+                    "type": "string",
+                    "required": false,
+                    "description": "데이터 처리 작업",
+                    "options": [
+                        "process",
+                        "filter",
+                        "transform",
+                        "aggregate",
+                        "validate"
+                    ]
+                }
+            },
+            "category": "data",
+            "template_used": "data-processor",
+            "created_at": "2025-09-08T16:41:52.185598Z",
+            "updated_at": "2025-09-08T16:41:52.185684Z",
+            "author": "user",
+            "tags": [
+                "data",
+                "processing",
+                "filter",
+                "transform",
+                "validation"
+            ]
+        }
+    },
+    "categories": {
+        "data-management": {
+            "name": "데이터 관리",
+            "description": "데이터 관리 및 처리 관련 함수",
+            "color": "blue"
+        },
+        "authentication": {
+            "name": "인증",
+            "description": "사용자 인증 및 권한 관리 함수",
+            "color": "red"
+        }
+    },
+    "statistics": {
+        "total_functions": 8,
+        "total_versions": 11,
+        "last_updated": "2025-09-08T16:41:52.185711Z"
+    }
+}
