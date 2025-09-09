@@ -23,11 +23,14 @@ class ProjectPage extends Model
         'user_id',
         'sort_order',
         'access_level',
-        'allowed_roles'
+        'allowed_roles',
+        'sandbox_type',
+        'custom_screen_settings'
     ];
 
     protected $casts = [
         'allowed_roles' => 'json',
+        'custom_screen_settings' => 'json',
     ];
 
     /**

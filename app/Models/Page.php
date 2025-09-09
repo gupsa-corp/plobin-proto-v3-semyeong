@@ -18,11 +18,14 @@ class Page extends Model
         'project_id',
         'parent_id',
         'user_id',
-        'sort_order'
+        'sort_order',
+        'sandbox_type',
+        'custom_screen_settings'
     ];
 
     protected $casts = [
         'sort_order' => 'integer',
+        'custom_screen_settings' => 'json',
     ];
 
     public function project(): BelongsTo

@@ -2,6 +2,19 @@
     <!-- 페이지 설정 탭 네비게이션 -->
     @include('300-page-service.309-page-settings-name.100-tab-navigation')
 
+    <!-- 알림 메시지 -->
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- 샌드박스 선택 콘텐츠 -->
     <div class="bg-white rounded-lg border border-gray-200">
         <!-- 헤더 -->
@@ -23,7 +36,7 @@
 
         <!-- 콘텐츠 -->
         <div class="p-6">
-            <form action="#" method="POST" class="space-y-6">
+            <form action="{{ route('project.dashboard.page.settings.sandbox.post', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" method="POST" class="space-y-6">
                 @csrf
                 
                 <!-- 샌드박스 목록 -->
@@ -41,7 +54,7 @@
                                 name="sandbox" 
                                 value="" 
                                 class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                checked
+                                {{ (empty($currentSandboxType)) ? 'checked' : '' }}
                             >
                             <label for="sandbox_none" class="ml-3 flex-1">
                                 <div class="font-medium text-gray-900">샌드박스 사용 안함</div>
@@ -57,6 +70,7 @@
                                 name="sandbox" 
                                 value="template" 
                                 class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                {{ ($currentSandboxType === 'template') ? 'checked' : '' }}
                             >
                             <label for="sandbox_template" class="ml-3 flex-1">
                                 <div class="font-medium text-gray-900">템플릿 샌드박스</div>
@@ -72,6 +86,7 @@
                                 name="sandbox" 
                                 value="1" 
                                 class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                {{ ($currentSandboxType === '1') ? 'checked' : '' }}
                             >
                             <label for="sandbox_1" class="ml-3 flex-1">
                                 <div class="font-medium text-gray-900">개발용 샌드박스 1</div>

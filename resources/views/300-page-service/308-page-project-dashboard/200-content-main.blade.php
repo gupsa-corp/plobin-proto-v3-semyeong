@@ -1,35 +1,20 @@
 @php
-    // URL에서 organization ID, project ID 추출
-    $urlSegments = explode('/', request()->path());
-    $organizationId = isset($urlSegments[1]) ? $urlSegments[1] : null;
-    $projectId = isset($urlSegments[3]) ? $urlSegments[3] : null;
+    // 라우트에서 전달받은 변수들 사용
+    // $organization, $project, $page 변수들이 라우트에서 전달됨
     
-    // 조직 정보 가져오기
-    $organization = null;
-    $project = null;
-    $firstPage = null;
+    $organizationId = $organization ? $organization->id : null;
+    $projectId = $project ? $project->id : null;
+    $pageId = $page ? $page->id : null;
     
-    try {
-        if ($organizationId && is_numeric($organizationId)) {
-            $organization = \App\Models\Organization::find($organizationId);
-        }
-        
-        if ($projectId && is_numeric($projectId)) {
-            $project = \App\Models\Project::find($projectId);
-            
-            // 첫 번째 페이지 찾기
-            if ($project) {
-                $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
-                    ->whereNull('parent_id')
-                    ->orderBy('sort_order')
-                    ->first();
-            }
-        }
-    } catch (\Exception $e) {
-        // 데이터베이스 오류 등이 발생해도 계속 진행
-        $organization = null;
-        $project = null;
-        $firstPage = null;
+    // 페이지가 있는 경우 샌드박스 설정 확인
+    $hasSandbox = false;
+    $hasCustomScreen = false;
+    $sandboxType = null;
+    
+    if ($page) {
+        $sandboxType = $page->sandbox_type;
+        $hasSandbox = !empty($sandboxType);
+        $hasCustomScreen = !empty($page->custom_screen_settings);
     }
 @endphp
 
@@ -93,6 +78,104 @@
                 </div>
             </div>
         </div>
+    @elseif($page && $hasSandbox)
+        @if($hasCustomScreen)
+            @php
+                // 커스텀 화면 설정에서 screen_id 가져오기
+                $customScreenSettings = $page->custom_screen_settings;
+                $screenId = isset($customScreenSettings['screen_id']) ? $customScreenSettings['screen_id'] : null;
+            @endphp
+            
+            @if($screenId == '1')
+                <!-- 조직 목록 커스텀 화면 렌더링 -->
+                @include('300-page-service.322-page-custom-screen-render.organizations-list')
+            @elseif($screenId == '2')
+                <!-- 조직 목록 (복사본) 화면 - 기본적으로 조직 목록과 동일 -->
+                @include('300-page-service.322-page-custom-screen-render.organizations-list')
+            @elseif($screenId == '3')
+                <!-- 프로젝트 목록 화면 - 임시로 조직 목록 사용 -->
+                @include('300-page-service.322-page-custom-screen-render.organizations-list')
+            @else
+                <!-- 알 수 없는 커스텀 화면 ID -->
+                <div class="flex flex-col items-center justify-center min-h-96 bg-white rounded-lg border border-yellow-200 shadow-sm">
+                    <div class="text-center max-w-md">
+                        <div class="mb-6">
+                            <svg class="w-16 h-16 text-yellow-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-semibold text-yellow-800 mb-2">
+                            커스텀 화면을 찾을 수 없습니다
+                        </h2>
+                        <p class="text-yellow-600 mb-6">
+                            설정된 커스텀 화면 (ID: {{ $screenId }})을 로드할 수 없습니다.
+                        </p>
+                    </div>
+                </div>
+            @endif
+            
+            <!-- 설정 버튼들을 하단에 표시 -->
+            <div class="mt-6 flex justify-center space-x-3">
+                <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    커스텀 화면 설정
+                </a>
+                
+                <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/sandbox" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    샌드박스 설정 수정
+                </a>
+            </div>
+        @else
+            <!-- 샌드박스만 설정되고 커스텀 화면이 없는 경우 -->
+            <div class="flex flex-col items-center justify-center min-h-96 bg-white rounded-lg border border-green-200 shadow-sm">
+                <div class="text-center max-w-md">
+                    <div class="mb-6">
+                        <svg class="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="text-xl font-semibold text-green-900 mb-2">
+                        샌드박스가 활성화되었습니다
+                    </h2>
+                    
+                    <p class="text-green-600 mb-2">
+                        현재 <strong>{{ ucfirst($sandboxType) }}</strong> 샌드박스가 설정되어 있습니다.
+                    </p>
+                    
+                    <p class="text-gray-500 mb-6">
+                        커스텀 화면을 추가로 설정할 수 있습니다.
+                    </p>
+                    
+                    <div class="space-y-3">
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen" 
+                           class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            커스텀 화면 설정
+                        </a>
+                        
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/sandbox" 
+                           class="inline-flex items-center justify-center px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            샌드박스 설정 수정
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     @else
         <!-- 빈 페이지 안내 -->
         <div class="flex flex-col items-center justify-center min-h-96 bg-white rounded-lg border border-gray-200 shadow-sm">
@@ -113,8 +196,8 @@
                 </p>
                 
                 <div class="space-y-3">
-                    @if($firstPage)
-                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $firstPage->id }}/settings/custom-screen" 
+                    @if($page)
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen" 
                            class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -126,7 +209,7 @@
                             또는 샌드박스 설정에서 바로 시작하세요
                         </div>
                         
-                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $firstPage->id }}/settings/sandbox" 
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/sandbox" 
                            class="inline-flex items-center justify-center px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>

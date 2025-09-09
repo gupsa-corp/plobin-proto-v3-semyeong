@@ -1,32 +1,50 @@
-<div class="px-6 py-6" x-data="{ sandboxSelected: true, selectedCustomScreen: null, customScreens: [] }"
-     x-init="
-        // 샘플 커스텀 화면 데이터 - 실제로는 API에서 가져와야 함
-        customScreens = [
-            {
-                id: 1,
-                title: '조직 목록',
-                description: '조직 관리를 위한 목록 화면입니다.',
-                type: 'list',
-                created_at: '2025-09-09 03:36:47'
-            },
-            {
-                id: 2,
-                title: '조직 목록 (복사본)',
-                description: '조직 관리를 위한 목록 화면입니다.',
-                type: 'list',
-                created_at: '2025-09-09 03:43:23'
-            },
-            {
-                id: 3,
-                title: '프로젝트 목록',
-                description: '프로젝트 목록을 보여주는 화면입니다',
-                type: 'list',
-                created_at: '2025-09-09 03:50:20'
-            }
-        ]
-    ">
+<script>
+// Initialize custom screens data safely before Alpine.js loads
+window.customScreensData = [
+    {
+        "id": "1",
+        "title": "조직 목록",
+        "description": "조직 관리를 위한 목록 화면입니다.",
+        "type": "list",
+        "created_at": "2024-01-01"
+    },
+    {
+        "id": "2", 
+        "title": "조직 목록 (복사본)",
+        "description": "조직 관리를 위한 목록 화면입니다.",
+        "type": "list",
+        "created_at": "2024-01-02"
+    },
+    {
+        "id": "3",
+        "title": "프로젝트 목록", 
+        "description": "프로젝트 목록을 보여주는 화면입니다",
+        "type": "list",
+        "created_at": "2024-01-03"
+    }
+];
+</script>
+
+<div class="px-6 py-6" x-data="{
+    sandboxSelected: true,
+    selectedCustomScreen: '{{ $currentCustomScreenSettings['screen_id'] ?? '' }}',
+    customScreens: window.customScreensData || []
+}"
     <!-- 페이지 설정 탭 네비게이션 -->
     @include('300-page-service.309-page-settings-name.100-tab-navigation')
+
+    <!-- 알림 메시지 -->
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <!-- 커스텀 화면 선택 콘텐츠 -->
     <div class="bg-white rounded-lg border border-gray-200">
@@ -66,7 +84,7 @@
 
             <!-- 샌드박스 선택 시 커스텀 화면 설정 폼 -->
             <div x-show="sandboxSelected">
-                <form action="#" method="POST" class="space-y-6">
+                <form action="{{ route('project.dashboard.page.settings.custom-screen.post', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" method="POST" class="space-y-6">
                     @csrf
                     
                     <!-- 커스텀 화면 사용 안함 옵션 -->
@@ -84,12 +102,25 @@
                                     value="" 
                                     class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                                     x-model="selectedCustomScreen"
-                                    checked
+                                    {{ empty($currentCustomScreenSettings['screen_id']) ? 'checked' : '' }}
                                 >
                                 <label for="custom_screen_none" class="ml-3 flex-1">
                                     <div class="font-medium text-gray-900">커스텀 화면 사용 안함</div>
                                     <div class="text-sm text-gray-500">기본 페이지 레이아웃을 사용합니다.</div>
                                 </label>
+                            </div>
+                            
+                            <!-- 커스텀 화면이 없을 때 오류 메시지 -->
+                            <div x-show="customScreens.length === 0" class="flex items-center p-4 border border-red-200 rounded-lg bg-red-50">
+                                <div class="flex-shrink-0">
+                                    <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-red-800">사용 가능한 커스텀 화면이 없습니다</div>
+                                    <div class="text-sm text-red-600">샌드박스에서 커스텀 화면을 먼저 생성해주세요.</div>
+                                </div>
                             </div>
                             
                             <!-- 사용 가능한 커스텀 화면들 -->

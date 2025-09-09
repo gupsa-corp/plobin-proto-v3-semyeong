@@ -94,7 +94,18 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
 
     // 프로젝트 페이지 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-        return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => 'overview']);
+        // Fetch the organization, project, and page objects
+        $organization = \App\Models\Organization::find($id);
+        $project = \App\Models\Project::find($projectId);
+        $page = \App\Models\ProjectPage::find($pageId);
+        
+        return view('300-page-service.308-page-project-dashboard.000-index', [
+            'currentPageId' => $pageId, 
+            'activeTab' => 'overview',
+            'organization' => $organization,
+            'project' => $project,
+            'page' => $page
+        ]);
     })->name('project.dashboard.page');
 
     // 프로젝트 설정 라우트들
@@ -121,7 +132,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
 $routes = config('routes-web');
 
 foreach ($routes as $path => $config) {
-    
+
     // 대시보드는 이미 위에서 처리했으므로 스킵
     if ($path === '/dashboard') {
         continue;
@@ -234,19 +245,133 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/na
 })->name('project.dashboard.page.settings.name.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
-    return view('300-page-service.310-page-settings-sandbox.000-index', ['currentPageId' => $pageId, 'activeTab' => 'sandbox']);
+    // 페이지 정보 가져오기
+    $page = \App\Models\Page::where('id', $pageId)
+        ->whereHas('project', function($query) use ($projectId, $id) {
+            $query->where('id', $projectId)
+                  ->whereHas('organization', function($q) use ($id) {
+                      $q->where('id', $id);
+                  });
+        })->first();
+
+    $currentSandboxType = $page ? $page->sandbox_type : null;
+
+    return view('300-page-service.310-page-settings-sandbox.000-index', [
+        'currentPageId' => $pageId,
+        'activeTab' => 'sandbox',
+        'currentSandboxType' => $currentSandboxType
+    ]);
 })->name('project.dashboard.page.settings.sandbox');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
-    return view('300-page-service.310-page-settings-sandbox.000-index', ['currentPageId' => $pageId, 'activeTab' => 'sandbox']);
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId, Illuminate\Http\Request $request) {
+    try {
+        // 페이지 존재 여부 확인
+        $page = \App\Models\Page::where('id', $pageId)
+            ->whereHas('project', function($query) use ($projectId, $id) {
+                $query->where('id', $projectId)
+                      ->whereHas('organization', function($q) use ($id) {
+                          $q->where('id', $id);
+                      });
+            })->first();
+
+        if (!$page) {
+            return redirect()->back()->with('error', '페이지를 찾을 수 없습니다.');
+        }
+
+        // 샌드박스 설정 저장
+        $sandboxType = $request->input('sandbox', '');
+        if (empty($sandboxType)) {
+            $sandboxType = null; // 빈 값을 null로 변환
+        }
+
+        $page->update([
+            'sandbox_type' => $sandboxType
+        ]);
+
+        return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
+    } catch (\Exception $e) {
+        \Log::error('샌드박스 설정 저장 오류', ['error' => $e->getMessage()]);
+        return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
+    }
 })->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
-    return view('300-page-service.311-page-settings-custom-screen.000-index', ['currentPageId' => $pageId, 'activeTab' => 'custom-screen']);
+    $page = \App\Models\Page::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
+        $query->where('id', $projectId)->whereHas('organization', function($q) use ($id) {
+            $q->where('id', $id);
+        });
+    })->first();
+
+    $currentSandboxType = $page ? $page->sandbox_type : null;
+    $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
+
+    // 실제 커스텀 화면 데이터 가져오기
+    $customScreens = [];
+    if (!empty($currentSandboxType)) {
+        try {
+            $currentStorage = session('sandbox_storage', 'template');
+            $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+
+            if (file_exists($dbPath)) {
+                $pdo = new \PDO("sqlite:$dbPath");
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $pdo->query('SELECT id, title, description, type, created_at FROM custom_screens ORDER BY created_at DESC');
+                $customScreens = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
+        } catch (\Exception $e) {
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage()]);
+            $customScreens = [];
+        }
+    }
+
+    return view('300-page-service.311-page-settings-custom-screen.000-index', [
+        'currentPageId' => $pageId,
+        'activeTab' => 'custom-screen',
+        'page' => $page,
+        'currentSandboxType' => $currentSandboxType,
+        'currentCustomScreenSettings' => $currentCustomScreenSettings,
+        'customScreens' => $customScreens
+    ]);
 })->name('project.dashboard.page.settings.custom-screen');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
-    return view('300-page-service.311-page-settings-custom-screen.000-index', ['currentPageId' => $pageId, 'activeTab' => 'custom-screen']);
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId, Illuminate\Http\Request $request) {
+    try {
+        $page = \App\Models\Page::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
+            $query->where('id', $projectId)->whereHas('organization', function($q) use ($id) {
+                $q->where('id', $id);
+            });
+        })->first();
+
+        if (!$page) {
+            return redirect()->back()->with('error', '페이지를 찾을 수 없습니다.');
+        }
+
+        // 샌드박스가 설정되어 있는지 확인
+        if (empty($page->sandbox_type)) {
+            return redirect()->back()->with('error', '커스텀 화면을 사용하려면 먼저 샌드박스를 선택해야 합니다.');
+        }
+
+        $customScreenId = $request->input('custom_screen', '');
+        $customScreenSettings = [];
+
+        if (!empty($customScreenId)) {
+            $customScreenSettings = [
+                'screen_id' => $customScreenId,
+                'enabled' => true,
+                'applied_at' => now()->format('Y-m-d H:i:s')
+            ];
+        }
+
+        $page->update([
+            'custom_screen_settings' => !empty($customScreenSettings) ? $customScreenSettings : null
+        ]);
+
+        return redirect()->back()->with('success', '커스텀 화면 설정이 저장되었습니다.');
+    } catch (\Exception $e) {
+        \Log::error('커스텀 화면 설정 저장 오류', ['error' => $e->getMessage()]);
+        return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
+    }
 })->name('project.dashboard.page.settings.custom-screen.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
@@ -344,7 +469,7 @@ Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', [\App\
 
 Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId, Illuminate\Http\Request $request) {
     $controller = new \App\Http\ProjectSandbox\Manage\Controller();
-    
+
     return match($request->input('action')) {
         'create' => $controller->create($request, $id, $projectId),
         'delete' => $controller->delete($request, $id, $projectId),
@@ -380,7 +505,7 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/create', function ($
         // 조직과 프로젝트 존재 확인
         $organization = \App\Models\Organization::find($id);
         $project = \App\Models\Project::find($projectId);
-        
+
         if (!$organization || !$project || $project->organization_id != $id) {
             return response()->json(['error' => '프로젝트를 찾을 수 없습니다.'], 404);
         }
