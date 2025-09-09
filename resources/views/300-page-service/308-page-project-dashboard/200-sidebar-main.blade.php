@@ -156,18 +156,8 @@
                                                 이름 변경
                                             </button>
                                             
-                                            {{-- 하위 페이지 추가 --}}
-                                            <button onclick="
-                                                addChildPage({{ $childPage->id }});
-                                                closeAllDropdowns();
-                                            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                                                    onmouseover="this.style.background='#F9FAFB'"
-                                                    onmouseout="this.style.background='white'">
-                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                                </svg>
-                                                하위 페이지 추가
-                                            </button>
+                                            {{-- 하위 페이지 추가 (depth 2 제한으로 비활성화) --}}
+                                            {{-- 하위 페이지에서는 더 이상 하위 페이지를 생성할 수 없음 --}}
                                             
                                             {{-- 구분선 --}}
                                             <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>

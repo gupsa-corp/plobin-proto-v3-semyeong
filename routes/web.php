@@ -127,19 +127,29 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
             }
 
-            // 페이지 순서 계산
+            // 요청에서 parent_id와 title 가져오기
+            $parentId = request()->input('parent_id');
+            $title = request()->input('title', '새 페이지');
+
+            // 페이지 순서 계산 (같은 parent_id를 가진 페이지들 기준)
             $sortOrder = \App\Models\ProjectPage::where('project_id', $projectId)
-                ->whereNull('parent_id')
+                ->where(function($query) use ($parentId) {
+                    if ($parentId) {
+                        $query->where('parent_id', $parentId);
+                    } else {
+                        $query->whereNull('parent_id');
+                    }
+                })
                 ->max('sort_order') + 1;
 
             // 새 페이지 생성
             $page = \App\Models\ProjectPage::create([
                 'project_id' => $projectId,
-                'title' => '새 페이지',
+                'title' => $title,
                 'slug' => 'new-page-' . time(), // 고유한 slug 생성
                 'content' => '',
                 'sort_order' => $sortOrder,
-                'parent_id' => null,
+                'parent_id' => $parentId,
                 'user_id' => Auth::id() // 현재 사용자 ID 추가
             ]);
 
@@ -155,6 +165,57 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         } catch (\Exception $e) {
             \Log::error('페이지 생성 오류: ' . $e->getMessage());
             return response()->json(['success' => false, 'error' => '페이지 생성 중 오류가 발생했습니다.']);
+        }
+    });
+
+    // 페이지 제목 업데이트 라우트
+    Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', function ($id, $projectId, $pageId) {
+        try {
+            // 프로젝트 존재 확인
+            $project = \App\Models\Project::where('id', $projectId)
+                ->whereHas('organization', function($query) use ($id) {
+                    $query->where('id', $id);
+                })
+                ->first();
+
+            if (!$project) {
+                return response()->json(['success' => false, 'error' => '프로젝트를 찾을 수 없습니다.']);
+            }
+
+            // 권한 확인 (프로젝트 소유자이거나 조직 멤버여야 함)
+            $hasAccess = $project->user_id === Auth::id() ||
+                \App\Models\OrganizationMember::where('organization_id', $id)
+                    ->where('user_id', Auth::id())
+                    ->where('invitation_status', 'accepted')
+                    ->exists();
+
+            if (!$hasAccess) {
+                return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
+            }
+
+            // 페이지 존재 확인
+            $page = \App\Models\ProjectPage::where('id', $pageId)
+                ->where('project_id', $projectId)
+                ->first();
+
+            if (!$page) {
+                return response()->json(['success' => false, 'error' => '페이지를 찾을 수 없습니다.']);
+            }
+
+            // 제목 업데이트
+            $title = request()->input('title');
+            if (empty($title)) {
+                return response()->json(['success' => false, 'error' => '제목을 입력해주세요.']);
+            }
+
+            $page->title = $title;
+            $page->save();
+
+            return response()->json(['success' => true, 'message' => '페이지 제목이 변경되었습니다.']);
+
+        } catch (\Exception $e) {
+            \Log::error('페이지 제목 업데이트 오류: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => '페이지 제목 변경 중 오류가 발생했습니다.']);
         }
     });
 
