@@ -3,19 +3,35 @@
 namespace App\Livewire\Sandbox\CustomScreens\Browser;
 
 use Livewire\Component as LivewireComponent;
+use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\File;
 
 class Component extends LivewireComponent
 {
     public $screens = [];
+    
+    #[Url]
     public $search = '';
+    
+    #[Url]
     public $filterType = '';
+    
+    #[Url(as: 'screen')]
+    public $selectedScreenId = null;
+    
     public $selectedScreen = null;
+    
+    #[Url]
     public $previewMode = false;
 
     public function mount()
     {
         $this->loadScreens();
+        
+        // URL에서 선택된 화면이 있다면 해당 화면을 선택 (화면 목록 로딩 후)
+        if ($this->selectedScreenId) {
+            $this->selectScreenById($this->selectedScreenId);
+        }
     }
 
     public function render()
@@ -84,6 +100,12 @@ class Component extends LivewireComponent
     }
 
     public function selectScreen($id)
+    {
+        $this->selectedScreenId = $id;
+        $this->selectScreenById($id);
+    }
+    
+    protected function selectScreenById($id)
     {
         $screen = collect($this->screens)->firstWhere('id', $id);
         if ($screen) {
@@ -183,6 +205,7 @@ class Component extends LivewireComponent
 
             if ($this->selectedScreen && $this->selectedScreen['id'] == $id) {
                 $this->selectedScreen = null;
+                $this->selectedScreenId = null;
             }
 
             $this->loadScreens();
@@ -200,6 +223,15 @@ class Component extends LivewireComponent
     public function updatedFilterType()
     {
         $this->applyFilters();
+    }
+    
+    public function updatedSelectedScreenId()
+    {
+        if ($this->selectedScreenId) {
+            $this->selectScreenById($this->selectedScreenId);
+        } else {
+            $this->selectedScreen = null;
+        }
     }
 
     private function applyFilters()

@@ -6,8 +6,8 @@
 <body class="bg-gray-100">
     @include('700-page-sandbox.700-common.401-custom-screens-header')
     
-    <div class="min-h-screen sandbox-container">
-        <div class="sandbox-card">
+    <div class="min-h-screen">
+        <div class="w-full">
             @livewire('sandbox.custom-screens.browser.component')
         </div>
     </div>

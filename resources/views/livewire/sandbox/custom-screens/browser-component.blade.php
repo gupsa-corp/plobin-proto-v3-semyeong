@@ -1,4 +1,4 @@
-<div class="max-w-full mx-auto p-6">
+<div class="w-full p-6">
     <!-- 헤더 -->
     <div class="flex justify-between items-center mb-6">
         <div>
