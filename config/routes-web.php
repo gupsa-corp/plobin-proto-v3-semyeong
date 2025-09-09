@@ -66,6 +66,6 @@ return [
     '/sandbox/scenario-manager' => ['view' => '700-page-sandbox.711-page-scenario-manager.000-index', 'name' => 'sandbox.scenario-manager'],
     '/sandbox/organizations-list' => ['view' => '700-page-sandbox.713-page-organizations-list.000-index', 'name' => 'sandbox.organizations-list'],
     '/sandbox/custom-screen/preview/{id}' => ['view' => '700-page-sandbox.714-page-custom-screen-preview.000-index', 'name' => 'sandbox.custom-screen-preview'],
-
+    '/sandbox/using-projects' => ['view' => '700-page-sandbox.716-page-using-projects.000-index', 'name' => 'sandbox.using-projects'],
     '/sandbox/projects-list' => ['view' => '700-page-sandbox.715-page-projects-list.000-index', 'name' => 'sandbox.projects-list'],
 ];

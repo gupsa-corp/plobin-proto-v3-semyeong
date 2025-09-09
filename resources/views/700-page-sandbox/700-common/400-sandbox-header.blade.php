@@ -45,6 +45,11 @@
                    class="text-sm text-blue-600 hover:text-blue-800 underline">
                     관리
                 </a>
+                <span class="text-gray-300">|</span>
+                <a href="{{ route('sandbox.using-projects') }}"
+                   class="text-sm text-yellow-600 hover:text-yellow-800 underline">
+                    사용 프로젝트
+                </a>
             </div>
         </div>
 

@@ -576,6 +576,9 @@ Route::get('/sandbox/projects-list', function () {
 // Custom Screen Preview
 Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\Controllers\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
 
+// 샌드박스 사용 프로젝트 목록
+Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
+
 // Global Functions 파일 다운로드
 Route::get('/sandbox/download/{filename}', function ($filename) {
     $filePath = storage_path('app/sandbox-exports/' . $filename);

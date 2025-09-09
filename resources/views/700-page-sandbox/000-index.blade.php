@@ -41,6 +41,11 @@
                     <p class="text-gray-600">데이터베이스 관리</p>
                 </a>
 
+                <a href="{{ route('sandbox.using-projects') }}" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-yellow-200 bg-yellow-50">
+                    <h3 class="text-lg font-semibold text-yellow-900 mb-2">📦 샌드박스 사용 프로젝트</h3>
+                    <p class="text-yellow-700">현재 샌드박스를 사용하고 있는 프로젝트 목록 확인</p>
+                </a>
+
                 <a href="/sandbox/git-version-control" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Git 버전 관리</h3>
                     <p class="text-gray-600">로컬 Git 저장소 관리</p>
