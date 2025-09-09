@@ -265,56 +265,19 @@ function customScreenSettingsPage() {
         },
         
         async loadCustomScreens() {
-            if (!window.currentSandboxType) {
-                return;
-            }
-            
-            this.loading = true;
+            // 백엔드에서 이미 데이터를 전달받았으므로 API 호출 불필요
+            this.customScreens = window.customScreensData || [];
+            this.loading = false;
             this.error = null;
             
-            try {
-                // sandbox_type 변환: "sandbox-template" -> "template"
-                let sandboxName = window.currentSandboxType;
-                if (sandboxName.startsWith('sandbox-')) {
-                    sandboxName = sandboxName.substring(8); // Remove "sandbox-" prefix
-                }
-                
-                const response = await fetch(`/api/sandbox/screens?sandbox_name=${encodeURIComponent(sandboxName)}`);
-                
-                if (!response.ok) {
-                    throw new Error('스크린 목록을 가져올 수 없습니다.');
-                }
-                
-                const data = await response.json();
-                
-                // API에서 받은 스크린 데이터를 커스텀 화면 형식으로 변환
-                this.customScreens = data.screens.map(screen => ({
-                    id: screen.id,
-                    title: screen.title,
-                    description: screen.description,
-                    type: screen.type,
-                    path: screen.path,
-                    directory: screen.directory,
-                    created_at: screen.modified_at,
-                    size: screen.size
-                }));
-                
-                console.log(`${data.total_count}개의 화면을 로드했습니다.`);
-                
-            } catch (error) {
-                console.error('스크린 로딩 오류:', error);
-                this.error = error.message;
-                this.customScreens = [];
-            } finally {
-                this.loading = false;
-            }
+            console.log(`${this.customScreens.length}개의 화면을 로드했습니다.`);
         },
         
         // 스크린 미리보기 함수
         previewScreen(screenId) {
-            const screen = this.customScreens.find(s => s.id === screenId);
+            const screen = this.customScreens.find(s => s.id == screenId);
             if (screen) {
-                const previewUrl = `/sandbox/screen/preview/${window.currentSandboxType}/${encodeURIComponent(screen.path)}`;
+                const previewUrl = `/sandbox/custom-screen/preview/${screenId}`;
                 window.open(previewUrl, 'screen-preview', 'width=1200,height=800,scrollbars=yes,resizable=yes');
             }
         }

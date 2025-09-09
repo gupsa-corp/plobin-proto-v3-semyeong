@@ -5,34 +5,55 @@ namespace App\Http\CoreApi\Sandbox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
+use App\Models\SandboxCustomScreen;
+use App\Services\CustomScreenRenderer;
 
 class CustomScreenPreviewController
 {
     public function show($id)
     {
-        $currentStorage = Session::get('sandbox_storage', 'template');
-        $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
-
-        if (!File::exists($dbPath)) {
-            abort(404, '커스텀 화면을 찾을 수 없습니다.');
-        }
-
         try {
-            $pdo = new \PDO("sqlite:$dbPath");
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
-            $stmt->execute([$id]);
-            $screen = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $screen = SandboxCustomScreen::find($id);
 
             if (!$screen) {
                 abort(404, '커스텀 화면을 찾을 수 없습니다.');
             }
 
-            // 항상 미리보기 페이지를 표시 (헤더/푸터 없이)
-            return view('700-page-sandbox.714-page-custom-screen-preview.000-index', compact('screen'));
+            if (!$screen->fileExists()) {
+                abort(404, '커스텀 화면 파일을 찾을 수 없습니다.');
+            }
+
+            // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
+            $renderer = new CustomScreenRenderer();
+            $customContent = $renderer->render($screen->getFullFilePath(), [
+                'title' => $screen->title,
+                'description' => $screen->description,
+                'organizations' => collect([
+                    ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15],
+                    ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
+                ]),
+                'projects' => collect([
+                    ['id' => 1, 'name' => '프로젝트 A', 'status' => '진행중'],
+                    ['id' => 2, 'name' => '프로젝트 B', 'status' => '완료'],
+                ]),
+                'users' => collect([
+                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com'],
+                    ['id' => 2, 'name' => '김영희', 'email' => 'kim@example.com'],
+                ]),
+                'activities' => collect([
+                    ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
+                    ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
+                ])
+            ]);
+
+            // 미리보기 페이지를 표시 (헤더/푸터 없이)
+            return view('700-page-sandbox.714-page-custom-screen-preview.000-index', [
+                'screen' => $screen,
+                'customContent' => $customContent
+            ]);
 
         } catch (\Exception $e) {
+            \Log::error('커스텀 화면 미리보기 오류', ['id' => $id, 'error' => $e->getMessage()]);
             abort(500, '미리보기를 불러올 수 없습니다: ' . $e->getMessage());
         }
     }

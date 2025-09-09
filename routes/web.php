@@ -165,24 +165,43 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
 
         // 커스텀 화면이 있는지 확인 (현재 세션의 샌드박스에서)
         $customScreen = null;
-        if ($page && !empty($page->sandbox_type)) {
+        if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
             try {
-                // 현재 세션의 샌드박스 스토리지를 확인
-                $currentStorage = session('sandbox_storage', $page->sandbox_type);
-                $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
-                if (File::exists($dbPath)) {
-                    $pdo = new \PDO("sqlite:$dbPath");
-                    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                // 커스텀 화면 설정에서 screen_id 가져오기
+                $customScreenSettings = is_string($page->custom_screen_settings) 
+                    ? json_decode($page->custom_screen_settings, true) 
+                    : $page->custom_screen_settings;
+                
+                $screenId = $customScreenSettings['screen_id'] ?? null;
+                
+                if ($screenId) {
+                    // 샌드박스 타입에서 실제 스토리지 이름 추출
+                    $sandboxType = $page->sandbox_type;
+                    if (strpos($sandboxType, 'sandbox-') === 0) {
+                        $storageType = substr($sandboxType, 8); // 'sandbox-' 제거
+                    } else {
+                        $storageType = $sandboxType;
+                    }
+                    
+                    // 현재 세션의 샌드박스 스토리지를 확인
+                    $currentStorage = session('sandbox_storage', $storageType);
+                    $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
+                    
+                    if (File::exists($dbPath)) {
+                        $pdo = new \PDO("sqlite:$dbPath");
+                        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-                    $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
-                    $stmt->execute([$pageId]);
-                    $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+                        $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
+                        $stmt->execute([$screenId]);
+                        $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    }
                 }
             } catch (\Exception $e) {
                 // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
                 \Log::info('커스텀 화면 로드 실패', [
                     'pageId' => $pageId,
                     'sandbox_type' => $page->sandbox_type,
+                    'custom_screen_settings' => $page->custom_screen_settings,
                     'storage' => $currentStorage ?? 'unknown',
                     'error' => $e->getMessage()
                 ]);
@@ -418,7 +437,7 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sa
 })->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
-    $page = \App\Models\Page::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
+    $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
         $query->where('id', $projectId)->whereHas('organization', function($q) use ($id) {
             $q->where('id', $id);
         });
@@ -427,23 +446,39 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     $currentSandboxType = $page ? $page->sandbox_type : null;
     $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
 
-    // 실제 커스텀 화면 데이터 가져오기 (현재 세션의 샌드박스에서)
+    // 메인 데이터베이스에서 커스텀 화면 데이터 가져오기
     $customScreens = [];
     if (!empty($currentSandboxType)) {
         try {
-            // 현재 세션의 샌드박스 스토리지를 확인
-            $currentStorage = session('sandbox_storage', $currentSandboxType);
-            $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
-
-            if (file_exists($dbPath)) {
-                $pdo = new \PDO("sqlite:$dbPath");
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $pdo->query('SELECT id, title, description, type, created_at FROM custom_screens ORDER BY created_at DESC');
-                $customScreens = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            // 샌드박스 타입에서 실제 스토리지 이름 추출
+            if (strpos($currentSandboxType, 'sandbox-') === 0) {
+                $storageType = substr($currentSandboxType, 8); // 'sandbox-' 제거
+            } else {
+                $storageType = $currentSandboxType;
             }
+            
+            // 메인 데이터베이스에서 해당 샌드박스 타입의 커스텀 화면 조회
+            $screens = \App\Models\SandboxCustomScreen::where('sandbox_type', $storageType)
+                ->orderBy('created_at', 'desc')
+                ->get();
+                
+            $customScreens = $screens->map(function($screen) {
+                return [
+                    'id' => $screen->id,
+                    'title' => $screen->title,
+                    'description' => $screen->description,
+                    'type' => $screen->type,
+                    'folder_name' => $screen->folder_name,
+                    'file_path' => $screen->file_path,
+                    'created_at' => $screen->created_at->format('Y-m-d H:i:s'),
+                    'file_exists' => $screen->fileExists(),
+                    'size' => $screen->getFileSize(),
+                    'directory' => dirname($screen->file_path)
+                ];
+            })->toArray();
+            
         } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType, 'storage' => $currentStorage ?? 'unknown']);
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType]);
             $customScreens = [];
         }
     }
@@ -460,7 +495,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
 
 Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId, Illuminate\Http\Request $request) {
     try {
-        $page = \App\Models\Page::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
+        $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
             $query->where('id', $projectId)->whereHas('organization', function($q) use ($id) {
                 $q->where('id', $id);
             });

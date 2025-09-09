@@ -65,13 +65,14 @@
                                         {{ ucfirst($screen['type']) }}
                                     </span>
                                     <span>{{ $screen['created_at'] }}</span>
-                                    @if($screen['connected_functions'])
-                                        @php $functions = json_decode($screen['connected_functions'], true); @endphp
-                                        @if(count($functions) > 0)
-                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                                🔗 {{ count($functions) }}개 함수
-                                            </span>
-                                        @endif
+                                    @if($screen['file_exists'])
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                                            📄 파일 존재
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">
+                                            ❌ 파일 없음
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -150,29 +151,37 @@
                                     </div>
                                 </div>
 
-                                @if($selectedScreen['connected_functions'])
-                                    @php $functions = json_decode($selectedScreen['connected_functions'], true); @endphp
-                                    @if(count($functions) > 0)
-                                        <div>
-                                            <h4 class="font-medium text-gray-900 mb-2">연결된 함수</h4>
-                                            <div class="space-y-2">
-                                                @foreach($functions as $func)
-                                                    <div class="bg-green-50 border border-green-200 rounded p-2 text-sm">
-                                                        <div class="font-medium text-green-800">{{ $func['name'] }}</div>
-                                                        <div class="text-green-600">{{ $func['description'] ?? '' }}</div>
-                                                        @if(!empty($func['binding']))
-                                                            <div class="text-xs text-green-500 mt-1">바인딩: {{ $func['binding'] }}</div>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endif
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">파일 정보</h4>
+                                    <div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm space-y-2">
+                                        <div><strong>경로:</strong> {{ $selectedScreen['file_path'] }}</div>
+                                        <div><strong>폴더명:</strong> {{ $selectedScreen['folder_name'] }}</div>
+                                        @if($selectedScreen['file_exists'])
+                                            <div class="text-green-600"><strong>상태:</strong> ✅ 파일 존재</div>
+                                            @if(isset($selectedScreen['file_size']))
+                                                <div><strong>크기:</strong> {{ $selectedScreen['file_size'] }}</div>
+                                            @endif
+                                            @if(isset($selectedScreen['file_modified']))
+                                                <div><strong>수정일:</strong> {{ $selectedScreen['file_modified'] }}</div>
+                                            @endif
+                                        @else
+                                            <div class="text-red-600"><strong>상태:</strong> ❌ 파일 없음</div>
+                                        @endif
+                                    </div>
+                                </div>
 
                                 <div>
-                                    <h4 class="font-medium text-gray-900 mb-2">블레이드 템플릿</h4>
-                                    <pre class="bg-gray-900 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>{{ $selectedScreen['blade_template'] ?? '코드가 없습니다.' }}</code></pre>
+                                    <h4 class="font-medium text-gray-900 mb-2">파일 미리보기</h4>
+                                    @if($selectedScreen['file_exists'])
+                                        <div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm">
+                                            <p class="text-gray-600 mb-2">💡 파일이 존재합니다. 편집하려면 직접 파일을 수정하세요.</p>
+                                            <code class="text-xs text-gray-800">{{ $selectedScreen['full_path'] }}</code>
+                                        </div>
+                                    @else
+                                        <div class="bg-red-50 border border-red-200 rounded p-3 text-sm">
+                                            <p class="text-red-600">⚠️ 파일이 존재하지 않습니다.</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endif

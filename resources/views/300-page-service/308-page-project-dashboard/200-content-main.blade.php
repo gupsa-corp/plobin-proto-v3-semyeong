@@ -141,11 +141,22 @@
 
             <!-- 커스텀 화면 컨텐츠 렌더링 -->
             <div class="custom-screen-content">
-                @if(!empty($customScreen['blade_template']))
-                    {!! App\Services\CustomScreenRenderer::render($customScreen['blade_template'], $customScreen) !!}
+                @if(!empty($customScreen['file_path']))
+                    @php
+                        // 파일 경로 구성
+                        $sandboxType = $page->sandbox_type;
+                        if (strpos($sandboxType, 'sandbox-') === 0) {
+                            $storageType = substr($sandboxType, 8); // 'sandbox-' 제거
+                        } else {
+                            $storageType = $sandboxType;
+                        }
+                        $currentStorage = session('sandbox_storage', $storageType);
+                        $filePath = storage_path("sandbox/storage-sandbox-{$currentStorage}/{$customScreen['file_path']}");
+                    @endphp
+                    {!! App\Services\CustomScreenRenderer::render($filePath, $customScreen) !!}
                 @else
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">렌더링할 템플릿이 없습니다.</p>
+                        <p class="text-yellow-800">커스텀 화면 파일을 찾을 수 없습니다.</p>
                     </div>
                 @endif
             </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $screen['title'] }} - 미리보기</title>
+    <title>{{ $screen->title }} - 미리보기</title>
     
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css'])
@@ -18,13 +18,16 @@
 <body class="bg-gray-50 m-0 p-0">
     <!-- 순수 커스텀 화면 컨텐츠만 표시 -->
     <div class="min-h-screen w-full">
-        @if($screen['blade_template'] && $screen['livewire_component'])
-            @livewire('sandbox.custom-screens.renderer.component', ['screenData' => $screen])
+        @if(isset($customContent) && !empty($customContent))
+            {!! $customContent !!}
         @else
             <div class="p-8 text-center text-gray-500">
                 <div class="text-6xl mb-4">📱</div>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">미리보기를 사용할 수 없습니다</h3>
-                <p>블레이드 템플릿 또는 라이브와이어 컴포넌트가 없습니다.</p>
+                <p>{{ $screen->title }} 화면 파일을 찾을 수 없습니다.</p>
+                <div class="mt-4 text-sm text-gray-400">
+                    파일 경로: {{ $screen->getFullFilePath() }}
+                </div>
             </div>
         @endif
     </div>

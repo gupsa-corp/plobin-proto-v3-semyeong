@@ -4,21 +4,59 @@ namespace App\Services;
 
 class CustomScreenRenderer
 {
-    public static function render($template, $screenData = [])
+    /**
+     * 커스텀 화면의 블레이드 파일을 렌더링합니다.
+     *
+     * @param string $filePath 렌더링할 블레이드 파일의 절대 경로
+     * @param array $screenData 화면 데이터 (context로 사용)
+     * @return string 렌더링된 HTML
+     */
+    public static function render($filePath, $screenData = [])
     {
-        if (empty($template)) {
-            return '<div class="bg-red-50 border border-red-200 rounded-lg p-4"><p class="text-red-800">렌더링할 템플릿이 없습니다.</p></div>';
-        }
-
         try {
+            // 파일 존재 여부 확인
+            if (!file_exists($filePath)) {
+                return self::renderError('커스텀 화면 파일을 찾을 수 없습니다: ' . $filePath);
+            }
+
+            // 파일이 .blade.php로 끝나는지 확인
+            if (!str_ends_with($filePath, '.blade.php')) {
+                return self::renderError('유효하지 않은 블레이드 파일입니다: ' . $filePath);
+            }
+
             // 샘플 데이터 준비
             $sampleData = self::prepareSampleData($screenData);
             
-            // 블레이드 템플릿 렌더링 (간단한 시뮬레이션)
-            return self::renderBladeTemplate($template, $sampleData);
+            // 파일에서 직접 템플릿 렌더링
+            return self::renderFileTemplate($filePath, $sampleData);
+            
         } catch (\Exception $e) {
-            return '<div class="bg-red-50 border border-red-200 rounded-lg p-4"><p class="text-red-800">렌더링 오류: ' . htmlspecialchars($e->getMessage()) . '</p></div>';
+            return self::renderError($e->getMessage());
         }
+    }
+    
+    /**
+     * 파일에서 직접 템플릿을 렌더링합니다.
+     */
+    private static function renderFileTemplate($filePath, $screenData)
+    {
+        // 변수를 추출하여 템플릿에서 사용 가능하게 만듦
+        extract($screenData);
+        
+        // 출력 버퍼링 시작
+        ob_start();
+        
+        try {
+            // 템플릿 파일 실행
+            include $filePath;
+            $html = ob_get_contents();
+        } catch (\Exception $e) {
+            $html = self::renderError($e->getMessage());
+        } finally {
+            ob_end_clean();
+        }
+        
+        return $html;
     }
 
     private static function prepareSampleData($screenData)
@@ -117,109 +155,60 @@ class CustomScreenRenderer
 
         return $sampleData;
     }
-
-    private static function renderBladeTemplate($template, $sampleData)
+    
+    /**
+     * 에러 메시지를 HTML로 렌더링합니다.
+     */
+    private static function renderError($message)
     {
-        $rendered = $template;
+        return '<div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                커스텀 화면 렌더링 오류
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>' . htmlspecialchars($message) . '</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+    }
+    
+    /**
+     * 안전한 블레이드 파일인지 검증합니다.
+     */
+    public static function isSecureFile($filePath)
+    {
+        // 파일이 샌드박스 디렉토리 내에 있는지 확인
+        $realPath = realpath($filePath);
+        $sandboxPath = realpath(storage_path('sandbox'));
         
-        // 기본 변수 치환
-        foreach ($sampleData as $key => $value) {
-            if (is_string($value)) {
-                $rendered = str_replace('{{ $' . $key . ' }}', $value, $rendered);
+        if (!$realPath || !str_starts_with($realPath, $sandboxPath)) {
+            return false;
+        }
+        
+        // 파일 내용에서 위험한 PHP 함수들을 체크
+        if (file_exists($filePath)) {
+            $content = file_get_contents($filePath);
+            $dangerousFunctions = [
+                'exec', 'shell_exec', 'system', 'passthru', 'file_get_contents',
+                'file_put_contents', 'unlink', 'rmdir', 'eval', '__halt_compiler',
+                'fopen', 'fwrite', 'fclose'
+            ];
+            
+            foreach ($dangerousFunctions as $function) {
+                if (strpos($content, $function) !== false) {
+                    return false;
+                }
             }
         }
-
-        // @if 처리
-        $rendered = self::processIfStatements($rendered, $sampleData);
         
-        // @foreach 처리
-        $rendered = self::processForeachStatements($rendered, $sampleData);
-        
-        // @empty 처리
-        $rendered = self::processEmptyStatements($rendered, $sampleData);
-
-        return $rendered;
-    }
-
-    private static function processIfStatements($rendered, $sampleData)
-    {
-        // @if($variable) ... @endif 패턴 처리
-        $pattern = '/@if\(\$(\w+)\)(.*?)@endif/s';
-        $rendered = preg_replace_callback($pattern, function($matches) use ($sampleData) {
-            $variable = $matches[1];
-            $content = $matches[2];
-            
-            if (isset($sampleData[$variable]) && !empty($sampleData[$variable])) {
-                return $content;
-            }
-            return '';
-        }, $rendered);
-
-        // @if($variable) ... @else ... @endif 패턴 처리
-        $pattern = '/@if\(\$(\w+)\)(.*?)@else(.*?)@endif/s';
-        $rendered = preg_replace_callback($pattern, function($matches) use ($sampleData) {
-            $variable = $matches[1];
-            $ifContent = $matches[2];
-            $elseContent = $matches[3];
-            
-            if (isset($sampleData[$variable]) && !empty($sampleData[$variable])) {
-                return $ifContent;
-            }
-            return $elseContent;
-        }, $rendered);
-
-        return $rendered;
-    }
-
-    private static function processForeachStatements($rendered, $sampleData)
-    {
-        // @foreach($collection as $item) ... @endforeach 패턴 처리
-        $pattern = '/@foreach\(\$(\w+) as \$(\w+)\)(.*?)@endforeach/s';
-        
-        $rendered = preg_replace_callback($pattern, function($matches) use ($sampleData) {
-            $collection = $matches[1];
-            $itemName = $matches[2];
-            $loopContent = $matches[3];
-            
-            if (!isset($sampleData[$collection]) || !is_array($sampleData[$collection])) {
-                return '';
-            }
-            
-            $result = '';
-            foreach ($sampleData[$collection] as $item) {
-                $itemContent = $loopContent;
-                
-                // 배열 항목의 각 속성 치환
-                if (is_array($item)) {
-                    foreach ($item as $key => $value) {
-                        $itemContent = str_replace('{{ $' . $itemName . '[\''. $key .'\'] }}', htmlspecialchars($value), $itemContent);
-                        $itemContent = str_replace('{{ $' . $itemName . '[\''.$key.'\'] }}', htmlspecialchars($value), $itemContent);
-                    }
-                }
-                
-                $result .= $itemContent;
-            }
-            
-            return $result;
-        }, $rendered);
-
-        return $rendered;
-    }
-
-    private static function processEmptyStatements($rendered, $sampleData)
-    {
-        // @empty($variable) ... @endempty 패턴 처리 
-        $pattern = '/@empty\(\$(\w+)\)(.*?)@endempty/s';
-        $rendered = preg_replace_callback($pattern, function($matches) use ($sampleData) {
-            $variable = $matches[1];
-            $content = $matches[2];
-            
-            if (!isset($sampleData[$variable]) || empty($sampleData[$variable])) {
-                return $content;
-            }
-            return '';
-        }, $rendered);
-
-        return $rendered;
+        return true;
     }
 }

@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
+
+class SandboxCustomScreen extends Model
+{
+    protected $fillable = [
+        'title',
+        'description', 
+        'type',
+        'folder_name',
+        'file_path',
+        'sandbox_type'
+    ];
+    
+    /**
+     * 파일이 존재하는지 확인
+     */
+    public function fileExists()
+    {
+        $fullPath = $this->getFullFilePath();
+        return File::exists($fullPath);
+    }
+    
+    /**
+     * 전체 파일 경로를 반환
+     */
+    public function getFullFilePath()
+    {
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_type}/{$this->file_path}");
+    }
+    
+    /**
+     * 파일 크기를 반환 (바이트)
+     */
+    public function getFileSize()
+    {
+        $fullPath = $this->getFullFilePath();
+        return File::exists($fullPath) ? File::size($fullPath) : 0;
+    }
+    
+    /**
+     * 파일 수정일시를 반환
+     */
+    public function getFileModified()
+    {
+        $fullPath = $this->getFullFilePath();
+        return File::exists($fullPath) ? File::lastModified($fullPath) : null;
+    }
+}
