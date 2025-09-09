@@ -47,7 +47,6 @@ return [
     '/sandbox/file-editor' => ['view' => '700-page-sandbox.704-page-file-editor.000-index', 'name' => 'sandbox.file-editor'],
     '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
     '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-page-git-version-control.000-index', 'name' => 'sandbox.git-version-control'],
-    '/sandbox/api-creator' => ['view' => '700-page-sandbox.703-page-api-creator.000-index', 'name' => 'sandbox.api-creator'],
     '/sandbox/api-list' => ['view' => '700-page-sandbox.704-page-api-list.000-index', 'name' => 'sandbox.api-list'],
     '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
     '/sandbox/custom-screens' => ['view' => '700-page-sandbox.706-page-custom-screens.000-index', 'name' => 'sandbox.custom-screens'],

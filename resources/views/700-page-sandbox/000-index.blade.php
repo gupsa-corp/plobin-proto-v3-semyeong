@@ -51,10 +51,6 @@
                     <p class="text-gray-600">로컬 Git 저장소 관리</p>
                 </a>
 
-                <a href="/sandbox/api-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">API 생성기</h3>
-                    <p class="text-gray-600">API 엔드포인트 생성 및 테스트</p>
-                </a>
 
                 <a href="/sandbox/api-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">API 목록</h3>

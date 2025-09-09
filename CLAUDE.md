@@ -43,7 +43,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
 - 메인 페이지: `000-index.blade.php`
 - 레이아웃: `301-layout-head.blade.php`
 - 컴포넌트: `200-sidebar-main.blade.php`
-- Livewire 뷰: `700-livewire-api-creator.blade.php`
+- Livewire 뷰: `700-livewire-component-name.blade.php`
 
 ### 숫자 접두사 체계
 - `000-xxx.blade.php`: 인덱스 파일 (메인 레이아웃)

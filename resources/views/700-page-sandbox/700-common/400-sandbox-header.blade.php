@@ -92,9 +92,6 @@
                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">개발 도구</div>
                 <div class="flex flex-wrap gap-2">
                     <!-- API 개발 -->
-                    <a href="/sandbox/api-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        🔧 API 생성기
-                    </a>
                     <a href="/sandbox/api-list" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
                         📋 API 목록
                     </a>
