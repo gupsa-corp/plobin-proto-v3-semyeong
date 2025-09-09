@@ -102,6 +102,31 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         return redirect()->route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
     })->name('project.dashboard.full');
 
+    // 프로젝트 샌드박스 관리 라우트들 (개발용 - 인증 없음)  
+    Route::get('/test/sandbox-templates', function() {
+        // 테스트용 샌드박스 템플릿 페이지
+        $project = (object)['id' => 2, 'name' => 'Test Project'];
+        $sandboxes = collect([]); // 빈 컬렉션
+        return view('300-page-service.318-page-project-settings-sandboxes.000-index', compact('project', 'sandboxes'));
+    })->name('test.sandbox.templates');
+    
+    Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', [App\Http\ProjectSandbox\Manage\Controller::class, 'index'])->name('project.dashboard.project.settings.sandboxes');
+    Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId, Illuminate\Http\Request $request) {
+        $action = $request->input('action');
+        $controller = new App\Http\ProjectSandbox\Manage\Controller();
+        
+        switch ($action) {
+            case 'create':
+                return $controller->create($request, $id, $projectId);
+            case 'delete':
+                return $controller->delete($request, $id, $projectId);
+            case 'toggle_status':
+                return $controller->toggleStatus($request, $id, $projectId);
+            default:
+                return back()->with('error', '잘못된 작업입니다.');
+        }
+    })->name('project.dashboard.project.settings.sandboxes.post');
+
     // 프로젝트 페이지 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
         // Fetch the organization, project, and page objects

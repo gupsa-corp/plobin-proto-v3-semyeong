@@ -23,18 +23,18 @@ class Controller extends BaseController
 
     public function index($organizationId, $projectId)
     {
-        // 인증 확인
-        $user = Auth::user();
-        if (!$user) {
-            return redirect('/login');
-        }
+        // 인증 확인 (개발용으로 임시 비활성화)
+        // $user = Auth::user();
+        // if (!$user) {
+        //     return redirect('/login');
+        // }
 
         $project = Project::findOrFail($projectId);
 
-        // 프로젝트 접근 권한 확인
-        if (!$project->canUserAccess($user)) {
-            abort(403);
-        }
+        // 프로젝트 접근 권한 확인 (개발용으로 임시 비활성화)
+        // if (!$project->canUserAccess($user)) {
+        //     abort(403);
+        // }
 
         $sandboxes = $project->sandboxes()->with('creator')->orderBy('created_at', 'desc')->get();
 

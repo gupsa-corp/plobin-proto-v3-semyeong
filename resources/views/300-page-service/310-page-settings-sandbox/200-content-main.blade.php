@@ -35,7 +35,7 @@
         </div>
 
         <!-- 콘텐츠 -->
-        <div class="p-6">
+        <div class="p-6" x-data="sandboxSettingsPage()">
             <form action="{{ route('project.dashboard.page.settings.sandbox.post', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" method="POST" class="space-y-6">
                 @csrf
                 
@@ -46,7 +46,7 @@
                     </label>
                     
                     <div class="space-y-3">
-                        <!-- 샌드박스 옵션들 -->
+                        <!-- 샌드박스 사용 안함 옵션 -->
                         <div class="flex items-center p-4 border border-gray-200 rounded-lg">
                             <input 
                                 type="radio" 
@@ -62,39 +62,65 @@
                             </label>
                         </div>
                         
-                        <!-- 샌드박스 템플릿 -->
-                        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
-                            <input 
-                                type="radio" 
-                                id="sandbox_template" 
-                                name="sandbox" 
-                                value="template" 
-                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                {{ ($currentSandboxType === 'template') ? 'checked' : '' }}
-                            >
-                            <label for="sandbox_template" class="ml-3 flex-1">
-                                <div class="font-medium text-gray-900">템플릿 샌드박스</div>
-                                <div class="text-sm text-gray-500">기본 템플릿이 포함된 샌드박스 환경입니다.</div>
-                            </label>
+                        <!-- 동적 샌드박스 템플릿 목록 -->
+                        <div x-show="loading" class="flex items-center justify-center p-4 border border-gray-200 rounded-lg">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-500">샌드박스 템플릿을 불러오는 중...</span>
                         </div>
 
-                        <!-- 샌드박스 1 -->
-                        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
-                            <input 
-                                type="radio" 
-                                id="sandbox_1" 
-                                name="sandbox" 
-                                value="1" 
-                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                {{ ($currentSandboxType === '1') ? 'checked' : '' }}
-                            >
-                            <label for="sandbox_1" class="ml-3 flex-1">
-                                <div class="font-medium text-gray-900">개발용 샌드박스 1</div>
-                                <div class="text-sm text-gray-500">개발 및 테스트를 위한 샌드박스 환경입니다.</div>
-                            </label>
+                        <div x-show="error && !loading" class="p-4 border border-red-200 rounded-lg bg-red-50">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">템플릿 로딩 오류</h3>
+                                    <p class="text-sm text-red-700 mt-1" x-text="error"></p>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- 사용자 정의 샌드박스 생성 옵션 -->
+                        <!-- 동적으로 로딩된 샌드박스 템플릿들 -->
+                        <template x-for="template in templates" :key="template.name">
+                            <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200">
+                                <input 
+                                    type="radio" 
+                                    :id="'sandbox_' + template.name" 
+                                    name="sandbox" 
+                                    :value="template.name" 
+                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    @if(!empty($currentSandboxType))
+                                        x-bind:checked="template.name === '{{ $currentSandboxType }}'"
+                                    @endif
+                                >
+                                <label :for="'sandbox_' + template.name" class="ml-3 flex-1 cursor-pointer">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900" x-text="template.name"></div>
+                                            <div class="text-sm text-gray-500 mt-1">
+                                                <span x-text="'파일: ' + template.file_count + '개'"></span>
+                                                <span class="mx-2">•</span>
+                                                <span x-text="'폴더: ' + template.directory_count + '개'"></span>
+                                                <span class="mx-2">•</span>
+                                                <span x-text="'생성일: ' + template.created_at"></span>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                템플릿
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </template>
+
+                        <!-- 새 샌드박스 생성 옵션 -->
                         <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
                             <div class="flex-1">
                                 <div class="font-medium text-gray-700">새 샌드박스 생성</div>
@@ -107,6 +133,15 @@
                                 </svg>
                                 생성
                             </a>
+                        </div>
+
+                        <!-- 템플릿이 없는 경우 -->
+                        <div x-show="!loading && !error && templates.length === 0" class="text-center py-6 border border-gray-200 rounded-lg">
+                            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                            <h4 class="mt-2 text-sm font-medium text-gray-900">사용 가능한 템플릿이 없습니다</h4>
+                            <p class="mt-1 text-xs text-gray-500">서버에서 샌드박스 템플릿을 찾을 수 없습니다.</p>
                         </div>
                     </div>
                 </div>
@@ -129,4 +164,52 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function sandboxSettingsPage() {
+            return {
+                templates: [],
+                loading: false,
+                error: null,
+                
+                init() {
+                    // 페이지 로드 시 템플릿 목록을 자동으로 불러오기
+                    this.loadTemplates();
+                },
+                
+                async loadTemplates() {
+                    this.loading = true;
+                    this.error = null;
+                    
+                    try {
+                        const response = await fetch('/api/sandbox/list', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        this.templates = data.sandboxes || [];
+                        
+                    } catch (error) {
+                        console.error('템플릿 로딩 에러:', error);
+                        this.error = error.message || '템플릿 목록을 불러오는 중 오류가 발생했습니다.';
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
 </div>

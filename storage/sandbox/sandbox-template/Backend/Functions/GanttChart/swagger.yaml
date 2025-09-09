@@ -1,0 +1,8 @@
+# GanttChart API OpenAPI 3.0 Specification
+# Generated automatically - Use swagger.json for complete specification
+
+openapi: 3.0.0
+info:
+  title: GanttChart API
+  version: 1.0.0
+  description: 'Comprehensive project and task management system'

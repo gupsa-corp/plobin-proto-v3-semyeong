@@ -38,6 +38,8 @@ use App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller as DownloadR
 use App\Http\CoreApi\OrganizationBilling\GetAvailablePlans\Controller as GetAvailablePlansController;
 use App\Http\CoreApi\User\SearchUsers\Controller as SearchUsersController;
 use App\Http\CoreApi\Sandbox\FileList\Controller as SandboxFileListController;
+use App\Http\CoreApi\Sandbox\ListSandboxes\Controller as ListSandboxesController;
+use App\Http\CoreApi\Sandbox\ListScreens\Controller as ListScreensController;
 use App\Http\CoreApi\PlatformAdmin\Pricing\Controller as PlatformAdminPricingController;
 use Illuminate\Support\Facades\Route;
 
@@ -178,6 +180,7 @@ Route::prefix('test/organizations')->group(function () {
 
 // 샌드박스 API (개발용 - 인증 없음)
 Route::prefix('sandbox')->group(function () {
+    Route::get('/list', [ListSandboxesController::class, 'listSandboxes']);
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     
     // AI Server Callback API
