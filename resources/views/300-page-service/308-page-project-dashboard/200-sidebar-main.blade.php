@@ -41,12 +41,75 @@
         @if($pages->count() > 0)
             @foreach($pages as $page)
                 <div style="margin-bottom: 8px;">
-                    <a href="{{ route('project.dashboard.page', ['id' => request()->route('id'), 'projectId' => $projectId, 'pageId' => $page->id]) }}" 
-                       style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; color: {{ $currentPageId == $page->id ? '#2563EB' : '#6B7280' }}; text-decoration: none; border-radius: 6px; cursor: pointer; background: {{ $currentPageId == $page->id ? '#EFF6FF' : 'transparent' }};"
-                       onmouseover="if({{ $currentPageId == $page->id ? 'false' : 'true' }}) this.style.background='#F9FAFB'"
-                       onmouseout="if({{ $currentPageId == $page->id ? 'false' : 'true' }}) this.style.background='transparent'">
-                        <span style="font-size: 14px; font-weight: {{ $currentPageId == $page->id ? '600' : '400' }};">{{ $page->title }}</span>
-                    </a>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: {{ $currentPageId == $page->id ? '#EFF6FF' : 'transparent' }}; border-radius: 6px;"
+                         onmouseover="if({{ $currentPageId == $page->id ? 'false' : 'true' }}) this.style.background='#F9FAFB'"
+                         onmouseout="if({{ $currentPageId == $page->id ? 'false' : 'true' }}) this.style.background='{{ $currentPageId == $page->id ? '#EFF6FF' : 'transparent' }}'">
+                        <a href="{{ route('project.dashboard.page', ['id' => request()->route('id'), 'projectId' => $projectId, 'pageId' => $page->id]) }}" 
+                           style="display: flex; align-items: center; gap: 8px; color: {{ $currentPageId == $page->id ? '#2563EB' : '#6B7280' }}; text-decoration: none; cursor: pointer; flex: 1;">
+                            <span style="font-size: 14px; font-weight: {{ $currentPageId == $page->id ? '600' : '400' }};">{{ $page->title }}</span>
+                        </a>
+                        
+                        {{-- 드롭다운 버튼 --}}
+                        <div class="page-dropdown-container" style="position: relative;">
+                            <button onclick="toggleDropdown({{ $page->id }})"
+                                    style="width: 24px; height: 24px; border: 1px solid #D1D5DB; border-radius: 4px; background: #F8F9FA; color: #495057; font-size: 14px; font-weight: bold; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                    onmouseover="this.style.background='#E9ECEF'; this.style.borderColor='#ADB5BD';"
+                                    onmouseout="this.style.background='#F8F9FA'; this.style.borderColor='#D1D5DB';"
+                                    title="페이지 옵션 (ID: {{ $page->id }})">
+                                ⋮
+                            </button>
+                            
+                            <div id="dropdown-{{ $page->id }}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                                
+                                {{-- 이름 변경 --}}
+                                <button onclick="
+                                    const newTitle = prompt('새로운 페이지 이름을 입력하세요:', '{{ addslashes($page->title) }}');
+                                    if (newTitle && newTitle.trim() !== '') {
+                                        updatePageTitle({{ $page->id }}, newTitle.trim());
+                                        closeAllDropdowns();
+                                    }
+                                " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                        onmouseover="this.style.background='#F9FAFB'"
+                                        onmouseout="this.style.background='white'">
+                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    이름 변경
+                                </button>
+                                
+                                {{-- 하위 페이지 추가 --}}
+                                <button onclick="
+                                    addChildPage({{ $page->id }});
+                                    closeAllDropdowns();
+                                " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                        onmouseover="this.style.background='#F9FAFB'"
+                                        onmouseout="this.style.background='white'">
+                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                    하위 페이지 추가
+                                </button>
+                                
+                                {{-- 구분선 --}}
+                                <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>
+                                
+                                {{-- 삭제 --}}
+                                <button onclick="
+                                    if (confirm('{{ addslashes($page->title) }} 페이지를 정말 삭제하시겠습니까?\\n\\n하위 페이지가 있는 경우 먼저 하위 페이지를 삭제해야 합니다.')) {
+                                        deletePage({{ $page->id }});
+                                        closeAllDropdowns();
+                                    }
+                                " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                        onmouseover="this.style.background='#FEF2F2'"
+                                        onmouseout="this.style.background='white'">
+                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     
                     {{-- 하위 페이지 표시 --}}
                     @php
@@ -58,12 +121,74 @@
                     @if($childPages->count() > 0)
                         <div style="margin-left: 16px; margin-top: 4px;">
                             @foreach($childPages as $childPage)
-                                <a href="{{ route('project.dashboard.page', ['id' => request()->route('id'), 'projectId' => $projectId, 'pageId' => $childPage->id]) }}" 
-                                   style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; color: {{ $currentPageId == $childPage->id ? '#2563EB' : '#9CA3AF' }}; text-decoration: none; border-radius: 4px; cursor: pointer; background: {{ $currentPageId == $childPage->id ? '#EFF6FF' : 'transparent' }}; margin-bottom: 2px;"
-                                   onmouseover="if({{ $currentPageId == $childPage->id ? 'false' : 'true' }}) this.style.background='#F9FAFB'"
-                                   onmouseout="if({{ $currentPageId == $childPage->id ? 'false' : 'true' }}) this.style.background='transparent'">
-                                    <span style="font-size: 13px; font-weight: {{ $currentPageId == $childPage->id ? '600' : '400' }};">{{ $childPage->title }}</span>
-                                </a>
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: {{ $currentPageId == $childPage->id ? '#EFF6FF' : 'transparent' }}; border-radius: 4px; margin-bottom: 2px;"
+                                     onmouseover="if({{ $currentPageId == $childPage->id ? 'false' : 'true' }}) this.style.background='#F9FAFB'"
+                                     onmouseout="if({{ $currentPageId == $childPage->id ? 'false' : 'true' }}) this.style.background='{{ $currentPageId == $childPage->id ? '#EFF6FF' : 'transparent' }}'">
+                                    <a href="{{ route('project.dashboard.page', ['id' => request()->route('id'), 'projectId' => $projectId, 'pageId' => $childPage->id]) }}" 
+                                       style="display: flex; align-items: center; gap: 8px; color: {{ $currentPageId == $childPage->id ? '#2563EB' : '#9CA3AF' }}; text-decoration: none; cursor: pointer; flex: 1;">
+                                        <span style="font-size: 13px; font-weight: {{ $currentPageId == $childPage->id ? '600' : '400' }};">{{ $childPage->title }}</span>
+                                    </a>
+                                    
+                                    {{-- 하위 페이지 드롭다운 버튼 --}}
+                                    <div class="page-dropdown-container" style="position: relative;">
+                                        <button onclick="toggleDropdown({{ $childPage->id }})"
+                                                style="width: 20px; height: 20px; border: 1px solid #D1D5DB; border-radius: 3px; background: #F8F9FA; color: #495057; font-size: 12px; font-weight: bold; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                                onmouseover="this.style.background='#E9ECEF'; this.style.borderColor='#ADB5BD';"
+                                                onmouseout="this.style.background='#F8F9FA'; this.style.borderColor='#D1D5DB';"
+                                                title="페이지 옵션 (ID: {{ $childPage->id }})">
+                                            ⋮
+                                        </button>
+                                        
+                                        <div id="dropdown-{{ $childPage->id }}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                                            {{-- 이름 변경 --}}
+                                            <button onclick="
+                                                const newTitle = prompt('새로운 페이지 이름을 입력하세요:', '{{ addslashes($childPage->title) }}');
+                                                if (newTitle && newTitle.trim() !== '') {
+                                                    updatePageTitle({{ $childPage->id }}, newTitle.trim());
+                                                    closeAllDropdowns();
+                                                }
+                                            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                                    onmouseover="this.style.background='#F9FAFB'"
+                                                    onmouseout="this.style.background='white'">
+                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                                이름 변경
+                                            </button>
+                                            
+                                            {{-- 하위 페이지 추가 --}}
+                                            <button onclick="
+                                                addChildPage({{ $childPage->id }});
+                                                closeAllDropdowns();
+                                            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                                    onmouseover="this.style.background='#F9FAFB'"
+                                                    onmouseout="this.style.background='white'">
+                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                </svg>
+                                                하위 페이지 추가
+                                            </button>
+                                            
+                                            {{-- 구분선 --}}
+                                            <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>
+                                            
+                                            {{-- 삭제 --}}
+                                            <button onclick="
+                                                if (confirm('{{ addslashes($childPage->title) }} 페이지를 정말 삭제하시겠습니까?')) {
+                                                    deletePage({{ $childPage->id }});
+                                                    closeAllDropdowns();
+                                                }
+                                            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                                                    onmouseover="this.style.background='#FEF2F2'"
+                                                    onmouseout="this.style.background='white'">
+                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     @endif
@@ -141,6 +266,137 @@ async function createNewPage() {
         button.innerHTML = originalText;
         button.disabled = false;
         button.style.cursor = 'pointer';
+    }
+}
+
+// 드롭다운 관리
+let currentOpenDropdownId = null;
+
+function toggleDropdown(pageId) {
+    closeAllDropdowns();
+    
+    if (currentOpenDropdownId !== pageId) {
+        const dropdown = document.getElementById('dropdown-' + pageId);
+        if (dropdown) {
+            dropdown.style.display = 'block';
+            currentOpenDropdownId = pageId;
+        }
+    } else {
+        currentOpenDropdownId = null;
+    }
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
+        dropdown.style.display = 'none';
+    });
+    currentOpenDropdownId = null;
+}
+
+// 문서 클릭 시 드롭다운 닫기
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.page-dropdown-container')) {
+        closeAllDropdowns();
+    }
+});
+
+// 페이지 제목 업데이트
+async function updatePageTitle(pageId, newTitle) {
+    try {
+        const pathParts = window.location.pathname.split('/');
+        const orgId = pathParts[2];
+        const projectId = pathParts[4];
+        
+        const response = await fetch(`/organizations/${orgId}/projects/${projectId}/pages/${pageId}/title`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                title: newTitle
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 페이지 새로고침으로 변경사항 반영
+            window.location.reload();
+        } else {
+            alert(result.error || '페이지 이름 변경에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Title update error:', error);
+        alert('페이지 이름 변경 중 오류가 발생했습니다.');
+    }
+}
+
+// 하위 페이지 추가
+async function addChildPage(parentId) {
+    try {
+        const pathParts = window.location.pathname.split('/');
+        const orgId = pathParts[2];
+        const projectId = pathParts[4];
+        
+        const response = await fetch(`/organizations/${orgId}/projects/${projectId}/pages/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                parent_id: parentId,
+                title: '새 하위 페이지'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 페이지 새로고침으로 변경사항 반영
+            window.location.reload();
+        } else {
+            alert(result.error || '하위 페이지 생성에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Child page creation error:', error);
+        alert('하위 페이지 생성 중 오류가 발생했습니다.');
+    }
+}
+
+// 페이지 삭제
+async function deletePage(pageId) {
+    try {
+        const pathParts = window.location.pathname.split('/');
+        const orgId = pathParts[2];
+        const projectId = pathParts[4];
+        
+        const response = await fetch(`/organizations/${orgId}/projects/${projectId}/pages/${pageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 현재 페이지가 삭제된 페이지라면 프로젝트 대시보드로 이동
+            const currentPageId = pathParts[6];
+            if (currentPageId == pageId) {
+                window.location.href = `/organizations/${orgId}/projects/${projectId}`;
+            } else {
+                // 페이지 새로고침으로 변경사항 반영
+                window.location.reload();
+            }
+        } else {
+            alert(result.error || '페이지 삭제에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('Page deletion error:', error);
+        alert('페이지 삭제 중 오류가 발생했습니다.');
     }
 }
 </script>
