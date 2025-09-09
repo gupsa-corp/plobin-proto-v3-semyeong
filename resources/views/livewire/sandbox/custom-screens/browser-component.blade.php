@@ -53,12 +53,20 @@
             <!-- 화면 목록 -->
             <div class="space-y-3 max-h-96 overflow-y-auto">
                 @forelse($screens as $screen)
-                    <div wire:click="selectScreen({{ $screen['id'] }})"
+                    <div wire:click="selectScreen({{ is_string($screen['id']) ? "'" . $screen['id'] . "'" : $screen['id'] }})"
                          class="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow
-                                {{ $selectedScreen && $selectedScreen['id'] == $screen['id'] ? 'border-blue-500 bg-blue-50' : '' }}">
+                                {{ $selectedScreen && $selectedScreen['id'] == $screen['id'] ? 'border-blue-500 bg-blue-50' : '' }}
+                                @if($screen['is_template']) border-purple-300 bg-purple-25 @endif">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <h3 class="font-semibold text-gray-900 mb-1">{{ $screen['title'] }}</h3>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-gray-900">{{ $screen['title'] }}</h3>
+                                    @if($screen['is_template'])
+                                        <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                            🎨 템플릿
+                                        </span>
+                                    @endif
+                                </div>
                                 <p class="text-sm text-gray-600 mb-2">{{ $screen['description'] ?? '설명 없음' }}</p>
                                 <div class="flex items-center space-x-4 text-xs text-gray-500">
                                     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
@@ -77,19 +85,26 @@
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-1 ml-4">
-                                <button wire:click.stop="editScreen({{ $screen['id'] }})"
-                                        class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
-                                    ✏️ 편집
-                                </button>
-                                <button wire:click.stop="duplicateScreen({{ $screen['id'] }})"
-                                        class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
-                                    📄 복사
-                                </button>
-                                <button wire:click.stop="deleteScreen({{ $screen['id'] }})"
-                                        class="text-red-600 hover:text-red-800 text-xs px-2 py-1 rounded hover:bg-red-50"
-                                        onclick="return confirm('정말 삭제하시겠습니까?')">
-                                    🗑️ 삭제
-                                </button>
+                                @if($screen['is_template'])
+                                    <button wire:click.stop="copyTemplateToCustomScreen({{ "'" . $screen['id'] . "'" }})"
+                                            class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50">
+                                        📋 배포하기
+                                    </button>
+                                @else
+                                    <button wire:click.stop="editScreen({{ $screen['id'] }})"
+                                            class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
+                                        ✏️ 편집
+                                    </button>
+                                    <button wire:click.stop="duplicateScreen({{ $screen['id'] }})"
+                                            class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
+                                        📄 복사
+                                    </button>
+                                    <button wire:click.stop="deleteScreen({{ $screen['id'] }})"
+                                            class="text-red-600 hover:text-red-800 text-xs px-2 py-1 rounded hover:bg-red-50"
+                                            onclick="return confirm('정말 삭제하시겠습니까?')">
+                                        🗑️ 삭제
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>

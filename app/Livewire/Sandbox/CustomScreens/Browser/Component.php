@@ -41,6 +41,7 @@ class Component extends LivewireComponent
     private function getScreensFromDatabase()
     {
         try {
+            // 데이터베이스에서 커스텀 화면 가져오기
             $screens = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)
                 ->orderBy('created_at', 'desc')
                 ->get()
@@ -57,9 +58,48 @@ class Component extends LivewireComponent
                         'full_path' => $screen->getFullFilePath(),
                         'file_size' => $screen->getFileSize(),
                         'file_modified' => $screen->getFileModified(),
+                        'is_template' => false,
                     ];
                 })
                 ->toArray();
+
+            // template 스토리지의 frontend 폴더에서 템플릿 화면들 가져오기
+            $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+            if (File::exists($templatePath)) {
+                $templateScreens = [];
+                $folders = File::directories($templatePath);
+                
+                foreach ($folders as $folder) {
+                    $folderName = basename($folder);
+                    $contentFile = $folder . '/000-content.blade.php';
+                    
+                    if (File::exists($contentFile)) {
+                        // 폴더명에서 화면 정보 추출
+                        $parts = explode('-', $folderName, 3);
+                        $screenId = $parts[0] ?? '000';
+                        $screenType = $parts[1] ?? 'screen';
+                        $screenName = $parts[2] ?? 'unnamed';
+                        
+                        $templateScreens[] = [
+                            'id' => 'template_' . $screenId,
+                            'title' => str_replace('-', ' ', $screenName),
+                            'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                            'type' => $screenType,
+                            'folder_name' => $folderName,
+                            'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
+                            'created_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'file_exists' => true,
+                            'full_path' => $contentFile,
+                            'file_size' => File::size($contentFile),
+                            'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'is_template' => true,
+                        ];
+                    }
+                }
+                
+                // 템플릿 화면들을 기존 화면 목록에 추가 (템플릿이 먼저 오도록)
+                $screens = array_merge($templateScreens, $screens);
+            }
 
             return $screens;
         } catch (\Exception $e) {
@@ -73,6 +113,54 @@ class Component extends LivewireComponent
         $screen = collect($this->screens)->firstWhere('id', $id);
         if ($screen) {
             $this->selectedScreen = $screen;
+        }
+    }
+
+    public function copyTemplateToCustomScreen($templateId)
+    {
+        try {
+            // 템플릿 화면 정보 찾기
+            $template = collect($this->screens)->firstWhere('id', $templateId);
+            if (!$template || !$template['is_template']) {
+                session()->flash('error', '템플릿을 찾을 수 없습니다.');
+                return;
+            }
+
+            // 새로운 폴더명 생성 (템플릿을 복사하여 커스텀 화면으로)
+            $newFolderName = $template['folder_name'] . '-deployed-' . time();
+            $newFileName = 'custom-screens/' . $newFolderName . '/000-content.blade.php';
+            
+            // 현재 스토리지의 custom-screens 경로에 저장
+            $targetPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/" . $newFileName);
+            
+            // 새 폴더 생성
+            $targetDir = dirname($targetPath);
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            
+            // 템플릿 파일 복사
+            if (File::exists($template['full_path'])) {
+                File::copy($template['full_path'], $targetPath);
+            } else {
+                session()->flash('error', '템플릿 파일을 찾을 수 없습니다.');
+                return;
+            }
+
+            // DB에 메타데이터 추가
+            SandboxCustomScreen::create([
+                'title' => $template['title'] . ' (배포됨)',
+                'description' => $template['description'] . ' - 템플릿에서 배포된 화면',
+                'type' => $template['type'],
+                'folder_name' => $newFolderName,
+                'file_path' => $newFileName,
+                'sandbox_type' => $this->currentStorage,
+            ]);
+
+            $this->loadScreens();
+            session()->flash('message', '템플릿이 커스텀 화면으로 배포되었습니다.');
+        } catch (\Exception $e) {
+            session()->flash('error', '템플릿 배포 중 오류가 발생했습니다: ' . $e->getMessage());
         }
     }
 
