@@ -53,7 +53,7 @@
                 </span>
             @endif
         </div>
-        <div style="display: flex; gap: 4px; align-items: center;">
+        <div style="display: flex !important; gap: 4px; align-items: center; opacity: 1 !important; visibility: visible !important; min-width: 30px;">
             {{-- Livewire 페이지 메뉴 드롭다운 --}}
             <livewire:page-menu-dropdown :page="$page" :key="'page-menu-'.$page['id']" />
         </div>

@@ -1,12 +1,12 @@
 {{-- Livewire 페이지 메뉴 드롭다운 컴포넌트 --}}
 <div class="page-dropdown-container" 
-     style="display: flex; position: relative;">
-    <button onclick="toggleDropdown({{ $page['id'] }})"
-            style="width: 20px; height: 20px; border: none; border-radius: 3px; background: #F3F4F6; color: #6B7280; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
-            onmouseover="this.style.background='#E5E7EB'"
-            onmouseout="this.style.background='#F3F4F6'"
-            title="페이지 옵션">
-        •••
+     style="display: flex !important; position: relative; opacity: 1 !important; visibility: visible !important;">
+    <button onclick="console.log('Button clicked for page:', {{ $page['id'] }}); toggleDropdown({{ $page['id'] }})"
+            style="width: 24px; height: 24px; border: 1px solid #D1D5DB; border-radius: 4px; background: #F8F9FA !important; color: #495057 !important; font-size: 14px; font-weight: bold; line-height: 1; cursor: pointer; display: flex !important; align-items: center; justify-content: center; opacity: 1 !important; visibility: visible !important; z-index: 999; margin-left: 4px;"
+            onmouseover="this.style.background='#E9ECEF'; this.style.borderColor='#ADB5BD';"
+            onmouseout="this.style.background='#F8F9FA'; this.style.borderColor='#D1D5DB';"
+            title="페이지 옵션 (ID: {{ $page['id'] }})">
+        ⋮
     </button>
     
     <div id="dropdown-{{ $page['id'] }}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
