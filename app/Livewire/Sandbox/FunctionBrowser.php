@@ -292,11 +292,20 @@ class FunctionBrowser extends Component implements HasForms
     public function testFunction($params = '{}')
     {
         if (empty($this->activeFunction)) {
+            // Try to parse params for display
+            $parsedParams = null;
+            try {
+                $parsedParams = json_decode($params, true);
+            } catch (\Exception $parseError) {
+                $parsedParams = ['error' => 'Invalid JSON'];
+            }
+            
             $this->testResults[] = [
                 'timestamp' => now()->format('H:i:s'),
                 'function' => 'N/A',
                 'version' => 'N/A',
-                'params' => $params,
+                'params' => $parsedParams ?: ['error' => 'Invalid JSON'],
+                'params_raw' => $params,
                 'error' => '함수가 선택되지 않았습니다.',
                 'success' => false
             ];
@@ -333,17 +342,27 @@ class FunctionBrowser extends Component implements HasForms
                 'timestamp' => now()->format('H:i:s'),
                 'function' => $functionName,
                 'version' => $version,
-                'params' => $params,
+                'params' => $paramsArray, // Store parsed params for better display
+                'params_raw' => $params, // Store raw JSON string
                 'result' => $result,
                 'success' => true
             ];
             
         } catch (\Exception $e) {
+            // Try to parse params for display even in error cases
+            $parsedParams = null;
+            try {
+                $parsedParams = json_decode($params, true);
+            } catch (\Exception $parseError) {
+                $parsedParams = ['error' => 'Invalid JSON'];
+            }
+            
             $this->testResults[] = [
                 'timestamp' => now()->format('H:i:s'),
                 'function' => $functionName ?? 'N/A',
                 'version' => $version ?? 'N/A',
-                'params' => $params,
+                'params' => $parsedParams ?: ['error' => 'Invalid JSON'],
+                'params_raw' => $params,
                 'error' => $e->getMessage(),
                 'success' => false
             ];
