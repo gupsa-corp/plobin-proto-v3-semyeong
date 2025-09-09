@@ -14,6 +14,9 @@ $(document).ready(function() {
     // Initialize drag and drop
     initializeDragDrop();
     
+    // Initialize sortable
+    initializeSortable();
+    
     // Initialize event handlers
     initializeEventHandlers();
     
@@ -24,22 +27,41 @@ $(document).ready(function() {
      * Initialize drag and drop functionality
      */
     function initializeDragDrop() {
+        // Destroy existing draggable instances first
+        try {
+            $('.component-item').draggable('destroy');
+        } catch(e) {
+            // Ignore if not initialized
+        }
+        
         // Make components draggable
         $('.component-item').draggable({
             helper: 'clone',
             revert: 'invalid',
             zIndex: 1000,
+            cursor: 'move',
+            cursorAt: { top: 5, left: 5 },
+            distance: 5,
             start: function(event, ui) {
                 $(ui.helper).addClass('dragging');
+                // Copy component type data to the helper
+                $(ui.helper).data('component-type', $(this).data('component-type'));
             }
         });
         
-        // Make form canvas droppable
+        // Make form canvas droppable for new components
         $('#form-canvas').droppable({
             accept: '.component-item',
             drop: function(event, ui) {
-                const componentType = ui.draggable.data('component-type');
-                addComponentToCanvas(componentType);
+                const componentType = $(ui.helper).data('component-type');
+                
+                if (!componentType) {
+                    // Fallback: try to get from original draggable element
+                    const fallbackType = ui.draggable.data('component-type');
+                    addComponentToCanvas(fallbackType);
+                } else {
+                    addComponentToCanvas(componentType);
+                }
                 hideEmptyState();
             },
             over: function(event, ui) {
@@ -49,16 +71,79 @@ $(document).ready(function() {
                 $(this).removeClass('drag-over');
             }
         });
+    }
+    
+    /**
+     * Initialize sortable for component reordering
+     */
+    function initializeSortable() {
+        // Destroy existing sortable first
+        try {
+            $('#form-components').sortable('destroy');
+        } catch(e) {
+            // Ignore if not initialized
+        }
         
-        // Make form components sortable
+        // Make form components container sortable for reordering components
         $('#form-components').sortable({
-            handle: '.component-wrapper',
+            items: '.component-wrapper',
+            handle: '.component-card',
             placeholder: 'sortable-placeholder',
             tolerance: 'pointer',
+            cursor: 'move',
+            distance: 5,
+            start: function(event, ui) {
+                $(ui.item).addClass('dragging');
+            },
+            stop: function(event, ui) {
+                $(ui.item).removeClass('dragging');
+            },
             update: function(event, ui) {
                 updateComponentOrder();
             }
         });
+        
+        // Apply dynamic styles for form builder
+        if (!$('#form-builder-styles').length) {
+            $('<style id="form-builder-styles">')
+                .prop('type', 'text/css')
+                .html(`
+                    .sortable-placeholder {
+                        border-bottom: 2px dashed #3b82f6;
+                        background-color: #dbeafe;
+                        height: 1px;
+                        margin: 4px 0;
+                        border-radius: 8px;
+                    }
+                    .component-wrapper.dragging {
+                        opacity: 0.8;
+                        transform: rotate(2deg);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                        z-index: 1000;
+                    }
+                    .component-card {
+                        cursor: move;
+                    }
+                    .drag-over {
+                        background-color: #f0f9ff !important;
+                        border-color: #3b82f6 !important;
+                    }
+                    .dragging {
+                        opacity: 0.8;
+                        transform: rotate(5deg);
+                    }
+                    .component-item {
+                        user-select: none;
+                        -webkit-user-select: none;
+                        -moz-user-select: none;
+                        -ms-user-select: none;
+                    }
+                    .component-item * {
+                        pointer-events: none;
+                    }
+                `)
+                .appendTo('head');
+        }
     }
     
     /**
@@ -78,7 +163,11 @@ $(document).ready(function() {
         });
         
         // Component selection
-        $(document).on('click', '.component-wrapper', function() {
+        $(document).on('click', '.component-wrapper', function(e) {
+            // Don't select if dragging
+            if ($(this).hasClass('dragging')) {
+                return;
+            }
             selectComponent($(this));
         });
         
@@ -168,6 +257,10 @@ $(document).ready(function() {
      * Add component to canvas
      */
     function addComponentToCanvas(componentType) {
+        if (!componentType) {
+            return;
+        }
+        
         const componentId = 'comp_' + (++componentCounter);
         let componentHtml = '';
         
@@ -218,7 +311,7 @@ $(document).ready(function() {
     function createInputComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="input">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -240,7 +333,7 @@ $(document).ready(function() {
     function createButtonComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="button">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -263,7 +356,7 @@ $(document).ready(function() {
     function createHeaderComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="header">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -284,7 +377,7 @@ $(document).ready(function() {
     function createTextareaComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="textarea">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -306,7 +399,7 @@ $(document).ready(function() {
     function createDropdownComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="dropdown">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -333,7 +426,7 @@ $(document).ready(function() {
     function createCheckboxComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="checkbox">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -357,7 +450,7 @@ $(document).ready(function() {
     function createRadioGroupComponent(componentId) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="radiogroup">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -394,7 +487,7 @@ $(document).ready(function() {
     function createGenericComponent(componentId, componentType) {
         return `
             <div id="${componentId}" class="component-wrapper mb-4" data-type="${componentType}">
-                <div class="bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
+                <div class="component-card bg-white border border-gray-200 rounded-md p-4 hover:border-blue-400 transition-colors relative group">
                     <div class="component-toolbar absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 mr-1" onclick="editComponent('${componentId}')">
                             <i class="fas fa-edit"></i>
@@ -494,22 +587,78 @@ $(document).ready(function() {
         const componentType = selectedComponent.data('type');
         const label = $('#prop-label').val();
         const placeholder = $('#prop-placeholder').val();
+        const name = $('#prop-name').val();
+        const required = $('#prop-required').is(':checked');
+        const disabled = $('#prop-disabled').is(':checked');
+        const hidden = $('#prop-hidden').is(':checked');
+        
+        // Style tab
+        const width = $('#prop-width').val();
+        const marginTop = parseInt($('#prop-margin-top').val() || 0, 10);
+        const marginBottom = parseInt($('#prop-margin-bottom').val() || 0, 10);
+        const paddingX = parseInt($('#prop-padding-x').val() || 0, 10);
+        const paddingY = parseInt($('#prop-padding-y').val() || 0, 10);
+        const bgColor = $('#prop-bg-color').val();
+        const textColor = $('#prop-text-color').val();
+        const borderStyle = $('#prop-border-style').val();
+        const borderWidth = parseInt($('#prop-border-width').val() || 0, 10);
+        const borderColor = $('#prop-border-color').val();
         
         switch(componentType) {
             case 'input':
                 selectedComponent.find('.component-label').text(label);
-                selectedComponent.find('.component-input').attr('placeholder', placeholder);
+                selectedComponent.find('.component-input')
+                    .attr('placeholder', placeholder)
+                    .attr('name', name || '')
+                    .prop('required', !!required)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
                 break;
             case 'button':
-                selectedComponent.find('.component-button').text(label);
+                selectedComponent.find('.component-button')
+                    .text(label)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
                 break;
             case 'header':
-                selectedComponent.find('.component-header').text(label);
+                selectedComponent.find('.component-header')
+                    .text(label)
+                    .toggleClass('hidden', !!hidden);
                 break;
             case 'textarea':
                 selectedComponent.find('.component-label').text(label);
-                selectedComponent.find('.component-textarea').attr('placeholder', placeholder);
+                selectedComponent.find('.component-textarea')
+                    .attr('placeholder', placeholder)
+                    .attr('name', name || '')
+                    .prop('required', !!required)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
                 break;
+        }
+        
+        // Apply style to only this component's card
+        const $card = selectedComponent.find('> .component-card');
+        if ($card.length) {
+            // width presets via Tailwind utility classes
+            $card.removeClass('w-full w-1/2 w-1/3 w-1/4');
+            if (width === 'full') $card.addClass('w-full');
+            if (width === 'half') $card.addClass('w-1/2');
+            if (width === 'third') $card.addClass('w-1/3');
+            if (width === 'quarter') $card.addClass('w-1/4');
+            
+            $card.css({
+                marginTop: `${marginTop}px`,
+                marginBottom: `${marginBottom}px`,
+                paddingLeft: `${paddingX}px`,
+                paddingRight: `${paddingX}px`,
+                paddingTop: `${paddingY}px`,
+                paddingBottom: `${paddingY}px`,
+                backgroundColor: bgColor || '',
+                color: textColor || '',
+                borderStyle: borderStyle || 'none',
+                borderWidth: `${borderWidth || 0}px`,
+                borderColor: borderColor || ''
+            });
         }
         
         // Update form data
@@ -779,17 +928,63 @@ $(document).ready(function() {
             case 'input':
                 if (properties.label) $component.find('.component-label').text(properties.label);
                 if (properties.placeholder) $component.find('.component-input').attr('placeholder', properties.placeholder);
+                if (properties.name !== undefined) $component.find('.component-input').attr('name', properties.name);
+                if (properties.required !== undefined) $component.find('.component-input').prop('required', !!properties.required);
+                if (properties.disabled !== undefined) $component.find('.component-input').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
                 break;
             case 'button':
                 if (properties.text) $component.find('.component-button').text(properties.text);
+                if (properties.disabled !== undefined) $component.find('.component-button').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
                 break;
             case 'header':
                 if (properties.text) $component.find('.component-header').text(properties.text);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
                 break;
             case 'textarea':
                 if (properties.label) $component.find('.component-label').text(properties.label);
                 if (properties.placeholder) $component.find('.component-textarea').attr('placeholder', properties.placeholder);
+                if (properties.name !== undefined) $component.find('.component-textarea').attr('name', properties.name);
+                if (properties.required !== undefined) $component.find('.component-textarea').prop('required', !!properties.required);
+                if (properties.disabled !== undefined) $component.find('.component-textarea').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
                 break;
+        }
+
+        // Restore style properties per component
+        const $card = $component.find('> .component-card');
+        if ($card.length) {
+            const width = properties.width;
+            const marginTop = properties.marginTop;
+            const marginBottom = properties.marginBottom;
+            const paddingX = properties.paddingX;
+            const paddingY = properties.paddingY;
+            const bgColor = properties.bgColor;
+            const textColor = properties.textColor;
+            const borderStyle = properties.borderStyle;
+            const borderWidth = properties.borderWidth;
+            const borderColor = properties.borderColor;
+
+            $card.removeClass('w-full w-1/2 w-1/3 w-1/4');
+            if (width === 'full') $card.addClass('w-full');
+            if (width === 'half') $card.addClass('w-1/2');
+            if (width === 'third') $card.addClass('w-1/3');
+            if (width === 'quarter') $card.addClass('w-1/4');
+
+            $card.css({
+                marginTop: marginTop !== undefined ? `${marginTop}px` : '',
+                marginBottom: marginBottom !== undefined ? `${marginBottom}px` : '',
+                paddingLeft: paddingX !== undefined ? `${paddingX}px` : '',
+                paddingRight: paddingX !== undefined ? `${paddingX}px` : '',
+                paddingTop: paddingY !== undefined ? `${paddingY}px` : '',
+                paddingBottom: paddingY !== undefined ? `${paddingY}px` : '',
+                backgroundColor: bgColor || '',
+                color: textColor || '',
+                borderStyle: borderStyle || '',
+                borderWidth: borderWidth !== undefined ? `${borderWidth}px` : '',
+                borderColor: borderColor || ''
+            });
         }
     }
     
@@ -824,22 +1019,49 @@ $(document).ready(function() {
                 properties.label = $component.find('.component-label').text();
                 properties.placeholder = $component.find('.component-input').attr('placeholder');
                 properties.name = $component.find('.component-input').attr('name') || '';
+                properties.required = $component.find('.component-input').prop('required') || false;
+                properties.disabled = $component.find('.component-input').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
                 break;
             case 'button':
                 properties.text = $component.find('.component-button').text();
                 properties.type = $component.find('.component-button').attr('type') || 'button';
+                properties.disabled = $component.find('.component-button').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
                 break;
             case 'header':
                 properties.text = $component.find('.component-header').text();
                 properties.level = $component.find('.component-header').prop('tagName').toLowerCase();
+                properties.hidden = $component.hasClass('hidden');
                 break;
             case 'textarea':
                 properties.label = $component.find('.component-label').text();
                 properties.placeholder = $component.find('.component-textarea').attr('placeholder');
                 properties.rows = $component.find('.component-textarea').attr('rows') || 4;
+                properties.name = $component.find('.component-textarea').attr('name') || '';
+                properties.required = $component.find('.component-textarea').prop('required') || false;
+                properties.disabled = $component.find('.component-textarea').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
                 break;
         }
-        
+        // Read style set on component-card
+        const $card = $component.find('> .component-card');
+        if ($card.length) {
+            if ($card.hasClass('w-full')) properties.width = 'full';
+            if ($card.hasClass('w-1/2')) properties.width = 'half';
+            if ($card.hasClass('w-1/3')) properties.width = 'third';
+            if ($card.hasClass('w-1/4')) properties.width = 'quarter';
+            properties.marginTop = parseInt(($card.css('marginTop') || '0').replace('px','')) || 0;
+            properties.marginBottom = parseInt(($card.css('marginBottom') || '0').replace('px','')) || 0;
+            properties.paddingX = parseInt(($card.css('paddingLeft') || '0').replace('px','')) || 0;
+            properties.paddingY = parseInt(($card.css('paddingTop') || '0').replace('px','')) || 0;
+            properties.bgColor = $card.css('backgroundColor');
+            properties.textColor = $card.css('color');
+            properties.borderStyle = $card.css('borderStyle');
+            properties.borderWidth = parseInt(($card.css('borderWidth') || '0').replace('px','')) || 0;
+            properties.borderColor = $card.css('borderColor');
+        }
+
         return properties;
     }
     
@@ -1068,7 +1290,20 @@ $(document).ready(function() {
      * Update component order
      */
     function updateComponentOrder() {
-        // This would be called after sortable update
+        // Update component IDs based on new order
+        $('#form-components .component-wrapper').each(function(index) {
+            const newId = 'comp_' + (index + 1);
+            $(this).attr('id', newId);
+            
+            // Update any internal references
+            $(this).find('[id*="comp_"]').each(function() {
+                const currentId = $(this).attr('id');
+                const newInternalId = currentId.replace(/comp_\d+/, newId);
+                $(this).attr('id', newInternalId);
+            });
+        });
+        
+        // Update form data
         updateFormData();
     }
     
