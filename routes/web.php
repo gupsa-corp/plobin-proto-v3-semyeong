@@ -169,7 +169,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             try {
                 // 현재 세션의 샌드박스 스토리지를 확인
                 $currentStorage = session('sandbox_storage', $page->sandbox_type);
-                $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+                $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
                 if (File::exists($dbPath)) {
                     $pdo = new \PDO("sqlite:$dbPath");
                     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -433,7 +433,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         try {
             // 현재 세션의 샌드박스 스토리지를 확인
             $currentStorage = session('sandbox_storage', $currentSandboxType);
-            $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+            $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
 
             if (file_exists($dbPath)) {
                 $pdo = new \PDO("sqlite:$dbPath");
@@ -886,7 +886,7 @@ Route::get('/test/organizations/{id}/projects/{projectId}/pages/{pageId}', funct
         try {
             // 현재 세션의 샌드박스 스토리지를 확인
             $currentStorage = session('sandbox_storage', $page->sandbox_type);
-            $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+            $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
             if (File::exists($dbPath)) {
                 $pdo = new \PDO("sqlite:$dbPath");
                 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

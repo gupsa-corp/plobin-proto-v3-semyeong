@@ -33,28 +33,28 @@ class Component extends LivewireComponent
         } catch (\Exception $e) {
             $this->screens = [];
         }
-        
+
         $this->applyFilters();
     }
 
     private function getScreensFromDatabase()
     {
         $dbPath = $this->getSandboxDbPath();
-        
+
         if (!File::exists($dbPath)) {
             return [];
         }
-        
+
         try {
             $pdo = new \PDO("sqlite:$dbPath");
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
+
             // custom_screens 테이블이 없으면 생성
             $this->createScreensTableIfNotExists($pdo);
-            
+
             $stmt = $pdo->query('SELECT * FROM custom_screens ORDER BY created_at DESC');
             $screens = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            
+
             return $screens;
         } catch (\Exception $e) {
             return [];
@@ -78,7 +78,7 @@ class Component extends LivewireComponent
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ";
-        
+
         $pdo->exec($sql);
     }
 
@@ -126,7 +126,7 @@ class Component extends LivewireComponent
             if (File::exists($dbPath)) {
                 $pdo = new \PDO("sqlite:$dbPath");
                 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                
+
                 $stmt = $pdo->prepare('INSERT INTO custom_screens (title, description, type, blade_template, livewire_component, connected_functions, db_queries, preview_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                 $stmt->execute([
                     $screen['title'] . ' (복사본)',
@@ -139,7 +139,7 @@ class Component extends LivewireComponent
                     $screen['preview_data']
                 ]);
             }
-            
+
             $this->loadScreens();
             session()->flash('message', '화면이 복사되었습니다.');
         } catch (\Exception $e) {
@@ -154,15 +154,15 @@ class Component extends LivewireComponent
             if (File::exists($dbPath)) {
                 $pdo = new \PDO("sqlite:$dbPath");
                 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                
+
                 $stmt = $pdo->prepare('DELETE FROM custom_screens WHERE id = ?');
                 $stmt->execute([$id]);
             }
-            
+
             if ($this->selectedScreen && $this->selectedScreen['id'] == $id) {
                 $this->selectedScreen = null;
             }
-            
+
             $this->loadScreens();
             session()->flash('message', '화면이 삭제되었습니다.');
         } catch (\Exception $e) {
@@ -202,6 +202,6 @@ class Component extends LivewireComponent
 
     private function getSandboxDbPath()
     {
-        return storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
+        return storage_path("sandbox/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
     }
 }

@@ -42,26 +42,46 @@
                 
                 <form method="POST" action="{{ route('sandbox.storage.create') }}" class="space-y-4">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         <div class="md:col-span-2">
                             <label for="storage_name" class="block text-sm font-medium text-gray-700 mb-1">
                                 스토리지 이름
                             </label>
                             <div class="flex">
                                 <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
-                                    storage-sandbox-
+                                    sandbox/
                                 </span>
                                 <input type="text" 
                                        class="sandbox-input rounded-l-none @error('storage_name') border-red-500 @enderror" 
                                        id="storage_name" 
                                        name="storage_name" 
                                        value="{{ old('storage_name') }}"
-                                       placeholder="프리픽스 입력">
+                                       placeholder="스토리지 이름 입력">
                             </div>
                             @error('storage_name')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                             <p class="text-xs text-gray-500 mt-1">영문자, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능</p>
+                        </div>
+                        <div>
+                            <label for="template_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                템플릿 선택
+                            </label>
+                            <select name="template_name" 
+                                    id="template_name"
+                                    class="sandbox-input @error('template_name') border-red-500 @enderror">
+                                @forelse($templates as $template)
+                                    <option value="{{ $template['name'] }}" 
+                                            {{ old('template_name', 'default') == $template['name'] ? 'selected' : '' }}>
+                                        {{ $template['display_name'] }} ({{ $template['file_count'] }}개 파일, {{ $template['size'] }})
+                                    </option>
+                                @empty
+                                    <option value="">사용 가능한 템플릿 없음</option>
+                                @endforelse
+                            </select>
+                            @error('template_name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <button type="submit" class="sandbox-button w-full">
@@ -75,6 +95,26 @@
             <!-- 기존 스토리지 목록 -->
             <div class="sandbox-card">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">기존 샌드박스 스토리지 목록</h2>
+                <!-- 디버깅 정보 -->
+                <div class="mb-4 p-2 bg-yellow-100 text-xs">
+                    <strong>디버깅:</strong> 스토리지 개수: {{ count($storages ?? []) }}, 현재 선택: {{ $currentStorage ?? 'null' }}
+                    @if(!empty($storages))
+                        <br>스토리지 목록: 
+                        @foreach($storages as $storage)
+                            {{ $storage['name'] ?? 'unknown' }}{{ !$loop->last ? ', ' : '' }}
+                        @endforeach
+                    @endif
+                    @if(isset($debugInfo))
+                        <br><strong>경로정보:</strong>
+                        <br>• Storage Path: {{ $debugInfo['storage_path'] ?? 'N/A' }}
+                        <br>• CWD: {{ $debugInfo['cwd'] ?? 'N/A' }}
+                        <br>• Storage Exists: {{ $debugInfo['storage_exists'] ? 'YES' : 'NO' }}
+                        <br>• Directories: {{ count($debugInfo['directories'] ?? []) }}개
+                        @if(!empty($debugInfo['directories']))
+                            <br>&nbsp;&nbsp;{{ implode(', ', array_map('basename', $debugInfo['directories'])) }}
+                        @endif
+                    @endif
+                </div>
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500">
@@ -92,7 +132,7 @@
                             <tr class="bg-white border-b hover:bg-gray-50">
                                 <td class="px-6 py-4 font-medium text-gray-900">
                                     <div class="flex items-center">
-                                        <strong>storage-sandbox-{{ $storage['name'] }}</strong>
+                                        <strong>{{ $storage['name'] }}</strong>
                                         @if($storage['name'] === $currentStorage)
                                             <span class="ml-2 px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                                                 현재 선택됨
@@ -145,7 +185,7 @@
             <div class="sandbox-card bg-gray-50 border border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">💡 사용 안내</h3>
                 <div class="text-sm text-gray-600 space-y-1">
-                    <p>• 새 스토리지는 <code class="bg-gray-200 px-1 rounded">storage-sandbox-template</code>을 복사하여 생성됩니다.</p>
+                    <p>• 새 스토리지는 선택한 템플릿을 복사하여 생성됩니다.</p>
                     <p>• 스토리지를 선택하면 모든 샌드박스 기능이 해당 스토리지를 기준으로 동작합니다.</p>
                     <p>• 템플릿 스토리지는 삭제할 수 없습니다.</p>
                     <p>• 현재 선택된 스토리지를 삭제할 경우 기본 스토리지(1)로 자동 전환됩니다.</p>

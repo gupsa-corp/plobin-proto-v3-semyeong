@@ -25,7 +25,7 @@ class TestController extends Controller
         $this->metadataService = $metadataService;
         $this->templateService = $templateService;
         $this->currentStorage = Session::get('sandbox_storage', 'template');
-        $this->basePath = storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}");
+        $this->basePath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}");
     }
 
     /**
@@ -37,7 +37,7 @@ class TestController extends Controller
             $functions = $this->metadataService->getFunctions();
             $statistics = $this->metadataService->getStatistics();
             $templates = $this->templateService->getTemplates();
-            
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -93,7 +93,7 @@ class TestController extends Controller
 
             // Get function file path
             $functionPath = $this->basePath . "/functions/{$functionName}/{$version}/Function.php";
-            
+
             if (!File::exists($functionPath)) {
                 return response()->json([
                     'success' => false,
@@ -103,7 +103,7 @@ class TestController extends Controller
 
             // Read function content
             $content = File::get($functionPath);
-            
+
             // Simulate execution (in real scenario, you'd load and execute the class)
             $executionResult = [
                 'function_name' => $functionName,
@@ -121,7 +121,7 @@ class TestController extends Controller
 
         } catch (\Exception $e) {
             Log::error("Function execution error: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -153,15 +153,15 @@ class TestController extends Controller
                 case 'functions':
                     $results = $this->queryFunctionFiles($functionName);
                     break;
-                
+
                 case 'templates':
                     $results = $this->queryTemplateFiles();
                     break;
-                
+
                 case 'metadata':
                     $results = $this->queryMetadataFiles();
                     break;
-                
+
                 default:
                     if ($path) {
                         $results = $this->queryPath($path, $pattern);
@@ -217,22 +217,22 @@ class TestController extends Controller
                 case 'create':
                     $result = $this->createFile($target, $content ?? '');
                     break;
-                
+
                 case 'update':
                     $result = $this->updateFile($target, $content ?? '');
                     break;
-                
+
                 case 'delete':
                     $result = $this->deleteFile($target);
                     break;
-                
+
                 case 'copy':
                     if (!$source) {
                         throw new \Exception('Source path required for copy operation');
                     }
                     $result = $this->copyFile($source, $target);
                     break;
-                
+
                 case 'move':
                     if (!$source) {
                         throw new \Exception('Source path required for move operation');
@@ -254,7 +254,7 @@ class TestController extends Controller
 
         } catch (\Exception $e) {
             Log::error("File modification error: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -269,7 +269,7 @@ class TestController extends Controller
     {
         try {
             $function = $this->metadataService->getFunction($functionName);
-            
+
             if (!$function) {
                 return response()->json([
                     'success' => false,
@@ -341,7 +341,7 @@ class TestController extends Controller
 
         } catch (\Exception $e) {
             Log::error("Test function creation error: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -377,11 +377,11 @@ class TestController extends Controller
     {
         $versions = [];
         $versionDirs = File::directories($path);
-        
+
         foreach ($versionDirs as $versionDir) {
             $version = basename($versionDir);
             $functionFile = $versionDir . '/Function.php';
-            
+
             $versions[$version] = [
                 'exists' => File::exists($functionFile),
                 'path' => $functionFile,
@@ -428,7 +428,7 @@ class TestController extends Controller
                     'path' => $file->getPathname(),
                     'size' => $file->getSize(),
                     'modified' => date('Y-m-d H:i:s', $file->getMTime()),
-                    'content_preview' => $file->getExtension() === 'json' ? 
+                    'content_preview' => $file->getExtension() === 'json' ?
                         json_decode(File::get($file->getPathname()), true) : null
                 ];
             }

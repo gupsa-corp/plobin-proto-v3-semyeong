@@ -10,37 +10,37 @@ class Component extends LivewireComponent
 {
     public $editMode = false;
     public $editId = null;
-    
+
     // 화면 정보
     public $title = '';
     public $description = '';
     public $type = 'dashboard';
-    
+
     // 코드 에디터
     public $bladeTemplate = '';
     public $livewireComponent = '';
-    
+
     // 함수 연동
     public $availableFunctions = [];
     public $connectedFunctions = [];
     public $selectedFunction = '';
-    
+
     // DB 쿼리
     public $dbQueries = [];
     public $newQueryName = '';
     public $newQuerySql = '';
-    
+
     // 미리보기
     public $previewData = [];
     public $showPreview = false;
-    
+
     public $currentStorage = '';
 
     public function mount($edit = null)
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
         $this->loadAvailableFunctions();
-        
+
         if ($edit) {
             $this->editMode = true;
             $this->editId = $edit;
@@ -58,16 +58,16 @@ class Component extends LivewireComponent
     private function loadAvailableFunctions()
     {
         // 함수 브라우저에서 사용 가능한 함수 목록 로드
-        $functionsPath = storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}/functions");
+        $functionsPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/functions");
         $functions = [];
 
         if (File::exists($functionsPath)) {
             $directories = File::directories($functionsPath);
-            
+
             foreach ($directories as $dir) {
                 $functionName = basename($dir);
                 $releasePath = $dir . '/release/Function.php';
-                
+
                 if (File::exists($releasePath)) {
                     $functions[] = [
                         'name' => $functionName,
@@ -85,7 +85,7 @@ class Component extends LivewireComponent
     {
         // 함수 설명을 가져오는 로직 (메타데이터 서비스 사용)
         try {
-            $metadataPath = storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}/functions/{$functionName}/metadata.json");
+            $metadataPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/functions/{$functionName}/metadata.json");
             if (File::exists($metadataPath)) {
                 $metadata = json_decode(File::get($metadataPath), true);
                 return $metadata['description'] ?? "함수: {$functionName}";
@@ -93,7 +93,7 @@ class Component extends LivewireComponent
         } catch (\Exception $e) {
             // 메타데이터가 없으면 기본 설명 반환
         }
-        
+
         return "함수: {$functionName}";
     }
 
@@ -116,11 +116,11 @@ class Component extends LivewireComponent
             if (File::exists($dbPath)) {
                 $pdo = new \PDO("sqlite:$dbPath");
                 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                
+
                 $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
                 $stmt->execute([$id]);
                 $screen = $stmt->fetch(\PDO::FETCH_ASSOC);
-                
+
                 if ($screen) {
                     $this->title = $screen['title'];
                     $this->description = $screen['description'];
@@ -152,7 +152,7 @@ class Component extends LivewireComponent
                 'binding' => '' // 라이브와이어 프로퍼티와의 바인딩
             ];
         }
-        
+
         $this->selectedFunction = '';
     }
 
@@ -173,7 +173,7 @@ class Component extends LivewireComponent
             'sql' => $this->newQuerySql,
             'binding' => ''
         ];
-        
+
         $this->newQueryName = '';
         $this->newQuerySql = '';
     }
@@ -202,10 +202,10 @@ class Component extends LivewireComponent
         try {
             $dbPath = $this->getSandboxDbPath();
             $this->ensureDbPath($dbPath);
-            
+
             $pdo = new \PDO("sqlite:$dbPath");
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            
+
             $this->createScreensTableIfNotExists($pdo);
 
             if ($this->editMode) {
@@ -258,7 +258,7 @@ class Component extends LivewireComponent
     {
         return '<div class="bg-white rounded-lg shadow p-6">
     <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ $title }}</h1>
-    
+
     @if($users)
         <div class="space-y-4">
             @foreach($users as $user)
@@ -335,13 +335,13 @@ class GeneratedScreen extends Component
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ";
-        
+
         $pdo->exec($sql);
     }
 
     private function getSandboxDbPath()
     {
-        return storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
+        return storage_path("sandbox/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
     }
 
     private function generateScreenFiles($title)
@@ -350,23 +350,23 @@ class GeneratedScreen extends Component
             $slug = $this->generateSlug($title);
             $folderNumber = $this->getNextFolderNumber();
             $folderName = "{$folderNumber}-page-{$slug}";
-            
+
             // 폴더 생성
             $folderPath = resource_path("views/700-page-sandbox/{$folderName}");
             if (!File::exists($folderPath)) {
                 File::makeDirectory($folderPath, 0755, true);
             }
-            
+
             // 000-index.blade.php 파일 생성
             $indexContent = $this->generateIndexBladeContent($title, $slug);
             File::put("{$folderPath}/000-index.blade.php", $indexContent);
-            
+
             // 라이브와이어 컴포넌트 생성
             $this->generateLivewireComponent($title, $slug);
-            
+
             // 블레이드 템플릿 생성
             $this->generateBladeTemplate($slug);
-            
+
         } catch (\Exception $e) {
             \Log::error('화면 파일 생성 오류: ' . $e->getMessage());
         }
@@ -383,7 +383,7 @@ class GeneratedScreen extends Component
             '프로필' => 'profile',
             '알림' => 'notifications',
         ];
-        
+
         return $slugMap[$title] ?? 'custom-screen-' . time();
     }
 
@@ -391,9 +391,9 @@ class GeneratedScreen extends Component
     {
         $sandboxPath = resource_path('views/700-page-sandbox');
         $folders = File::directories($sandboxPath);
-        
+
         $maxNumber = 712; // 현재 최대 번호
-        
+
         foreach ($folders as $folder) {
             $folderName = basename($folder);
             if (preg_match('/^(\d{3})-page-/', $folderName, $matches)) {
@@ -403,14 +403,14 @@ class GeneratedScreen extends Component
                 }
             }
         }
-        
+
         return str_pad($maxNumber + 1, 3, '0', STR_PAD_LEFT);
     }
 
     private function generateIndexBladeContent($title, $slug)
     {
         $componentName = $this->convertSlugToComponentName($slug);
-        
+
         return "<?php \$common = getCommonPath(); ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
@@ -418,16 +418,16 @@ class GeneratedScreen extends Component
 
 <body class=\"bg-gray-100\">
     @include('700-page-sandbox.700-common.400-sandbox-header')
-    
+
     <div class=\"min-h-screen sandbox-container\">
         <div class=\"sandbox-card\">
             @livewire('sandbox.custom-screens.{$componentName}')
         </div>
     </div>
-    
+
     <!-- Livewire Scripts -->
     @livewireScripts
-    
+
     <!-- Filament Scripts -->
     @filamentScripts
 </body>
@@ -438,15 +438,15 @@ class GeneratedScreen extends Component
     {
         $componentName = $this->convertSlugToComponentName($slug);
         $className = $this->convertSlugToClassName($slug);
-        
+
         $componentPath = app_path("Livewire/Sandbox/CustomScreens/{$className}.php");
-        
+
         // 디렉토리가 없으면 생성
         $componentDir = dirname($componentPath);
         if (!File::exists($componentDir)) {
             File::makeDirectory($componentDir, 0755, true);
         }
-        
+
         $componentContent = "<?php
 
 namespace App\Livewire\Sandbox\CustomScreens;
@@ -477,7 +477,7 @@ class {$className} extends Component
         return view('livewire.sandbox.custom-screens.{$componentName}');
     }
 }";
-        
+
         File::put($componentPath, $componentContent);
     }
 
@@ -485,13 +485,13 @@ class {$className} extends Component
     {
         $componentName = $this->convertSlugToComponentName($slug);
         $templatePath = resource_path("views/livewire/sandbox/custom-screens/{$componentName}.blade.php");
-        
+
         // 디렉토리가 없으면 생성
         $templateDir = dirname($templatePath);
         if (!File::exists($templateDir)) {
             File::makeDirectory($templateDir, 0755, true);
         }
-        
+
         File::put($templatePath, $this->bladeTemplate);
     }
 
@@ -554,13 +554,13 @@ class {$className} extends Component
             $folderNumber = $this->getNextFolderNumber() - 1; // 방금 생성한 폴더 번호
             $routeName = "sandbox.{$slug}";
             $routePath = "/sandbox/{$slug}";
-            
+
             // web.php 라우트 추가
             $this->addWebRoute($routePath, $folderNumber, $slug, $routeName);
-            
+
             // routes-web.php 설정 추가
             $this->addRouteConfig($routePath, $folderNumber, $slug, $routeName);
-            
+
         } catch (\Exception $e) {
             \Log::error('라우트 업데이트 오류: ' . $e->getMessage());
         }
@@ -570,13 +570,13 @@ class {$className} extends Component
     {
         $webRoutesPath = base_path('routes/web.php');
         $webRoutesContent = File::get($webRoutesPath);
-        
+
         $newRoute = "
 // {$this->title} (Generated Custom Screen)
 Route::get('{$routePath}', function () {
     return view('700-page-sandbox.{$folderNumber}-page-{$slug}.000-index');
 })->name('{$routeName}');";
-        
+
         // 적절한 위치에 라우트 추가 (organizations-list 라우트 뒤)
         $insertPosition = strpos($webRoutesContent, "Route::get('/sandbox/organizations-list'");
         if ($insertPosition !== false) {
@@ -592,9 +592,9 @@ Route::get('{$routePath}', function () {
     {
         $configPath = config_path('routes-web.php');
         $configContent = File::get($configPath);
-        
+
         $newConfig = "    '{$routePath}' => ['view' => '700-page-sandbox.{$folderNumber}-page-{$slug}.000-index', 'name' => '{$routeName}'],";
-        
+
         // 마지막 라우트 뒤에 추가
         $insertPosition = strrpos($configContent, '];');
         if ($insertPosition !== false) {

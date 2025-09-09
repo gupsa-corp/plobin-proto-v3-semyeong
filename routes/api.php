@@ -182,6 +182,7 @@ Route::prefix('test/organizations')->group(function () {
 Route::prefix('sandbox')->group(function () {
     Route::get('/list', [ListSandboxesController::class, 'listSandboxes']);
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
+    Route::get('/screens', [ListScreensController::class, 'listScreens']);
     
     // AI Server Callback API
     Route::prefix('storage-sandbox-1/callbacks')->group(function () {

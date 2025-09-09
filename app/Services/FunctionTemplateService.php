@@ -13,7 +13,7 @@ class FunctionTemplateService
     public function __construct()
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
-        $this->basePath = storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}");
+        $this->basePath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}");
     }
 
     /**
@@ -22,14 +22,14 @@ class FunctionTemplateService
     public function getTemplates(): array
     {
         $templatesFile = $this->basePath . '/metadata/templates.json';
-        
+
         if (!File::exists($templatesFile)) {
             return [];
         }
 
         $content = File::get($templatesFile);
         $data = json_decode($content, true);
-        
+
         return $data['templates'] ?? [];
     }
 
@@ -39,14 +39,14 @@ class FunctionTemplateService
     public function getCategories(): array
     {
         $templatesFile = $this->basePath . '/metadata/templates.json';
-        
+
         if (!File::exists($templatesFile)) {
             return [];
         }
 
         $content = File::get($templatesFile);
         $data = json_decode($content, true);
-        
+
         return $data['categories'] ?? [];
     }
 
@@ -65,13 +65,13 @@ class FunctionTemplateService
     public function getTemplateContent(string $templateId): ?string
     {
         $template = $this->getTemplate($templateId);
-        
+
         if (!$template || !isset($template['file'])) {
             return null;
         }
 
         $templateFile = $this->basePath . '/templates/' . $template['file'];
-        
+
         if (!File::exists($templateFile)) {
             return null;
         }
@@ -85,7 +85,7 @@ class FunctionTemplateService
     public function processTemplate(string $templateId, array $parameters): ?string
     {
         $content = $this->getTemplateContent($templateId);
-        
+
         if (!$content) {
             return null;
         }
@@ -96,7 +96,7 @@ class FunctionTemplateService
                 $content = $this->processArrayParameter($content, $key, $value);
             }
         }
-        
+
         // Then process simple string replacements
         foreach ($parameters as $key => $value) {
             if (!is_array($value)) {
@@ -117,18 +117,18 @@ class FunctionTemplateService
     {
         // Handle {{#each actions}} blocks with more aggressive pattern matching
         $pattern = '/\{\{#each\s+' . preg_quote($key) . '\s*\}\}(.*?)\{\{\/each\}\}/s';
-        
+
         if (preg_match($pattern, $content, $matches)) {
             $template = $matches[1];
             $result = '';
-            
+
             foreach ($value as $item) {
                 $itemContent = $template;
                 $itemContent = str_replace('{{this}}', $item, $itemContent);
                 $itemContent = str_replace('{{capitalize this}}', ucfirst($item), $itemContent);
                 $result .= $itemContent;
             }
-            
+
             $content = str_replace($matches[0], $result, $content);
         }
 
@@ -161,7 +161,7 @@ class FunctionTemplateService
             // Process template
             $parameters['className'] = $functionName;
             $processedContent = $this->processTemplate($templateId, $parameters);
-            
+
             if (!$processedContent) {
                 throw new \Exception('Failed to process template.');
             }
@@ -197,7 +197,7 @@ class FunctionTemplateService
     private function updateFunctionsMetadata(string $functionName, string $templateId, array $parameters): void
     {
         $functionsFile = $this->basePath . '/metadata/functions.json';
-        
+
         // Load existing metadata
         $data = [];
         if (File::exists($functionsFile)) {
@@ -218,7 +218,7 @@ class FunctionTemplateService
 
         // Get template info
         $template = $this->getTemplate($templateId);
-        
+
         // Add new function
         $data['functions'][$functionName] = [
             'versions' => ['release'],
@@ -250,7 +250,7 @@ class FunctionTemplateService
     private function generateParameterSchema(array $template, array $parameters): array
     {
         $schema = [];
-        
+
         // Basic parameters based on template type
         switch ($template['category']) {
             case 'api':
@@ -261,7 +261,7 @@ class FunctionTemplateService
                     'options' => $parameters['actions'] ?? []
                 ];
                 break;
-            
+
             case 'data':
                 $schema['data'] = [
                     'type' => 'array',
@@ -275,7 +275,7 @@ class FunctionTemplateService
                     'options' => ['process', 'filter', 'transform', 'aggregate', 'validate']
                 ];
                 break;
-                
+
             case 'utility':
                 $schema['operation'] = [
                     'type' => 'string',
@@ -285,7 +285,7 @@ class FunctionTemplateService
                 ];
                 break;
         }
-        
+
         return $schema;
     }
 
@@ -295,7 +295,7 @@ class FunctionTemplateService
     public function validateParameters(string $templateId, array $parameters): array
     {
         $template = $this->getTemplate($templateId);
-        
+
         if (!$template) {
             return [
                 'valid' => false,
@@ -309,7 +309,7 @@ class FunctionTemplateService
         foreach ($templateParams as $param) {
             $name = $param['name'];
             $required = $param['required'] ?? false;
-            
+
             if ($required && !isset($parameters[$name])) {
                 $errors[] = "Required parameter '{$name}' is missing";
             }
