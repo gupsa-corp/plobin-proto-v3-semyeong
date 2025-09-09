@@ -31,7 +31,7 @@ class Component extends LivewireComponent
                 return;
             }
 
-            // 블레이드 템플릿 렌더링
+            // 블레이드 템플릿을 Laravel의 Blade 엔진으로 렌더링
             $this->renderedContent = $this->renderBladeTemplate($this->screen['blade_template']);
             $this->error = null;
         } catch (\Exception $e) {
@@ -41,6 +41,41 @@ class Component extends LivewireComponent
     }
 
     private function renderBladeTemplate($template)
+    {
+        try {
+            // 실제 샌드박스 데이터베이스에서 데이터 가져오기
+            $sampleData = $this->getSandboxData();
+            
+            $sampleData['title'] = $this->screen['title'] ?? '샘플 화면';
+            $sampleData['description'] = $this->screen['description'] ?? '이것은 미리보기입니다';
+
+            // Laravel의 Blade 엔진을 사용해서 실제 렌더링
+            $tempFileName = 'temp_' . uniqid() . '.blade.php';
+            $tempPath = resource_path('views/temp/' . $tempFileName);
+            
+            // temp 디렉토리가 없으면 생성
+            if (!File::exists(dirname($tempPath))) {
+                File::makeDirectory(dirname($tempPath), 0755, true);
+            }
+            
+            // 템플릿 파일 작성
+            File::put($tempPath, $template);
+            
+            // Blade 렌더링
+            $rendered = view('temp.' . basename($tempFileName, '.blade.php'), $sampleData)->render();
+            
+            // 임시 파일 삭제
+            File::delete($tempPath);
+            
+            return $rendered;
+            
+        } catch (\Exception $e) {
+            // 에러 발생 시 기존 방식 사용
+            return $this->renderBladeTemplateFallback($template);
+        }
+    }
+    
+    private function renderBladeTemplateFallback($template)
     {
         // 실제 샌드박스 데이터베이스에서 데이터 가져오기
         $sampleData = $this->getSandboxData();

@@ -92,7 +92,7 @@ class CustomScreenPreviewController
             abort(404, '템플릿 파일이 존재하지 않습니다.');
         }
         
-        // 템플릿 파일 내용 직접 렌더링
+        // 템플릿 파일 내용을 그대로 사용
         $content = File::get($contentFile);
         
         // 샘플 데이터 설정
