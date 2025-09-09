@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.web-or-token' => \App\Http\Middleware\SimpleAuth::class,
             'rate.limit' => \App\Http\Middleware\ApiRateLimit::class,
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
+            'loginRequired.auth' => \App\Http\Middleware\LoginRequiredAuth::class,
         ]);
 
         // SimpleAuth를 CSRF 검증보다 먼저 실행하도록 우선순위 설정

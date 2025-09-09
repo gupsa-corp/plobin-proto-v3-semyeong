@@ -3,10 +3,129 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// 웹 라우트 일괄 등록
+// 인증이 필요한 페이지들을 위한 라우트 그룹
+Route::group(['middleware' => 'loginRequired.auth'], function () {
+    // 대시보드 페이지는 인증 필요
+    Route::get('/dashboard', function () {
+        // 조직 관련 페이지들에 조직 데이터 전달
+        $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+            ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+            ->where('organization_members.user_id', Auth::id())
+            ->where('organization_members.invitation_status', 'accepted')
+            ->orderBy('organizations.created_at', 'desc')
+            ->get();
+
+        // 1. 내가 소유한 프로젝트들
+        $ownedProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
+            ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+            ->where('projects.user_id', Auth::id());
+
+        // 2. 조직 멤버십을 통해 접근 가능한 프로젝트들 (내가 소유한 프로젝트 제외)
+        $memberProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
+            ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+            ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+            ->where('organization_members.user_id', Auth::id())
+            ->where('organization_members.invitation_status', 'accepted')
+            ->where('projects.user_id', '!=', Auth::id());
+
+        // 3. 두 결과를 합치기
+        $projects = $ownedProjects->union($memberProjects)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // 4. 최근 페이지들 조회 (내가 접근 가능한 프로젝트의 페이지들)
+        $pages = \App\Models\ProjectPage::select(['project_pages.id', 'project_pages.title', 'project_pages.content', 'project_pages.updated_at', 'projects.name as project_name', 'projects.id as project_id', 'organizations.name as organization_name', 'organizations.id as organization_id'])
+            ->join('projects', 'project_pages.project_id', '=', 'projects.id')
+            ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
+            ->where(function($query) {
+                // 내가 소유한 프로젝트의 페이지들
+                $query->where('projects.user_id', Auth::id())
+                      // 또는 내가 멤버인 조직의 프로젝트 페이지들
+                      ->orWhereExists(function($subQuery) {
+                          $subQuery->select(\DB::raw(1))
+                                   ->from('organization_members')
+                                   ->whereColumn('organization_members.organization_id', 'organizations.id')
+                                   ->where('organization_members.user_id', Auth::id())
+                                   ->where('organization_members.invitation_status', 'accepted');
+                      });
+            })
+            ->orderBy('project_pages.updated_at', 'desc')
+            ->limit(4)
+            ->get();
+
+        $viewName = config('routes-web./dashboard.view', '300-page-service.301-page-dashboard.000-index');
+        return view($viewName, compact('organizations', 'projects', 'pages'));
+    })->name('dashboard');
+
+    // 조직 대시보드
+    Route::get('/organizations/{id}/dashboard', function ($id) {
+        $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+            ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
+            ->where('organization_members.user_id', Auth::id())
+            ->where('organization_members.invitation_status', 'accepted')
+            ->orderBy('organizations.created_at', 'desc')
+            ->get();
+
+        return view('300-page-service.302-page-organization-dashboard.000-index', compact('organizations'));
+    })->name('organization.dashboard');
+
+    // 프로젝트 관련 라우트들
+    Route::get('/organizations/{id}/projects/{projectId}', function ($id, $projectId) {
+        $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->first();
+
+        if ($firstPage) {
+            return redirect()->route('project.dashboard.page', [
+                'id' => $id,
+                'projectId' => $projectId,
+                'pageId' => $firstPage->id
+            ]);
+        }
+
+        return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => null]);
+    })->name('project.dashboard');
+
+    Route::get('/organizations/{id}/projects/{projectId}/dashboard', function ($id, $projectId) {
+        return redirect()->route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
+    })->name('project.dashboard.full');
+
+    // 프로젝트 페이지 라우트들
+    Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
+        return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => 'overview']);
+    })->name('project.dashboard.page');
+
+    // 프로젝트 설정 라우트들
+    Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
+        return view('300-page-service.314-page-project-settings-name.000-index', [
+            'currentProjectId' => $projectId,
+            'activeTab' => 'name',
+            'organizationId' => $id,
+            'projectId' => $projectId
+        ]);
+    })->name('project.dashboard.project.settings.name');
+
+    Route::post('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
+        return view('300-page-service.314-page-project-settings-name.000-index', [
+            'currentProjectId' => $projectId,
+            'activeTab' => 'name',
+            'organizationId' => $id,
+            'projectId' => $projectId
+        ]);
+    })->name('project.dashboard.project.settings.name.post');
+});
+
+// 웹 라우트 일괄 등록 (대시보드 제외)
 $routes = config('routes-web');
 
 foreach ($routes as $path => $config) {
+    
+    // 대시보드는 이미 위에서 처리했으므로 스킵
+    if ($path === '/dashboard') {
+        continue;
+    }
 
     // 이전 버전 호환성 지원
     if (is_string($config)) {
@@ -100,102 +219,9 @@ foreach ($routes as $path => $config) {
     // }
 }
 
-// 매개변수가 있는 특수 라우트들을 수동으로 등록 (개발용 - 인증 제거)
-Route::get('/organizations/{id}/dashboard', function ($id) {
-    // 조직 선택 드롭다운을 위한 조직 목록 전달
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
+// 위의 loginRequired.auth 그룹으로 이동된 라우트들
 
-    return view('300-page-service.302-page-organization-dashboard.000-index', compact('organizations'));
-})->name('organization.dashboard');
-
-// 프로젝트 대시보드 라우트들 - 첫 번째 페이지로 리다이렉트
-Route::get('/organizations/{id}/projects/{projectId}', function ($id, $projectId) {
-    try {
-        // 조직 존재 여부 확인
-        $organization = \App\Models\Organization::find($id);
-        if (!$organization) {
-            return redirect('/organizations')->with('error', '조직을 찾을 수 없습니다.');
-        }
-
-        // 프로젝트 존재 여부 확인
-        $project = \App\Models\Project::find($projectId);
-        if (!$project || $project->organization_id != $id) {
-            return redirect("/organizations/{$id}/projects")->with('error', '프로젝트를 찾을 수 없습니다.');
-        }
-
-        // 첫 번째 프로젝트 페이지로 리다이렉트
-        $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
-            ->whereNull('parent_id')
-            ->orderBy('sort_order')
-            ->first();
-
-        if ($firstPage) {
-            return redirect()->route('project.dashboard.page', [
-                'id' => $id,
-                'projectId' => $projectId,
-                'pageId' => $firstPage->id
-            ]);
-        }
-
-        // 페이지가 없으면 기본 뷰 표시 (빈 상태)
-        return view('300-page-service.308-page-project-dashboard.000-index', [
-            'currentPageId' => null,
-            'organizationId' => $id,
-            'projectId' => $projectId,
-            'organization' => $organization,
-            'project' => $project
-        ]);
-    } catch (\Exception $e) {
-        // 데이터베이스 오류 등이 발생한 경우
-        \Log::error('Project dashboard error', ['error' => $e->getMessage(), 'orgId' => $id, 'projectId' => $projectId]);
-        return redirect('/organizations')->with('error', '페이지 로딩 중 오류가 발생했습니다.');
-    }
-})->name('project.dashboard');
-
-Route::get('/organizations/{id}/projects/{projectId}/dashboard', function ($id, $projectId) {
-    return redirect()->route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
-})->name('project.dashboard.full');
-
-// 동적 프로젝트 페이지 라우트들 (1뎁스)
-Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-    try {
-        // 조직 존재 여부 확인
-        $organization = \App\Models\Organization::find($id);
-        if (!$organization) {
-            return redirect('/organizations')->with('error', '조직을 찾을 수 없습니다.');
-        }
-
-        // 프로젝트 존재 여부 확인
-        $project = \App\Models\Project::find($projectId);
-        if (!$project || $project->organization_id != $id) {
-            return redirect("/organizations/{$id}/projects")->with('error', '프로젝트를 찾을 수 없습니다.');
-        }
-
-        // 페이지 존재 여부 확인
-        $page = \App\Models\ProjectPage::find($pageId);
-        if (!$page || $page->project_id != $projectId) {
-            return redirect("/organizations/{$id}/projects/{$projectId}")->with('error', '페이지를 찾을 수 없습니다.');
-        }
-
-        return view('300-page-service.308-page-project-dashboard.000-index', [
-            'currentPageId' => $pageId, 
-            'activeTab' => 'overview',
-            'organizationId' => $id,
-            'projectId' => $projectId,
-            'organization' => $organization,
-            'project' => $project,
-            'page' => $page
-        ]);
-    } catch (\Exception $e) {
-        \Log::error('Project page error', ['error' => $e->getMessage(), 'orgId' => $id, 'projectId' => $projectId, 'pageId' => $pageId]);
-        return redirect("/organizations/{$id}/projects/{$projectId}")->with('error', '페이지 로딩 중 오류가 발생했습니다.');
-    }
-})->name('project.dashboard.page');
+// 중복된 라우트들 제거됨 - loginRequired.auth 그룹에서 처리
 
 // 페이지 설정 관련 라우트들 (더 구체적인 라우트를 먼저 등록)
 // 페이지 설정 탭별 라우트들
@@ -260,24 +286,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', f
     return redirect()->route('project.dashboard.page.settings.name', ['id' => $id, 'projectId' => $projectId, 'pageId' => $pageId]);
 })->name('project.dashboard.page.settings');
 
-// 프로젝트 설정 라우트들 (특정 설정 먼저)
-Route::get('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
-    return view('300-page-service.314-page-project-settings-name.000-index', [
-        'currentProjectId' => $projectId,
-        'activeTab' => 'name',
-        'organizationId' => $id,
-        'projectId' => $projectId
-    ]);
-})->name('project.dashboard.project.settings.name');
-
-Route::post('/organizations/{id}/projects/{projectId}/settings/name', function ($id, $projectId) {
-    return view('300-page-service.314-page-project-settings-name.000-index', [
-        'currentProjectId' => $projectId,
-        'activeTab' => 'name',
-        'organizationId' => $id,
-        'projectId' => $projectId
-    ]);
-})->name('project.dashboard.project.settings.name.post');
+// 프로젝트 설정 라우트들은 loginRequired.auth 그룹으로 이동됨
 
 Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
     // 프로젝트 정보 조회
