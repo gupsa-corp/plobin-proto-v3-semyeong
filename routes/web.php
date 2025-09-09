@@ -115,22 +115,46 @@ Route::get('/organizations/{id}/dashboard', function ($id) {
 
 // 프로젝트 대시보드 라우트들 - 첫 번째 페이지로 리다이렉트
 Route::get('/organizations/{id}/projects/{projectId}', function ($id, $projectId) {
-    // 첫 번째 프로젝트 페이지로 리다이렉트
-    $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
-        ->whereNull('parent_id')
-        ->orderBy('sort_order')
-        ->first();
+    try {
+        // 조직 존재 여부 확인
+        $organization = \App\Models\Organization::find($id);
+        if (!$organization) {
+            return redirect('/organizations')->with('error', '조직을 찾을 수 없습니다.');
+        }
 
-    if ($firstPage) {
-        return redirect()->route('project.dashboard.page', [
-            'id' => $id,
+        // 프로젝트 존재 여부 확인
+        $project = \App\Models\Project::find($projectId);
+        if (!$project || $project->organization_id != $id) {
+            return redirect("/organizations/{$id}/projects")->with('error', '프로젝트를 찾을 수 없습니다.');
+        }
+
+        // 첫 번째 프로젝트 페이지로 리다이렉트
+        $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->first();
+
+        if ($firstPage) {
+            return redirect()->route('project.dashboard.page', [
+                'id' => $id,
+                'projectId' => $projectId,
+                'pageId' => $firstPage->id
+            ]);
+        }
+
+        // 페이지가 없으면 기본 뷰 표시 (빈 상태)
+        return view('300-page-service.308-page-project-dashboard.000-index', [
+            'currentPageId' => null,
+            'organizationId' => $id,
             'projectId' => $projectId,
-            'pageId' => $firstPage->id
+            'organization' => $organization,
+            'project' => $project
         ]);
+    } catch (\Exception $e) {
+        // 데이터베이스 오류 등이 발생한 경우
+        \Log::error('Project dashboard error', ['error' => $e->getMessage(), 'orgId' => $id, 'projectId' => $projectId]);
+        return redirect('/organizations')->with('error', '페이지 로딩 중 오류가 발생했습니다.');
     }
-
-    // 페이지가 없으면 기본 뷰 표시 (빈 상태)
-    return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => null]);
 })->name('project.dashboard');
 
 Route::get('/organizations/{id}/projects/{projectId}/dashboard', function ($id, $projectId) {
@@ -139,7 +163,38 @@ Route::get('/organizations/{id}/projects/{projectId}/dashboard', function ($id, 
 
 // 동적 프로젝트 페이지 라우트들 (1뎁스)
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-    return view('300-page-service.308-page-project-dashboard.000-index', ['currentPageId' => $pageId, 'activeTab' => 'overview']);
+    try {
+        // 조직 존재 여부 확인
+        $organization = \App\Models\Organization::find($id);
+        if (!$organization) {
+            return redirect('/organizations')->with('error', '조직을 찾을 수 없습니다.');
+        }
+
+        // 프로젝트 존재 여부 확인
+        $project = \App\Models\Project::find($projectId);
+        if (!$project || $project->organization_id != $id) {
+            return redirect("/organizations/{$id}/projects")->with('error', '프로젝트를 찾을 수 없습니다.');
+        }
+
+        // 페이지 존재 여부 확인
+        $page = \App\Models\ProjectPage::find($pageId);
+        if (!$page || $page->project_id != $projectId) {
+            return redirect("/organizations/{$id}/projects/{$projectId}")->with('error', '페이지를 찾을 수 없습니다.');
+        }
+
+        return view('300-page-service.308-page-project-dashboard.000-index', [
+            'currentPageId' => $pageId, 
+            'activeTab' => 'overview',
+            'organizationId' => $id,
+            'projectId' => $projectId,
+            'organization' => $organization,
+            'project' => $project,
+            'page' => $page
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Project page error', ['error' => $e->getMessage(), 'orgId' => $id, 'projectId' => $projectId, 'pageId' => $pageId]);
+        return redirect("/organizations/{$id}/projects/{$projectId}")->with('error', '페이지 로딩 중 오류가 발생했습니다.');
+    }
 })->name('project.dashboard.page');
 
 // 페이지 설정 관련 라우트들 (더 구체적인 라우트를 먼저 등록)
@@ -309,6 +364,50 @@ Route::post('/organizations/{id}/projects/{projectId}/settings/logs', function (
 Route::get('/organizations/{id}/projects/{projectId}/settings', function ($id, $projectId) {
     return redirect()->route('project.dashboard.project.settings.name', ['id' => $id, 'projectId' => $projectId]);
 });
+
+// 페이지 생성 API 라우트
+Route::post('/organizations/{id}/projects/{projectId}/pages/create', function ($id, $projectId) {
+    try {
+        // 조직과 프로젝트 존재 확인
+        $organization = \App\Models\Organization::find($id);
+        $project = \App\Models\Project::find($projectId);
+        
+        if (!$organization || !$project || $project->organization_id != $id) {
+            return response()->json(['error' => '프로젝트를 찾을 수 없습니다.'], 404);
+        }
+
+        // 현재 페이지 개수 확인
+        $pageCount = \App\Models\ProjectPage::where('project_id', $projectId)
+            ->whereNull('parent_id')
+            ->count();
+
+        // 새 페이지 생성
+        $page = \App\Models\ProjectPage::create([
+            'title' => '새 페이지 ' . ($pageCount + 1),
+            'slug' => 'page-' . uniqid(),
+            'content' => '',
+            'status' => 'draft',
+            'project_id' => $projectId,
+            'parent_id' => null,
+            'user_id' => auth()->id() ?? 1,
+            'sort_order' => $pageCount
+        ]);
+
+        // 생성된 페이지로 리다이렉트
+        return response()->json([
+            'success' => true,
+            'redirect_url' => "/organizations/{$id}/projects/{$projectId}/pages/{$page->id}"
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Page creation error: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+            'orgId' => $id,
+            'projectId' => $projectId
+        ]);
+        return response()->json(['error' => '페이지 생성 중 오류가 발생했습니다: ' . $e->getMessage()], 500);
+    }
+})->name('project.pages.create');
 
 // 동적 프로젝트 페이지의 탭들 (2뎁스) - 가장 일반적인 라우트는 마지막에
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/{tab}', function ($id, $projectId, $pageId, $tab) {

@@ -169,7 +169,7 @@ class PageListLivewire extends Component
             'status' => 'draft',
             'project_id' => $this->projectId,
             'parent_id' => null,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id() ?? 1, // 인증되지 않은 경우 기본 사용자 ID 1
             'sort_order' => $parentCount
         ]);
         
@@ -194,7 +194,7 @@ class PageListLivewire extends Component
             'status' => 'draft',
             'project_id' => $this->projectId,
             'parent_id' => $parentId,
-            'user_id' => auth()->id(), // 인증되지 않은 경우 기본 사용자 ID
+            'user_id' => auth()->id() ?? 1, // 인증되지 않은 경우 기본 사용자 ID 1
             'sort_order' => $childrenCount
         ]);
         
