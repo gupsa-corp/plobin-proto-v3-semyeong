@@ -265,8 +265,9 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                             $templateId = 'template_' . $folderName;
 
                             if ($templateId === $screenId && \File::exists($contentFile)) {
-                                // 템플릿 파일 내용 읽기
-                                $fileContent = \File::get($contentFile);
+                                // CustomScreenRenderer를 사용하여 템플릿 렌더링
+                                $renderer = new \App\Services\CustomScreenRenderer();
+                                $renderedContent = $renderer->render($contentFile, []);
 
                                 // 폴더명에서 화면 정보 추출
                                 $parts = explode('-', $folderName, 3);
@@ -277,7 +278,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                                     'title' => str_replace('-', ' ', $screenName),
                                     'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
                                     'type' => 'template',
-                                    'content' => $fileContent
+                                    'content' => $renderedContent
                                 ];
                                 break;
                             }
@@ -289,8 +290,9 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                     $fullPath = storage_path('sandbox/storage-sandbox-template/' . $templatePath);
 
                     if (\File::exists($fullPath)) {
-                        // 템플릿 파일 내용 읽기
-                        $fileContent = \File::get($fullPath);
+                        // CustomScreenRenderer를 사용하여 템플릿 렌더링
+                        $renderer = new \App\Services\CustomScreenRenderer();
+                        $renderedContent = $renderer->render($fullPath, []);
 
                         // 화면 타입에서 제목 추출
                         $screenType = $customScreenSettings['screen_type'] ?? 'custom screen';
@@ -300,7 +302,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                             'title' => $screenType,
                             'description' => '템플릿 화면 - ' . $screenType,
                             'type' => 'template',
-                            'content' => $fileContent
+                            'content' => $renderedContent
                         ];
                     }
                 }

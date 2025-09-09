@@ -40,16 +40,27 @@ class CustomScreenRenderer
      */
     private static function renderFileTemplate($filePath, $screenData)
     {
-        // 변수를 추출하여 템플릿에서 사용 가능하게 만듦
-        extract($screenData);
-        
-        // 출력 버퍼링 시작
-        ob_start();
-        
         try {
-            // 템플릿 파일 실행
-            include $filePath;
+            // Blade 엔진을 사용하여 템플릿 컴파일 및 렌더링
+            $templateContent = file_get_contents($filePath);
+            
+            // Laravel의 Blade 엔진 사용
+            $blade = app('view')->getEngineResolver()->resolve('blade');
+            $tempViewPath = 'custom_screen_' . md5($filePath . time());
+            
+            // 임시 파일을 생성하지 않고 직접 컴파일
+            $php = $blade->getCompiler()->compileString($templateContent);
+            
+            // 변수를 추출하여 템플릿에서 사용 가능하게 만듦
+            extract($screenData);
+            
+            // 출력 버퍼링 시작
+            ob_start();
+            
+            // 컴파일된 PHP 코드 실행
+            eval('?>' . $php);
             $html = ob_get_contents();
+            
         } catch (\Exception $e) {
             $html = self::renderError($e->getMessage());
         } finally {
