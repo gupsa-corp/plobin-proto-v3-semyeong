@@ -32,8 +32,8 @@ class Component extends LivewireComponent
 
     private function setupSandboxDatabase()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/Backend/Databases/Release.sqlite");
+        $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+        $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
 
         if (file_exists($sandboxDbPath)) {
             Config::set('database.connections.sandbox_sqlite', [
@@ -74,12 +74,12 @@ class Component extends LivewireComponent
     private function getSandboxConnection()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', '1');
-            $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/Backend/Databases/Release.sqlite");
+            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+            $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
 
             // 파일 존재 확인
             if (!file_exists($sandboxDbPath)) {
-                $this->addError('connection', "선택된 샌드박스({$selectedSandbox})의 데이터베이스 파일이 존재하지 않습니다.");
+                $this->addError('connection', "선택된 샌드박스({$selectedSandbox})의 데이터베이스 파일이 존재하지 않습니다: {$sandboxDbPath}");
                 return null;
             }
 
@@ -123,7 +123,7 @@ class Component extends LivewireComponent
         $this->isExecuting = true;
         $this->executionResult = null;
         $startTime = microtime(true);
-        $selectedSandbox = Session::get('sandbox_storage', '1');
+        $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
 
         try {
             $connection = $this->getSandboxConnection();
@@ -176,7 +176,7 @@ class Component extends LivewireComponent
             // 메인 DB에 실행 기록 저장 (try-catch로 래핑하여 로깅 실패가 주요 기능을 방해하지 않도록)
             try {
                 SandboxSqlExecution::logExecution(
-                    "storage-sandbox-{$selectedSandbox}",
+                    $selectedSandbox,
                     $this->sqlQuery,
                     $queryType,
                     'success',
@@ -206,7 +206,7 @@ class Component extends LivewireComponent
             // 메인 DB에 에러 기록 저장
             try {
                 SandboxSqlExecution::logExecution(
-                    "storage-sandbox-{$selectedSandbox}",
+                    $selectedSandbox,
                     $this->sqlQuery,
                     $queryType,
                     'error',
@@ -254,9 +254,9 @@ class Component extends LivewireComponent
     public function getExecutionHistory()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', '1');
+            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
 
-            return SandboxSqlExecution::where('sandbox_name', "storage-sandbox-{$selectedSandbox}")
+            return SandboxSqlExecution::where('sandbox_name', $selectedSandbox)
                 ->where('user_session_id', session()->getId())
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
@@ -273,11 +273,11 @@ class Component extends LivewireComponent
     public function render()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', '1');
+            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
             $executionHistory = $this->getExecutionHistory();
 
             return view('700-page-sandbox.702-livewire-sql-executor', [
-                'selectedSandbox' => $selectedSandbox ?? '1',
+                'selectedSandbox' => $selectedSandbox ?? 'storage-sandbox-template',
                 'executionHistory' => $executionHistory ?? new LengthAwarePaginator([], 0, 10, 1, [
                     'path' => request()->url(),
                     'pageName' => 'page'
@@ -288,7 +288,7 @@ class Component extends LivewireComponent
             $this->addError('render', '페이지 로드 실패: ' . $e->getMessage());
 
             return view('700-page-sandbox.702-livewire-sql-executor', [
-                'selectedSandbox' => Session::get('sandbox_storage', '1'),
+                'selectedSandbox' => Session::get('sandbox_storage', 'storage-sandbox-template'),
                 'executionHistory' => new LengthAwarePaginator([], 0, 10, 1, [
                     'path' => request()->url(),
                     'pageName' => 'page'

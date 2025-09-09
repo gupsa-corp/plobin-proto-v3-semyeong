@@ -1027,8 +1027,11 @@ Route::get('/sandbox/projects-list', function () {
     return view('700-page-sandbox.715-page-projects-list.000-index');
 })->name('sandbox.projects-list');
 
-// Custom Screen Preview
+// Custom Screen Preview (기존 방식 - 하위 호환성)
 Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\CoreApi\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
+
+// Template Preview (새로운 직관적인 경로)
+Route::get('/sandbox/{sandboxType}/{templateId}', [\App\Http\CoreApi\Sandbox\CustomScreenPreviewController::class, 'showByPath'])->name('sandbox.template-preview');
 
 // 샌드박스 사용 프로젝트 목록
 Route::get('/sandbox/using-projects', [\App\Http\CoreApi\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');

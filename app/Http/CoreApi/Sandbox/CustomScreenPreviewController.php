@@ -119,6 +119,59 @@ class CustomScreenPreviewController
         ]);
     }
 
+    public function showByPath($sandboxType, $templateId)
+    {
+        try {
+            // storage-sandbox-template/005-screen-gantt-chart 형태로 직접 경로 매핑
+            $templatePath = storage_path("sandbox/{$sandboxType}/frontend/{$templateId}");
+            $contentFile = $templatePath . '/000-content.blade.php';
+            
+            if (!File::exists($contentFile)) {
+                abort(404, '템플릿 파일이 존재하지 않습니다.');
+            }
+            
+            // 템플릿 파일 내용 직접 렌더링
+            $content = File::get($contentFile);
+            
+            // 폴더명에서 화면 정보 추출
+            $parts = explode('-', $templateId, 3);
+            $screenName = $parts[2] ?? 'unnamed';
+            
+            // 샘플 데이터 설정
+            $sampleData = [
+                'title' => str_replace('-', ' ', $screenName),
+                'description' => '샌드박스 템플릿 - ' . str_replace('-', ' ', $screenName),
+                'users' => [
+                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active'],
+                    ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive'],
+                    ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active']
+                ],
+                'projects' => [
+                    ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75],
+                    ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30],
+                    ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100]
+                ]
+            ];
+            
+            // 미리보기 페이지를 표시 (템플릿 전용)
+            return view('700-page-sandbox.715-page-template-preview.000-index', [
+                'templateContent' => $content,
+                'templateData' => $sampleData,
+                'templateId' => "template_{$templateId}",
+                'templateFolder' => $templateId,
+                'sandboxType' => $sandboxType
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('템플릿 미리보기 오류', [
+                'sandboxType' => $sandboxType,
+                'templateId' => $templateId, 
+                'error' => $e->getMessage()
+            ]);
+            abort(500, '미리보기를 불러올 수 없습니다: ' . $e->getMessage());
+        }
+    }
+
     private function generateComponentPath($screen)
     {
         // 화면 제목을 기반으로 컴포넌트 경로 생성
