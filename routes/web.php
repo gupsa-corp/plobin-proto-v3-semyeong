@@ -163,7 +163,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $project = \App\Models\Project::find($projectId);
         $page = \App\Models\ProjectPage::find($pageId);
 
-        // 커스텀 화면이 있는지 확인 (현재 세션의 샌드박스에서)
+        // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
         $customScreen = null;
         if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
             try {
@@ -174,26 +174,39 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 
                 $screenId = $customScreenSettings['screen_id'] ?? null;
                 
-                if ($screenId) {
-                    // 샌드박스 타입에서 실제 스토리지 이름 추출
-                    $sandboxType = $page->sandbox_type;
-                    if (strpos($sandboxType, 'sandbox-') === 0) {
-                        $storageType = substr($sandboxType, 8); // 'sandbox-' 제거
-                    } else {
-                        $storageType = $sandboxType;
-                    }
+                if ($screenId && isset($customScreenSettings['enabled']) && $customScreenSettings['enabled']) {
+                    // 메인 데이터베이스에서 커스텀 화면 조회
+                    $screen = \App\Models\SandboxCustomScreen::find($screenId);
                     
-                    // 현재 세션의 샌드박스 스토리지를 확인
-                    $currentStorage = session('sandbox_storage', $storageType);
-                    $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
-                    
-                    if (File::exists($dbPath)) {
-                        $pdo = new \PDO("sqlite:$dbPath");
-                        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                        $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
-                        $stmt->execute([$screenId]);
-                        $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($screen && $screen->fileExists()) {
+                        // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
+                        $renderer = new \App\Services\CustomScreenRenderer();
+                        $customScreen = [
+                            'id' => $screen->id,
+                            'title' => $screen->title,
+                            'description' => $screen->description,
+                            'type' => $screen->type,
+                            'content' => $renderer->render($screen->getFullFilePath(), [
+                                'title' => $screen->title,
+                                'description' => $screen->description,
+                                'organizations' => collect([
+                                    ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15],
+                                    ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
+                                ]),
+                                'projects' => collect([
+                                    ['id' => 1, 'name' => '프로젝트 A', 'status' => '진행중'],
+                                    ['id' => 2, 'name' => '프로젝트 B', 'status' => '완료'],
+                                ]),
+                                'users' => collect([
+                                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com'],
+                                    ['id' => 2, 'name' => '김영희', 'email' => 'kim@example.com'],
+                                ]),
+                                'activities' => collect([
+                                    ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
+                                    ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
+                                ])
+                            ])
+                        ];
                     }
                 }
             } catch (\Exception $e) {
@@ -202,7 +215,6 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                     'pageId' => $pageId,
                     'sandbox_type' => $page->sandbox_type,
                     'custom_screen_settings' => $page->custom_screen_settings,
-                    'storage' => $currentStorage ?? 'unknown',
                     'error' => $e->getMessage()
                 ]);
             }
@@ -924,23 +936,54 @@ Route::get('/test/organizations/{id}/projects/{projectId}/pages/{pageId}', funct
     // 실제 페이지 데이터를 가져와서 sandbox_type 확인
     $page = \App\Models\ProjectPage::find($pageId);
 
-    // 커스텀 화면이 있는지 확인 (현재 세션의 샌드박스에서)
+    // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
     $customScreen = null;
-    if ($page && !empty($page->sandbox_type)) {
+    if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
         try {
-            // 현재 세션의 샌드박스 스토리지를 확인
-            $currentStorage = session('sandbox_storage', $page->sandbox_type);
-            $dbPath = storage_path("sandbox/storage-sandbox-{$currentStorage}/database/sqlite.db");
-            if (File::exists($dbPath)) {
-                $pdo = new \PDO("sqlite:$dbPath");
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
-                $stmt->execute([$pageId]);
-                $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+            // 커스텀 화면 설정에서 screen_id 가져오기
+            $customScreenSettings = is_string($page->custom_screen_settings) 
+                ? json_decode($page->custom_screen_settings, true) 
+                : $page->custom_screen_settings;
+            
+            $screenId = $customScreenSettings['screen_id'] ?? null;
+            
+            if ($screenId && isset($customScreenSettings['enabled']) && $customScreenSettings['enabled']) {
+                // 메인 데이터베이스에서 커스텀 화면 조회
+                $screen = \App\Models\SandboxCustomScreen::find($screenId);
+                
+                if ($screen && $screen->fileExists()) {
+                    // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
+                    $renderer = new \App\Services\CustomScreenRenderer();
+                    $customScreen = [
+                        'id' => $screen->id,
+                        'title' => $screen->title,
+                        'description' => $screen->description,
+                        'type' => $screen->type,
+                        'content' => $renderer->render($screen->getFullFilePath(), [
+                            'title' => $screen->title,
+                            'description' => $screen->description,
+                            'organizations' => collect([
+                                ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15],
+                                ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
+                            ]),
+                            'projects' => collect([
+                                ['id' => 1, 'name' => '프로젝트 A', 'status' => '진행중'],
+                                ['id' => 2, 'name' => '프로젝트 B', 'status' => '완료'],
+                            ]),
+                            'users' => collect([
+                                ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com'],
+                                ['id' => 2, 'name' => '김영희', 'email' => 'kim@example.com'],
+                            ]),
+                            'activities' => collect([
+                                ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
+                                ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
+                            ])
+                        ])
+                    ];
+                }
             }
         } catch (\Exception $e) {
-            return "데이터베이스 오류: " . $e->getMessage();
+            return "커스텀 화면 로드 오류: " . $e->getMessage();
         }
     }
 
