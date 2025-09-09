@@ -15,7 +15,7 @@ return [
     '/mypage/delete' => ['view' => '300-page-service.305-page-mypage-delete.000-index', 'name' => 'account.delete'],
     '/organizations/{id}/dashboard' => ['view' => '300-page-service.302-page-organization-dashboard.000-index', 'name' => 'organization.dashboard'],
     '/organizations/{id}/projects' => ['view' => '300-page-service.307-page-organization-projects.000-index', 'name' => 'organization.projects'],
-    '/organizations/{id}/projects/{projectId}' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard'],
+    // '/organizations/{id}/projects/{projectId}' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard'], // 보호된 라우트에서 처리
     '/organizations/{id}/projects/{projectId}/dashboard' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard.full'],
     // 플랫폼 관리자 라우트들 (platform/admin/{페이지별 경로})
     '/platform/admin' => ['view' => '900-page-platform-admin.901-page-dashboard.000-index', 'name' => 'platform.admin.dashboard'],
