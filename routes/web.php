@@ -229,7 +229,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
         $sandboxType = null;
         $customScreenSettings = null;
-        
+
         // 우선순위: 페이지 레벨 > 프로젝트 레벨
         if ($page && !empty($page->sandbox_type)) {
             $sandboxType = $page->sandbox_type;
@@ -244,34 +244,34 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         if (!empty($sandboxType) && !empty($customScreenSettings)) {
             try {
                 // 커스텀 화면 설정에서 screen_id 또는 template_path 가져오기
-                $customScreenSettings = is_string($customScreenSettings) 
-                    ? json_decode($customScreenSettings, true) 
+                $customScreenSettings = is_string($customScreenSettings)
+                    ? json_decode($customScreenSettings, true)
                     : $customScreenSettings;
-                
+
                 $screenId = $customScreenSettings['screen_id'] ?? null;
                 $templatePath = $customScreenSettings['template_path'] ?? null;
                 $enabled = $customScreenSettings['enabled'] ?? true; // template_path 방식은 기본적으로 enabled
-                
+
                 // screen_id 방식 처리 (새로운 방식)
                 if ($screenId && $enabled) {
                     $storagePath = storage_path('sandbox/storage-sandbox-template/frontend');
-                    
+
                     if (\File::exists($storagePath)) {
                         $folders = \File::directories($storagePath);
-                        
+
                         foreach ($folders as $folder) {
                             $folderName = basename($folder);
                             $contentFile = $folder . '/000-content.blade.php';
                             $templateId = 'template_' . $folderName;
-                            
+
                             if ($templateId === $screenId && \File::exists($contentFile)) {
                                 // 템플릿 파일 내용 읽기
                                 $fileContent = \File::get($contentFile);
-                                
+
                                 // 폴더명에서 화면 정보 추출
                                 $parts = explode('-', $folderName, 3);
                                 $screenName = $parts[2] ?? 'unnamed';
-                                
+
                                 $customScreen = [
                                     'id' => $templateId,
                                     'title' => str_replace('-', ' ', $screenName),
@@ -287,14 +287,14 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 // template_path 방식 처리 (기존 방식)
                 elseif ($templatePath) {
                     $fullPath = storage_path('sandbox/storage-sandbox-template/' . $templatePath);
-                    
+
                     if (\File::exists($fullPath)) {
                         // 템플릿 파일 내용 읽기
                         $fileContent = \File::get($fullPath);
-                        
+
                         // 화면 타입에서 제목 추출
                         $screenType = $customScreenSettings['screen_type'] ?? 'custom screen';
-                        
+
                         $customScreen = [
                             'id' => 'template_' . str_replace(['/', '\\'], '-', $templatePath),
                             'title' => $screenType,
@@ -592,7 +592,7 @@ foreach ($routes as $path => $config) {
                 if (!Auth::check()) {
                     return redirect('/login');
                 }
-                
+
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
                     ->where('organization_members.user_id', Auth::id())
@@ -786,7 +786,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
             usort($customScreens, function($a, $b) {
                 return strcmp($b['created_at'], $a['created_at']);
             });
-            
+
         } catch (\Exception $e) {
             \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType]);
             $customScreens = [];
@@ -1160,12 +1160,6 @@ Route::get('/sandbox/projects-list', function () {
     return view('700-page-sandbox.715-page-projects-list.000-index');
 })->name('sandbox.projects-list');
 
-// Custom Screen Preview (기존 방식 - 하위 호환성)
-Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\CoreApi\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
-
-// Template Preview (새로운 직관적인 경로)
-Route::get('/sandbox/{sandboxType}/{templateId}', [\App\Http\CoreApi\Sandbox\CustomScreenPreviewController::class, 'showByPath'])->name('sandbox.template-preview');
-
 // 샌드박스 사용 프로젝트 목록
 Route::get('/sandbox/using-projects', [\App\Http\CoreApi\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
 
@@ -1267,16 +1261,16 @@ Route::get('/test/organizations/{id}/projects/{projectId}/pages/{pageId}', funct
     if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
         try {
             // 커스텀 화면 설정에서 screen_id 가져오기
-            $customScreenSettings = is_string($page->custom_screen_settings) 
-                ? json_decode($page->custom_screen_settings, true) 
+            $customScreenSettings = is_string($page->custom_screen_settings)
+                ? json_decode($page->custom_screen_settings, true)
                 : $page->custom_screen_settings;
-            
+
             $screenId = $customScreenSettings['screen_id'] ?? null;
-            
+
             if ($screenId && isset($customScreenSettings['enabled']) && $customScreenSettings['enabled']) {
                 // 메인 데이터베이스에서 커스텀 화면 조회
                 $screen = \App\Models\SandboxCustomScreen::find($screenId);
-                
+
                 if ($screen && $screen->fileExists()) {
                     // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
                     $renderer = new \App\Services\CustomScreenRenderer();
