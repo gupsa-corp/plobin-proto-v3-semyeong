@@ -311,6 +311,11 @@ foreach ($routes as $path => $config) {
 
             // 조직 관련 페이지들에 조직 데이터 전달
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
+                // 조직 관련 페이지는 인증이 필요
+                if (!Auth::check()) {
+                    return redirect('/login');
+                }
+                
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
                     ->where('organization_members.user_id', Auth::id())
