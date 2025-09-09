@@ -48,7 +48,8 @@ return [
     '/sandbox/api-creator' => ['view' => '700-page-sandbox.703-page-api-creator.000-index', 'name' => 'sandbox.api-creator'],
     '/sandbox/api-list' => ['view' => '700-page-sandbox.704-page-api-list.000-index', 'name' => 'sandbox.api-list'],
     '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
-    '/sandbox/blade-list' => ['view' => '700-page-sandbox.706-page-blade-list.000-index', 'name' => 'sandbox.blade-list'],
+    '/sandbox/custom-screens' => ['view' => '700-page-sandbox.706-page-custom-screens.000-index', 'name' => 'sandbox.custom-screens'],
+    '/sandbox/custom-screen-creator' => ['view' => '700-page-sandbox.707-page-custom-screen-creator.000-index', 'name' => 'sandbox.custom-screen-creator'],
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
     '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],
     '/sandbox/form-creator' => ['view' => '700-page-sandbox.709-page-form-creator.000-index', 'name' => 'sandbox.form-creator'],
@@ -63,4 +64,8 @@ return [
     '/sandbox/function-automation' => ['view' => '700-page-sandbox.711-page-function-automation.000-index', 'name' => 'sandbox.function-automation'],
     '/sandbox/function-templates' => ['view' => '700-page-sandbox.712-page-function-templates.000-index', 'name' => 'sandbox.function-templates'],
     '/sandbox/scenario-manager' => ['view' => '700-page-sandbox.711-page-scenario-manager.000-index', 'name' => 'sandbox.scenario-manager'],
+    '/sandbox/organizations-list' => ['view' => '700-page-sandbox.713-page-organizations-list.000-index', 'name' => 'sandbox.organizations-list'],
+    '/sandbox/custom-screen/preview/{id}' => ['view' => '700-page-sandbox.714-page-custom-screen-preview.000-index', 'name' => 'sandbox.custom-screen-preview'],
+
+    '/sandbox/projects-list' => ['view' => '700-page-sandbox.715-page-projects-list.000-index', 'name' => 'sandbox.projects-list'],
 ];

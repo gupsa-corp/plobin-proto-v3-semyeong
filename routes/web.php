@@ -554,6 +554,28 @@ Route::get('/sandbox/documentation-manager', function () {
     return view('700-page-sandbox.710-page-documentation-manager.000-index');
 })->name('sandbox.documentation-manager');
 
+// Custom Screens
+Route::get('/sandbox/custom-screens', function () {
+    return view('700-page-sandbox.706-page-custom-screens.000-index');
+})->name('sandbox.custom-screens');
+
+// Custom Screen Creator
+Route::get('/sandbox/custom-screen-creator', function () {
+    return view('700-page-sandbox.707-page-custom-screen-creator.000-index');
+})->name('sandbox.custom-screen-creator');
+
+// Organizations List (Generated Custom Screen)
+Route::get('/sandbox/organizations-list', function () {
+    return view('700-page-sandbox.713-page-organizations-list.000-index');
+})->name('sandbox.organizations-list');
+// 프로젝트 목록 (Generated Custom Screen)
+Route::get('/sandbox/projects-list', function () {
+    return view('700-page-sandbox.715-page-projects-list.000-index');
+})->name('sandbox.projects-list');
+
+// Custom Screen Preview
+Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\Controllers\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
+
 // Global Functions 파일 다운로드
 Route::get('/sandbox/download/{filename}', function ($filename) {
     $filePath = storage_path('app/sandbox-exports/' . $filename);
@@ -610,6 +632,7 @@ Route::prefix('sandbox/form-publisher')->group(function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list.post');
 });
+
 
 // 로그인 처리 라우트 추가 (모달용)
 Route::post('/login', function () {
