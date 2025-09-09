@@ -221,4 +221,32 @@ class Component extends LivewireComponent
 
         $this->screens = array_values($allScreens);
     }
+
+    public function hasLiveScreen($title)
+    {
+        $liveScreens = [
+            'dashboard' => 'sandbox.live-dashboard',
+            'project list' => 'sandbox.live-project-list',
+            'table view' => 'sandbox.live-table-view',
+            'kanban board' => 'sandbox.live-kanban-board',
+            'gantt chart' => 'sandbox.live-gantt-chart',
+            'calendar view' => 'sandbox.live-calendar-view',
+        ];
+
+        return array_key_exists(strtolower($title), $liveScreens);
+    }
+
+    public function getLiveScreenUrl($title)
+    {
+        $liveScreens = [
+            'dashboard' => route('sandbox.live-dashboard'),
+            'project list' => route('sandbox.live-project-list'),
+            'table view' => route('sandbox.live-table-view'),
+            'kanban board' => route('sandbox.live-kanban-board'),
+            'gantt chart' => route('sandbox.live-gantt-chart'),
+            'calendar view' => route('sandbox.live-calendar-view'),
+        ];
+
+        return $liveScreens[strtolower($title)] ?? '#';
+    }
 }

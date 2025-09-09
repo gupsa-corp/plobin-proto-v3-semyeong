@@ -82,6 +82,12 @@
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-1 ml-4">
+                                @if($this->hasLiveScreen($screen['title']))
+                                    <a href="{{ $this->getLiveScreenUrl($screen['title']) }}" 
+                                       class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 text-center">
+                                        🚀 라이브 보기
+                                    </a>
+                                @endif
                                 <button wire:click.stop="editScreen({{ "'" . $screen['id'] . "'" }})"
                                         class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
                                     ✏️ 편집

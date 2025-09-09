@@ -4,6 +4,7 @@ namespace App\Livewire\Sandbox\CustomScreens\Renderer;
 
 use Livewire\Component as LivewireComponent;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class Component extends LivewireComponent
 {
@@ -41,29 +42,11 @@ class Component extends LivewireComponent
 
     private function renderBladeTemplate($template)
     {
-        // 향상된 블레이드 템플릿 시뮬레이션
-        // 더 많은 샘플 데이터와 복잡한 렌더링 지원
+        // 실제 샌드박스 데이터베이스에서 데이터 가져오기
+        $sampleData = $this->getSandboxData();
         
-        $sampleData = [
-            'title' => $this->screen['title'] ?? '샘플 화면',
-            'description' => $this->screen['description'] ?? '이것은 미리보기입니다',
-            'users' => [
-                ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active'],
-                ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive'],
-                ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active']
-            ],
-            'projects' => [
-                ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75],
-                ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30],
-                ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100]
-            ],
-            'stats' => [
-                'total_users' => 156,
-                'active_users' => 142,
-                'total_projects' => 23,
-                'completed_projects' => 18
-            ]
-        ];
+        $sampleData['title'] = $this->screen['title'] ?? '샘플 화면';
+        $sampleData['description'] = $this->screen['description'] ?? '이것은 미리보기입니다';
 
         $rendered = $template;
         
@@ -149,6 +132,86 @@ class Component extends LivewireComponent
         }, $rendered);
 
         return $rendered;
+    }
+
+    private function getSandboxData()
+    {
+        try {
+            // 샌드박스 데이터베이스 연결 설정 (config/database.php의 sandbox 연결 사용)
+            $sandboxConnection = 'sandbox';
+            
+            // 실제 데이터 가져오기
+            $users = DB::connection($sandboxConnection)->table('users')->limit(10)->get()->toArray();
+            $projects = DB::connection($sandboxConnection)->table('projects')->limit(10)->get()->toArray();
+            $organizations = DB::connection($sandboxConnection)->table('organizations')->limit(10)->get()->toArray();
+            
+            // 통계 데이터 계산
+            $userCount = DB::connection($sandboxConnection)->table('users')->count();
+            $activeUserCount = DB::connection($sandboxConnection)->table('users')->where('email_verified_at', '!=', null)->count();
+            $projectCount = DB::connection($sandboxConnection)->table('projects')->count();
+            $organizationCount = DB::connection($sandboxConnection)->table('organizations')->count();
+            
+            return [
+                'users' => collect($users)->map(function($user) {
+                    return [
+                        'id' => $user->id ?? 0,
+                        'name' => $user->name ?? '사용자',
+                        'email' => $user->email ?? 'user@example.com',
+                        'status' => ($user->email_verified_at ?? null) ? 'active' : 'inactive',
+                        'created_at' => $user->created_at ?? now()
+                    ];
+                })->toArray(),
+                'projects' => collect($projects)->map(function($project) {
+                    return [
+                        'id' => $project->id ?? 0,
+                        'name' => $project->name ?? '프로젝트',
+                        'status' => $project->status ?? 'active',
+                        'progress' => rand(10, 100),
+                        'created_at' => $project->created_at ?? now()
+                    ];
+                })->toArray(),
+                'organizations' => collect($organizations)->map(function($org) {
+                    return [
+                        'id' => $org->id ?? 0,
+                        'name' => $org->name ?? '조직',
+                        'created_at' => $org->created_at ?? now()
+                    ];
+                })->toArray(),
+                'stats' => [
+                    'total_users' => $userCount,
+                    'active_users' => $activeUserCount,
+                    'total_projects' => $projectCount,
+                    'completed_projects' => collect($projects)->where('status', 'completed')->count(),
+                    'total_organizations' => $organizationCount
+                ]
+            ];
+            
+        } catch (\Exception $e) {
+            // 데이터베이스 연결 실패시 기본 샘플 데이터 반환
+            return [
+                'users' => [
+                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active', 'created_at' => now()],
+                    ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive', 'created_at' => now()],
+                    ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active', 'created_at' => now()]
+                ],
+                'projects' => [
+                    ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75, 'created_at' => now()],
+                    ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30, 'created_at' => now()],
+                    ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100, 'created_at' => now()]
+                ],
+                'organizations' => [
+                    ['id' => 1, 'name' => '테스트 조직 1', 'created_at' => now()],
+                    ['id' => 2, 'name' => '테스트 조직 2', 'created_at' => now()]
+                ],
+                'stats' => [
+                    'total_users' => 156,
+                    'active_users' => 142,
+                    'total_projects' => 23,
+                    'completed_projects' => 18,
+                    'total_organizations' => 5
+                ]
+            ];
+        }
     }
 
     public function refreshPreview()
