@@ -12,5 +12,6 @@
     </div>
 
     @include('300-page-service.303-page-mypage-profile.400-js-profile')
+    @livewire('profile.password-modal')
 </body>
 </html>

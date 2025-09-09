@@ -102,30 +102,59 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         return redirect()->route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
     })->name('project.dashboard.full');
 
-    // 프로젝트 샌드박스 관리 라우트들 (개발용 - 인증 없음)  
-    Route::get('/test/sandbox-templates', function() {
-        // 테스트용 샌드박스 템플릿 페이지
-        $project = (object)['id' => 2, 'name' => 'Test Project'];
-        $sandboxes = collect([]); // 빈 컬렉션
-        return view('300-page-service.318-page-project-settings-sandboxes.000-index', compact('project', 'sandboxes'));
-    })->name('test.sandbox.templates');
-    
-    Route::get('/organizations/{id}/projects/{projectId}/settings/sandboxes', [App\Http\ProjectSandbox\Manage\Controller::class, 'index'])->name('project.dashboard.project.settings.sandboxes');
-    Route::post('/organizations/{id}/projects/{projectId}/settings/sandboxes', function ($id, $projectId, Illuminate\Http\Request $request) {
-        $action = $request->input('action');
-        $controller = new App\Http\ProjectSandbox\Manage\Controller();
-        
-        switch ($action) {
-            case 'create':
-                return $controller->create($request, $id, $projectId);
-            case 'delete':
-                return $controller->delete($request, $id, $projectId);
-            case 'toggle_status':
-                return $controller->toggleStatus($request, $id, $projectId);
-            default:
-                return back()->with('error', '잘못된 작업입니다.');
+    // 페이지 생성 라우트
+    Route::post('/organizations/{id}/projects/{projectId}/pages/create', function ($id, $projectId) {
+        try {
+            // 프로젝트 존재 확인
+            $project = \App\Models\Project::where('id', $projectId)
+                ->whereHas('organization', function($query) use ($id) {
+                    $query->where('id', $id);
+                })
+                ->first();
+
+            if (!$project) {
+                return response()->json(['success' => false, 'error' => '프로젝트를 찾을 수 없습니다.']);
+            }
+
+            // 권한 확인 (프로젝트 소유자이거나 조직 멤버여야 함)
+            $hasAccess = $project->user_id === Auth::id() ||
+                \App\Models\OrganizationMember::where('organization_id', $id)
+                    ->where('user_id', Auth::id())
+                    ->where('invitation_status', 'accepted')
+                    ->exists();
+
+            if (!$hasAccess) {
+                return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
+            }
+
+            // 페이지 순서 계산
+            $sortOrder = \App\Models\ProjectPage::where('project_id', $projectId)
+                ->whereNull('parent_id')
+                ->max('sort_order') + 1;
+
+            // 새 페이지 생성
+            $page = \App\Models\ProjectPage::create([
+                'project_id' => $projectId,
+                'title' => '새 페이지',
+                'content' => '',
+                'sort_order' => $sortOrder,
+                'parent_id' => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('project.dashboard.page', [
+                    'id' => $id,
+                    'projectId' => $projectId,
+                    'pageId' => $page->id
+                ])
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('페이지 생성 오류: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => '페이지 생성 중 오류가 발생했습니다.']);
         }
-    })->name('project.dashboard.project.settings.sandboxes.post');
+    });
 
     // 프로젝트 페이지 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
@@ -238,6 +267,17 @@ foreach ($routes as $path => $config) {
         });
     } else {
         $route = Route::get($path, function () use ($viewName, $path) {
+            // /mypage/edit 경로는 특별 처리 - 비밀번호 확인 후 접근
+            if ($path === '/mypage/edit') {
+                // 세션에 password_verified가 없으면 /mypage로 리다이렉트
+                if (!session('password_verified')) {
+                    return redirect('/mypage')->with('show_password_modal', true);
+                }
+
+                // 비밀번호 확인이 완료된 경우 세션 삭제하고 진행
+                session()->forget('password_verified');
+            }
+
             // 조직 관련 페이지들에 조직 데이터 전달
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
