@@ -13,6 +13,12 @@ class CustomScreenPreviewController
     public function show($id)
     {
         try {
+            // 템플릿 ID인지 확인 (template_xxx 형식)
+            if (str_starts_with($id, 'template_')) {
+                return $this->showTemplateScreen($id);
+            }
+
+            // DB 기반 커스텀 화면 처리
             $screen = SandboxCustomScreen::find($id);
 
             if (!$screen) {
@@ -56,6 +62,61 @@ class CustomScreenPreviewController
             \Log::error('커스텀 화면 미리보기 오류', ['id' => $id, 'error' => $e->getMessage()]);
             abort(500, '미리보기를 불러올 수 없습니다: ' . $e->getMessage());
         }
+    }
+
+    private function showTemplateScreen($id)
+    {
+        // template_xxx에서 실제 ID 추출
+        $screenId = str_replace('template_', '', $id);
+        
+        // 템플릿 파일 경로 찾기
+        $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+        $folders = File::directories($templatePath);
+        
+        $templateFolder = null;
+        foreach ($folders as $folder) {
+            $folderName = basename($folder);
+            $parts = explode('-', $folderName, 3);
+            if (($parts[0] ?? '') === $screenId) {
+                $templateFolder = $folder;
+                break;
+            }
+        }
+        
+        if (!$templateFolder) {
+            abort(404, '템플릿 화면을 찾을 수 없습니다.');
+        }
+        
+        $contentFile = $templateFolder . '/000-content.blade.php';
+        if (!File::exists($contentFile)) {
+            abort(404, '템플릿 파일이 존재하지 않습니다.');
+        }
+        
+        // 템플릿 파일 내용 직접 렌더링
+        $content = File::get($contentFile);
+        
+        // 샘플 데이터 설정
+        $sampleData = [
+            'title' => str_replace('-', ' ', basename($templateFolder)),
+            'users' => [
+                ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active'],
+                ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive'],
+                ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active']
+            ],
+            'projects' => [
+                ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75],
+                ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30],
+                ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100]
+            ]
+        ];
+        
+        // 미리보기 페이지를 표시 (템플릿 전용)
+        return view('700-page-sandbox.715-page-template-preview.000-index', [
+            'templateContent' => $content,
+            'templateData' => $sampleData,
+            'templateId' => $id,
+            'templateFolder' => basename($templateFolder)
+        ]);
     }
 
     private function generateComponentPath($screen)

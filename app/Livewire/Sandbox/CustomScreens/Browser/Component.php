@@ -53,6 +53,9 @@ class Component extends LivewireComponent
                     $screenType = $parts[1] ?? 'screen';
                     $screenName = $parts[2] ?? 'unnamed';
                     
+                    // 파일 내용 읽기
+                    $fileContent = File::get($contentFile);
+                    
                     $screens[] = [
                         'id' => 'template_' . $screenId,
                         'title' => str_replace('-', ' ', $screenName),
@@ -66,6 +69,7 @@ class Component extends LivewireComponent
                         'file_size' => File::size($contentFile),
                         'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
                         'is_template' => true,
+                        'blade_template' => $fileContent, // 렌더러가 기대하는 템플릿 데이터 추가
                     ];
                 }
             }

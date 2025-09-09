@@ -124,7 +124,7 @@
                                         class="text-sm px-3 py-1 rounded-md {{ $previewMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                     {{ $previewMode ? '📝 코드 보기' : '👁️ 미리보기' }}
                                 </button>
-                                <button wire:click="openPreviewInNewWindow({{ $selectedScreen['id'] }})"
+                                <button wire:click="openPreviewInNewWindow('{{ $selectedScreen['id'] }}')"
                                         class="text-sm px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700">
                                     🚀 새 창에서 보기
                                 </button>
