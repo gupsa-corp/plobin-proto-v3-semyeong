@@ -94,19 +94,49 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.textContent = '삭제 처리중...';
 
-        // TODO: 실제 계정 삭제 API 호출
-        console.log('계정 삭제 요청', {
-            reason: formData.get('reason'),
-            other_reason: formData.get('other_reason'),
-            password: '***',
-            confirmation: formData.get('confirmation')
+        // 실제 계정 삭제 API 호출
+        fetch('/mypage/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                reason: formData.get('reason'),
+                other_reason: formData.get('other_reason'),
+                password: formData.get('password'),
+                confirmation: formData.get('confirmation')
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message || '계정이 성공적으로 삭제되었습니다.\n지금까지 서비스를 이용해주셔서 감사합니다.');
+                // 메인 페이지로 리다이렉트
+                window.location.href = data.redirect || '/';
+            } else {
+                // 오류 처리
+                alert(data.message || '회원 탈퇴 처리 중 오류가 발생했습니다.');
+                
+                // 조직 소유자인 경우 추가 정보 표시
+                if (data.organizations && data.organizations.length > 0) {
+                    const orgList = data.organizations.join(', ');
+                    alert(`소유하고 있는 조직: ${orgList}\n\n조직을 먼저 삭제하거나 다른 사용자에게 양도한 후 탈퇴해주세요.`);
+                }
+                
+                // 버튼 상태 복구
+                submitBtn.disabled = false;
+                submitBtn.textContent = '계정 영구 삭제';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            
+            // 버튼 상태 복구
+            submitBtn.disabled = false;
+            submitBtn.textContent = '계정 영구 삭제';
         });
-
-        // 시뮬레이션: 3초 후 성공/실패 처리
-        setTimeout(() => {
-            // 성공 시
-            alert('계정이 성공적으로 삭제되었습니다.\n지금까지 서비스를 이용해주셔서 감사합니다.');
-        }, 3000);
     });
 
     // 확인 텍스트 실시간 검증

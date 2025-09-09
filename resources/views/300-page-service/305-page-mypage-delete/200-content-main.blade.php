@@ -39,23 +39,84 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">이름</label>
-                    <p class="text-base text-gray-900">홍길동</p>
+                    <p class="text-base text-gray-900">{{ $user->name ?? '-' }}</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-                    <p class="text-base text-gray-900">user@example.com</p>
+                    <p class="text-base text-gray-900">{{ $user->email ?? '-' }}</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">가입일</label>
-                    <p class="text-base text-gray-900">2024-01-01</p>
+                    <p class="text-base text-gray-900">{{ $user->created_at ? $user->created_at->format('Y-m-d') : '-' }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">소속</label>
-                    <p class="text-base text-gray-900">샘플 조직</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">소속 조직</label>
+                    <p class="text-base text-gray-900">
+                        @if($organizations->isNotEmpty())
+                            {{ $organizations->count() }}개 조직
+                        @else
+                            없음
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+
+    @if($ownedOrganizations->isNotEmpty())
+    <!-- 조직 소유자 경고 -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800">회원 탈퇴 불가</h3>
+                <div class="mt-2 text-sm text-yellow-700">
+                    <p>다음 조직의 소유자이므로 회원 탈퇴를 할 수 없습니다:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        @foreach($ownedOrganizations as $org)
+                        <li><strong>{{ $org->name }}</strong></li>
+                        @endforeach
+                    </ul>
+                    <p class="mt-3 font-medium">회원 탈퇴를 원하시면 다음 중 하나를 선택하세요:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>조직을 다른 멤버에게 양도</li>
+                        <li>조직을 완전 삭제</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($organizations->isNotEmpty() && $ownedOrganizations->isEmpty())
+    <!-- 조직 멤버 정보 -->
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">조직 멤버십 정보</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <p>현재 다음 조직의 멤버입니다:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        @foreach($organizations as $org)
+                        @php $member = $org->members->first(); @endphp
+                        <li><strong>{{ $org->name }}</strong> ({{ $member->role_name ?? 'member' }})</li>
+                        @endforeach
+                    </ul>
+                    <p class="mt-3">회원 탈퇴 시 이 모든 조직에서 자동으로 제외됩니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
     
     <!-- 탈퇴 처리 폼 -->
     <div class="bg-white shadow rounded-lg">
@@ -63,6 +124,15 @@
             <h3 class="text-lg font-medium text-red-600">회원탈퇴 확인</h3>
         </div>
         <div class="p-6">
+            @if($ownedOrganizations->isNotEmpty())
+            <div class="text-center py-8">
+                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <h4 class="text-lg font-medium text-gray-900 mb-2">회원 탈퇴가 제한되었습니다</h4>
+                <p class="text-gray-600">소유하고 있는 조직을 먼저 처리해주세요.</p>
+            </div>
+            @else
             <form id="account-delete-form" class="space-y-6">
                 <!-- 탈퇴 사유 -->
                 <div>
@@ -120,6 +190,7 @@
                     </button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 </div>

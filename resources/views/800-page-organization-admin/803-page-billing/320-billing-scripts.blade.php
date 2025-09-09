@@ -18,6 +18,64 @@
                 addPaymentMethodBtn.addEventListener('click', showPaymentMethodModal);
             }
 
+            // 모달 닫기 이벤트 리스너들
+            const closePaymentModal = document.getElementById('closePaymentModal');
+            const cancelPaymentMethod = document.getElementById('cancelPaymentMethod');
+            const closeBillingDetailModal = document.getElementById('closeBillingDetailModal');
+            const closePlanModal = document.getElementById('closePlanModal');
+            const cancelPlanChange = document.getElementById('cancelPlanChange');
+
+            if (closePaymentModal) closePaymentModal.addEventListener('click', hidePaymentMethodModal);
+            if (cancelPaymentMethod) cancelPaymentMethod.addEventListener('click', hidePaymentMethodModal);
+            if (closeBillingDetailModal) closeBillingDetailModal.addEventListener('click', hideBillingDetailModal);
+            if (closePlanModal) closePlanModal.addEventListener('click', hidePlanChangeModal);
+            if (cancelPlanChange) cancelPlanChange.addEventListener('click', hidePlanChangeModal);
+
+            // 모달 백드롭 클릭 시 닫기
+            const paymentMethodModal = document.getElementById('paymentMethodModal');
+            const billingDetailModal = document.getElementById('billingDetailModal');
+            const planChangeModal = document.getElementById('planChangeModal');
+
+            if (paymentMethodModal) {
+                paymentMethodModal.addEventListener('click', function(e) {
+                    if (e.target === paymentMethodModal) {
+                        hidePaymentMethodModal();
+                    }
+                });
+            }
+
+            if (billingDetailModal) {
+                billingDetailModal.addEventListener('click', function(e) {
+                    if (e.target === billingDetailModal) {
+                        hideBillingDetailModal();
+                    }
+                });
+            }
+
+            if (planChangeModal) {
+                planChangeModal.addEventListener('click', function(e) {
+                    if (e.target === planChangeModal) {
+                        hidePlanChangeModal();
+                    }
+                });
+            }
+
+            // ESC 키로 모달 닫기
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // 현재 열려있는 모달 찾아서 닫기
+                    if (paymentMethodModal && paymentMethodModal.style.display === 'flex') {
+                        hidePaymentMethodModal();
+                    }
+                    if (billingDetailModal && billingDetailModal.style.display === 'flex') {
+                        hideBillingDetailModal();
+                    }
+                    if (planChangeModal && planChangeModal.style.display === 'flex') {
+                        hidePlanChangeModal();
+                    }
+                }
+            });
+
             /**
              * 결제 데이터 로드
              */
@@ -157,6 +215,39 @@
                 const modal = document.getElementById('paymentMethodModal');
                 if (modal) {
                     modal.style.display = 'flex';
+                }
+            }
+
+            /**
+             * 결제 수단 모달 닫기
+             */
+            function hidePaymentMethodModal() {
+                const modal = document.getElementById('paymentMethodModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    // 폼 초기화
+                    const form = document.getElementById('paymentMethodForm');
+                    if (form) form.reset();
+                }
+            }
+
+            /**
+             * 결제 내역 상세 모달 닫기
+             */
+            function hideBillingDetailModal() {
+                const modal = document.getElementById('billingDetailModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            /**
+             * 플랜 변경 모달 닫기
+             */
+            function hidePlanChangeModal() {
+                const modal = document.getElementById('planChangeModal');
+                if (modal) {
+                    modal.style.display = 'none';
                 }
             }
 
