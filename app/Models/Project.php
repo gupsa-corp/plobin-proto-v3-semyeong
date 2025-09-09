@@ -19,7 +19,8 @@ class Project extends Model
         'organization_id',
         'user_id',
         'default_access_level',
-        'project_roles'
+        'project_roles',
+        'sandbox_type'
     ];
 
     protected $casts = [

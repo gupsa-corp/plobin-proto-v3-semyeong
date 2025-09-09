@@ -136,9 +136,11 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             $page = \App\Models\ProjectPage::create([
                 'project_id' => $projectId,
                 'title' => '새 페이지',
+                'slug' => 'new-page-' . time(), // 고유한 slug 생성
                 'content' => '',
                 'sort_order' => $sortOrder,
-                'parent_id' => null
+                'parent_id' => null,
+                'user_id' => Auth::id() // 현재 사용자 ID 추가
             ]);
 
             return response()->json([
@@ -163,14 +165,27 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $project = \App\Models\Project::find($projectId);
         $page = \App\Models\ProjectPage::find($pageId);
 
+        // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
+        $sandboxType = null;
+        $customScreenSettings = null;
+        
+        // 우선순위: 페이지 레벨 > 프로젝트 레벨
+        if ($page && !empty($page->sandbox_type)) {
+            $sandboxType = $page->sandbox_type;
+            $customScreenSettings = $page->custom_screen_settings;
+        } elseif ($project && !empty($project->sandbox_type)) {
+            $sandboxType = $project->sandbox_type;
+            $customScreenSettings = null; // 프로젝트 레벨에서는 커스텀 화면 설정이 없음
+        }
+
         // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
         $customScreen = null;
-        if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
+        if (!empty($sandboxType) && !empty($customScreenSettings)) {
             try {
                 // 커스텀 화면 설정에서 screen_id 가져오기
-                $customScreenSettings = is_string($page->custom_screen_settings) 
-                    ? json_decode($page->custom_screen_settings, true) 
-                    : $page->custom_screen_settings;
+                $customScreenSettings = is_string($customScreenSettings) 
+                    ? json_decode($customScreenSettings, true) 
+                    : $customScreenSettings;
                 
                 $screenId = $customScreenSettings['screen_id'] ?? null;
                 
@@ -213,8 +228,8 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
                 \Log::info('커스텀 화면 로드 실패', [
                     'pageId' => $pageId,
-                    'sandbox_type' => $page->sandbox_type,
-                    'custom_screen_settings' => $page->custom_screen_settings,
+                    'sandbox_type' => $sandboxType,
+                    'custom_screen_settings' => $customScreenSettings,
                     'error' => $e->getMessage()
                 ]);
             }
@@ -227,7 +242,8 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             'organization' => $organization,
             'project' => $project,
             'page' => $page,
-            'customScreen' => $customScreen
+            'customScreen' => $customScreen,
+            'sandboxType' => $sandboxType
         ]);
     })->name('project.dashboard.page');
 
@@ -262,6 +278,54 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             'projectId' => $projectId
         ]);
     })->name('project.dashboard.project.settings.name.post');
+
+    // 프로젝트 샌드박스 설정 라우트들
+    Route::get('/organizations/{id}/projects/{projectId}/settings/sandbox', function ($id, $projectId) {
+        // 프로젝트 정보 가져오기
+        $project = \App\Models\Project::where('id', $projectId)
+            ->whereHas('organization', function($query) use ($id) {
+                $query->where('id', $id);
+            })->first();
+
+        $currentSandboxType = $project ? $project->sandbox_type : null;
+
+        return view('300-page-service.315-page-project-settings-sandbox.000-index', [
+            'currentProjectId' => $projectId,
+            'activeTab' => 'sandbox',
+            'organizationId' => $id,
+            'projectId' => $projectId,
+            'currentSandboxType' => $currentSandboxType
+        ]);
+    })->name('project.dashboard.project.settings.sandbox');
+
+    Route::post('/organizations/{id}/projects/{projectId}/settings/sandbox', function ($id, $projectId, Illuminate\Http\Request $request) {
+        try {
+            // 프로젝트 존재 여부 확인
+            $project = \App\Models\Project::where('id', $projectId)
+                ->whereHas('organization', function($query) use ($id) {
+                    $query->where('id', $id);
+                })->first();
+
+            if (!$project) {
+                return redirect()->back()->with('error', '프로젝트를 찾을 수 없습니다.');
+            }
+
+            // 샌드박스 설정 저장
+            $sandboxType = $request->input('sandbox', '');
+            if (empty($sandboxType)) {
+                $sandboxType = null; // 빈 값을 null로 변환
+            }
+
+            $project->update([
+                'sandbox_type' => $sandboxType
+            ]);
+
+            return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
+        } catch (\Exception $e) {
+            \Log::error('샌드박스 설정 저장 오류', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
+        }
+    })->name('project.dashboard.project.settings.sandbox.post');
 });
 
 // 웹 라우트 일괄 등록 (대시보드 제외)

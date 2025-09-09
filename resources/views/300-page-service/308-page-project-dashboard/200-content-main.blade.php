@@ -12,15 +12,23 @@
     $projectId = $project ? $project->id : null;
     $pageId = $page ? $page->id : null;
 
-    // 페이지가 있는 경우 샌드박스 설정 확인
+    // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 설정 확인
     $hasSandbox = false;
     $hasCustomScreen = false;
     $sandboxType = null;
+    $sandboxLevel = null; // 'page' 또는 'project' 구분용
 
-    if ($page) {
+    // 우선순위: 페이지 레벨 > 프로젝트 레벨
+    if ($page && !empty($page->sandbox_type)) {
         $sandboxType = $page->sandbox_type;
-        $hasSandbox = !empty($sandboxType);
+        $sandboxLevel = 'page';
+        $hasSandbox = true;
         $hasCustomScreen = !empty($page->custom_screen_settings);
+    } elseif ($project && !empty($project->sandbox_type)) {
+        $sandboxType = $project->sandbox_type;
+        $sandboxLevel = 'project';
+        $hasSandbox = true;
+        $hasCustomScreen = false; // 프로젝트 레벨에서는 커스텀 화면 설정 없음
     }
 @endphp
 
@@ -112,7 +120,7 @@
                             </svg>
                             설정
                         </a>
-                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/settings/sandboxes"
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/settings/sandbox"
                            class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors duration-200">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -195,10 +203,17 @@
                                 </svg>
                                 <span class="text-sm font-medium text-green-800">
                                     {{ ucfirst($sandboxType) }} Sandbox
+                                    @if($sandboxLevel === 'project')
+                                        <span class="text-xs font-normal text-green-700">(프로젝트 레벨)</span>
+                                    @endif
                                 </span>
                             </div>
                             <div class="text-sm text-green-600">
-                                커스텀 화면 미설정
+                                @if($sandboxLevel === 'project')
+                                    프로젝트 전체에 적용됨
+                                @else
+                                    커스텀 화면 미설정
+                                @endif
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -234,12 +249,23 @@
                         </h2>
 
                         <p class="text-green-600 mb-2">
-                            현재 <strong>{{ ucfirst($sandboxType) }}</strong> 샌드박스가 설정되어 있습니다.
+                            현재 <strong>{{ ucfirst($sandboxType) }}</strong> 샌드박스가 
+                            @if($sandboxLevel === 'project')
+                                <span class="font-semibold">프로젝트 레벨</span>에서 설정되어 있습니다.
+                            @else
+                                설정되어 있습니다.
+                            @endif
                         </p>
 
-                        <p class="text-gray-500 mb-6">
-                            커스텀 화면을 추가로 설정할 수 있습니다.
-                        </p>
+                        @if($sandboxLevel === 'project')
+                            <p class="text-gray-500 mb-6">
+                                이 설정은 프로젝트의 모든 페이지에 적용됩니다. 개별 페이지에서 다른 샌드박스를 설정할 수도 있습니다.
+                            </p>
+                        @else
+                            <p class="text-gray-500 mb-6">
+                                커스텀 화면을 추가로 설정할 수 있습니다.
+                            </p>
+                        @endif
 
                         <div class="space-y-3">
                             <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen"
@@ -293,7 +319,7 @@
                                 설정
                             </a>
                         @endif
-                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/settings/sandboxes"
+                        <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/settings/sandbox"
                            class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors duration-200">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
