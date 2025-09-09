@@ -532,8 +532,8 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     if (!empty($currentSandboxType)) {
         try {
             // 샌드박스 타입에서 실제 스토리지 이름 추출
-            if (strpos($currentSandboxType, 'sandbox-') === 0) {
-                $storageType = substr($currentSandboxType, 8); // 'sandbox-' 제거
+            if (strpos($currentSandboxType, 'storage-sandbox-') === 0) {
+                $storageType = substr($currentSandboxType, 16); // 'storage-sandbox-' 제거
             } else {
                 $storageType = $currentSandboxType;
             }

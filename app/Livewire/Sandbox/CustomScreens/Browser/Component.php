@@ -38,24 +38,24 @@ class Component extends LivewireComponent
     {
         $screens = [];
         $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
-        
+
         if (File::exists($templatePath)) {
             $folders = File::directories($templatePath);
-            
+
             foreach ($folders as $folder) {
                 $folderName = basename($folder);
                 $contentFile = $folder . '/000-content.blade.php';
-                
+
                 if (File::exists($contentFile)) {
                     // 폴더명에서 화면 정보 추출
                     $parts = explode('-', $folderName, 3);
                     $screenId = $parts[0] ?? '000';
                     $screenType = $parts[1] ?? 'screen';
                     $screenName = $parts[2] ?? 'unnamed';
-                    
+
                     // 파일 내용 읽기
                     $fileContent = File::get($contentFile);
-                    
+
                     $screens[] = [
                         'id' => 'template_' . $screenId,
                         'title' => str_replace('-', ' ', $screenName),
@@ -74,12 +74,12 @@ class Component extends LivewireComponent
                 }
             }
         }
-        
+
         // 생성 날짜 기준 내림차순 정렬
         usort($screens, function($a, $b) {
             return strcmp($b['created_at'], $a['created_at']);
         });
-        
+
         return $screens;
     }
 
@@ -88,6 +88,7 @@ class Component extends LivewireComponent
         $screen = collect($this->screens)->firstWhere('id', $id);
         if ($screen) {
             $this->selectedScreen = $screen;
+            $this->previewMode = true; // 화면 선택시 자동으로 미리보기 모드 활성화
         }
     }
 
@@ -126,16 +127,16 @@ class Component extends LivewireComponent
             // 새로운 폴더명 생성 (템플릿 내에서)
             $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
             $newFolderName = $this->generateNewFolderName($templatePath, $originalScreen['folder_name']);
-            
+
             $sourcePath = $originalScreen['full_path'];
             $targetPath = $templatePath . '/' . $newFolderName . '/000-content.blade.php';
-            
+
             // 새 폴더 생성
             $targetDir = dirname($targetPath);
             if (!File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
-            
+
             // 파일 복사
             if (File::exists($sourcePath)) {
                 File::copy($sourcePath, $targetPath);
@@ -155,7 +156,7 @@ class Component extends LivewireComponent
             $newName = $originalName . '-copy-' . $counter;
             $counter++;
         } while (File::exists($basePath . '/' . $newName));
-        
+
         return $newName;
     }
 
@@ -171,11 +172,11 @@ class Component extends LivewireComponent
             // 파일 및 폴더 삭제 (템플릿 내에서만)
             $filePath = $screen['full_path'];
             $folderPath = dirname($filePath);
-            
+
             if (File::exists($filePath)) {
                 File::delete($filePath);
             }
-            
+
             if (File::exists($folderPath) && File::isDirectory($folderPath)) {
                 File::deleteDirectory($folderPath);
             }

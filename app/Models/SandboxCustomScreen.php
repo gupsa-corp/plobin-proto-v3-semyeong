@@ -17,12 +17,20 @@ class SandboxCustomScreen extends Model
     ];
     
     /**
-     * 파일이 존재하는지 확인
+     * 폴더가 존재하는지 확인
      */
     public function fileExists()
     {
-        $fullPath = $this->getFullFilePath();
-        return File::exists($fullPath);
+        $folderPath = $this->getFolderPath();
+        return File::isDirectory($folderPath);
+    }
+    
+    /**
+     * 폴더 경로를 반환
+     */
+    public function getFolderPath()
+    {
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_type}");
     }
     
     /**
