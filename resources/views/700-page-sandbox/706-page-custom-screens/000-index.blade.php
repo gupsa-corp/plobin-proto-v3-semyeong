@@ -4,7 +4,7 @@
 @include($common . '.301-layout-head', ['title' => '커스텀 화면'])
 
 <body class="bg-gray-100">
-    @include('700-page-sandbox.700-common.400-sandbox-header')
+    @include('700-page-sandbox.700-common.401-custom-screens-header')
     
     <div class="min-h-screen sandbox-container">
         <div class="sandbox-card">

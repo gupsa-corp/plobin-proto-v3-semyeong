@@ -3,16 +3,12 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 flex items-center">
-                📱 커스텀 화면 브라우저
+                🎨 템플릿 화면 관리자
             </h1>
-            <p class="text-gray-600 mt-1">블레이드 + 라이브와이어로 구현된 화면들을 관리하고 미리보기할 수 있습니다.</p>
+            <p class="text-gray-600 mt-1">템플릿 화면들을 관리하고 미리보기할 수 있습니다. 모든 화면은 템플릿 스토리지에 저장됩니다.</p>
         </div>
         
         <div class="flex space-x-3">
-            <button wire:click="syncAllTemplates"
-                    class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center">
-                🔄 템플릿 일괄 동기화
-            </button>
             <a href="{{ route('sandbox.custom-screen-creator') }}" 
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                 ✨ 새 화면 만들기
@@ -47,7 +43,7 @@
                 </div>
                 
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500">총 {{ count($screens) }}개 화면</span>
+                    <span class="text-sm text-gray-500">총 {{ count($screens) }}개 템플릿 화면</span>
                     <button wire:click="loadScreens" class="text-sm text-blue-600 hover:text-blue-800">
                         🔄 새로고침
                     </button>
@@ -59,17 +55,14 @@
                 @forelse($screens as $screen)
                     <div wire:click="selectScreen({{ is_string($screen['id']) ? "'" . $screen['id'] . "'" : $screen['id'] }})"
                          class="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow
-                                {{ $selectedScreen && $selectedScreen['id'] == $screen['id'] ? 'border-blue-500 bg-blue-50' : '' }}
-                                @if($screen['is_template']) border-purple-300 bg-purple-25 @endif">
+                                {{ $selectedScreen && $selectedScreen['id'] == $screen['id'] ? 'border-blue-500 bg-blue-50' : '' }}">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <div class="flex items-center space-x-2 mb-1">
                                     <h3 class="font-semibold text-gray-900">{{ $screen['title'] }}</h3>
-                                    @if($screen['is_template'])
-                                        <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                                            🎨 템플릿
-                                        </span>
-                                    @endif
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                        🎨 템플릿
+                                    </span>
                                 </div>
                                 <p class="text-sm text-gray-600 mb-2">{{ $screen['description'] ?? '설명 없음' }}</p>
                                 <div class="flex items-center space-x-4 text-xs text-gray-500">
@@ -89,37 +82,30 @@
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-1 ml-4">
-                                @if($screen['is_template'])
-                                    <button wire:click.stop="copyTemplateToCustomScreen({{ "'" . $screen['id'] . "'" }})"
-                                            class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50">
-                                        🔄 동기화
-                                    </button>
-                                @else
-                                    <button wire:click.stop="editScreen({{ $screen['id'] }})"
-                                            class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
-                                        ✏️ 편집
-                                    </button>
-                                    <button wire:click.stop="duplicateScreen({{ $screen['id'] }})"
-                                            class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
-                                        📄 복사
-                                    </button>
-                                    <button wire:click.stop="deleteScreen({{ $screen['id'] }})"
-                                            class="text-red-600 hover:text-red-800 text-xs px-2 py-1 rounded hover:bg-red-50"
-                                            onclick="return confirm('정말 삭제하시겠습니까?')">
-                                        🗑️ 삭제
-                                    </button>
-                                @endif
+                                <button wire:click.stop="editScreen({{ "'" . $screen['id'] . "'" }})"
+                                        class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
+                                    ✏️ 편집
+                                </button>
+                                <button wire:click.stop="duplicateScreen({{ "'" . $screen['id'] . "'" }})"
+                                        class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
+                                    📄 복사
+                                </button>
+                                <button wire:click.stop="deleteScreen({{ "'" . $screen['id'] . "'" }})"
+                                        class="text-red-600 hover:text-red-800 text-xs px-2 py-1 rounded hover:bg-red-50"
+                                        onclick="return confirm('정말 삭제하시겠습니까? 템플릿 파일이 완전히 제거됩니다.')">
+                                    🗑️ 삭제
+                                </button>
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
-                        <div class="text-gray-400 text-6xl mb-4">📱</div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">화면이 없습니다</h3>
-                        <p class="text-gray-500 mb-4">새로운 커스텀 화면을 만들어보세요!</p>
+                        <div class="text-gray-400 text-6xl mb-4">🎨</div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">템플릿 화면이 없습니다</h3>
+                        <p class="text-gray-500 mb-4">새로운 템플릿 화면을 만들어보세요!</p>
                         <a href="{{ route('sandbox.custom-screen-creator') }}" 
                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            ✨ 첫 번째 화면 만들기
+                            ✨ 첫 번째 템플릿 화면 만들기
                         </a>
                     </div>
                 @endforelse
@@ -178,7 +164,7 @@
                                         @if($selectedScreen['file_exists'])
                                             <div class="text-green-600"><strong>상태:</strong> ✅ 파일 존재</div>
                                             @if(isset($selectedScreen['file_size']))
-                                                <div><strong>크기:</strong> {{ $selectedScreen['file_size'] }}</div>
+                                                <div><strong>크기:</strong> {{ $selectedScreen['file_size'] }} bytes</div>
                                             @endif
                                             @if(isset($selectedScreen['file_modified']))
                                                 <div><strong>수정일:</strong> {{ $selectedScreen['file_modified'] }}</div>
@@ -190,15 +176,15 @@
                                 </div>
 
                                 <div>
-                                    <h4 class="font-medium text-gray-900 mb-2">파일 미리보기</h4>
+                                    <h4 class="font-medium text-gray-900 mb-2">템플릿 경로</h4>
                                     @if($selectedScreen['file_exists'])
                                         <div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm">
-                                            <p class="text-gray-600 mb-2">💡 파일이 존재합니다. 편집하려면 직접 파일을 수정하세요.</p>
-                                            <code class="text-xs text-gray-800">{{ $selectedScreen['full_path'] }}</code>
+                                            <p class="text-gray-600 mb-2">💡 템플릿 파일 위치:</p>
+                                            <code class="text-xs text-gray-800 break-all">{{ $selectedScreen['full_path'] }}</code>
                                         </div>
                                     @else
                                         <div class="bg-red-50 border border-red-200 rounded p-3 text-sm">
-                                            <p class="text-red-600">⚠️ 파일이 존재하지 않습니다.</p>
+                                            <p class="text-red-600">⚠️ 템플릿 파일이 존재하지 않습니다.</p>
                                         </div>
                                     @endif
                                 </div>
@@ -207,7 +193,7 @@
                     @else
                         <div class="text-center py-8 text-gray-500">
                             <div class="text-4xl mb-2">👈</div>
-                            <p>화면을 선택하여 미리보기를 확인하세요.</p>
+                            <p>템플릿 화면을 선택하여 미리보기를 확인하세요.</p>
                         </div>
                     @endif
                 </div>
