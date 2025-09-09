@@ -1,8 +1,0 @@
-# GanttChart API Individual Endpoints OpenAPI 3.0 Specification
-# Generated automatically - Use swagger-individual.json for complete specification
-
-openapi: 3.0.0
-info:
-  title: GanttChart API - Individual Endpoints
-  version: 1.0.0
-  description: 'Individual endpoints for each API function'
