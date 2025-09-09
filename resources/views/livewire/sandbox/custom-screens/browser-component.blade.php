@@ -204,14 +204,27 @@
 <script>
     document.addEventListener('livewire:initialized', () => {
         Livewire.on('openPreviewWindow', (event) => {
-            const { url } = event;
+            console.log('Opening preview window:', event);
+            const url = event.url || event[0]?.url;
+            if (!url) {
+                console.error('No URL provided for preview window');
+                return;
+            }
+            
             const width = Math.min(1200, screen.width * 0.8);
             const height = Math.min(800, screen.height * 0.8);
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
             
-            window.open(url, 'preview-window', 
+            console.log('Opening URL:', url);
+            const newWindow = window.open(url, '_blank', 
                 `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+            
+            if (!newWindow) {
+                console.error('Failed to open popup window - may be blocked');
+                // 팝업이 차단된 경우 현재 탭에서 열기
+                window.open(url, '_blank');
+            }
         });
     });
 </script>

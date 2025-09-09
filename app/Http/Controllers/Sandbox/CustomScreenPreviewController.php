@@ -29,17 +29,7 @@ class CustomScreenPreviewController
                 abort(404, '커스텀 화면을 찾을 수 없습니다.');
             }
             
-            // 화면 제목을 기반으로 동적으로 컴포넌트와 라우트 결정
-            $componentPath = $this->generateComponentPath($screen);
-            $routePath = $this->generateRoutePath($screen);
-            
-            // 실제 생성된 화면이 있는지 확인
-            if ($this->hasGeneratedScreen($screen)) {
-                // 실제 생성된 화면으로 리다이렉트
-                return redirect($routePath);
-            }
-            
-            // 실제 화면이 없으면 미리보기 페이지 표시
+            // 항상 미리보기 페이지를 표시 (헤더/푸터 없이)
             return view('700-page-sandbox.714-page-custom-screen-preview.000-index', compact('screen'));
             
         } catch (\Exception $e) {

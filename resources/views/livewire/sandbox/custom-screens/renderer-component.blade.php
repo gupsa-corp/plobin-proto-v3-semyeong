@@ -1,4 +1,71 @@
 <div>
+    <style>
+        /* 렌더링된 콘텐츠를 위한 기본 스타일 */
+        .rendered-content {
+            /* Tailwind CSS 스타일이 적용되도록 */
+        }
+        
+        .rendered-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+        
+        .rendered-content h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .rendered-content h3 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .rendered-content p {
+            color: #4b5563;
+        }
+        
+        .rendered-content .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .rendered-content .border {
+            border-color: #e5e7eb;
+            border-width: 1px;
+        }
+        
+        .rendered-content .rounded {
+            border-radius: 0.5rem;
+        }
+        
+        .rendered-content .p-4 {
+            padding: 1rem;
+        }
+        
+        .rendered-content .bg-white {
+            background-color: #ffffff;
+        }
+        
+        .rendered-content .shadow {
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        .rendered-content .text-gray-500 {
+            color: #6b7280;
+        }
+        
+        .rendered-content .font-semibold {
+            font-weight: 600;
+        }
+        
+        .rendered-content .text-gray-600 {
+            color: #4b5563;
+        }
+    </style>
+
     @if($error)
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
             <div class="flex items-start">
@@ -61,63 +128,3 @@
         </div>
     @endif
 </div>
-
-<style>
-    /* 렌더링된 콘텐츠를 위한 기본 스타일 */
-    .rendered-content {
-        /* Tailwind CSS 스타일이 적용되도록 */
-        @apply space-y-4;
-    }
-    
-    .rendered-content h1 {
-        @apply text-2xl font-bold text-gray-900;
-    }
-    
-    .rendered-content h2 {
-        @apply text-xl font-semibold text-gray-800;
-    }
-    
-    .rendered-content h3 {
-        @apply text-lg font-medium text-gray-700;
-    }
-    
-    .rendered-content p {
-        @apply text-gray-600;
-    }
-    
-    .rendered-content .space-y-4 > * + * {
-        @apply mt-4;
-    }
-    
-    .rendered-content .border {
-        @apply border-gray-200;
-    }
-    
-    .rendered-content .rounded {
-        @apply rounded-lg;
-    }
-    
-    .rendered-content .p-4 {
-        @apply p-4;
-    }
-    
-    .rendered-content .bg-white {
-        @apply bg-white;
-    }
-    
-    .rendered-content .shadow {
-        @apply shadow-sm;
-    }
-    
-    .rendered-content .text-gray-500 {
-        @apply text-gray-500;
-    }
-    
-    .rendered-content .font-semibold {
-        @apply font-semibold;
-    }
-    
-    .rendered-content .text-gray-600 {
-        @apply text-gray-600;
-    }
-</style>

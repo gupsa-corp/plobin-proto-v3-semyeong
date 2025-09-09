@@ -1,4 +1,30 @@
-<div class="px-6 py-6" x-data="{ sandboxSelected: false }">
+<div class="px-6 py-6" x-data="{ sandboxSelected: true, selectedCustomScreen: null, customScreens: [] }"
+     x-init="
+        // 샘플 커스텀 화면 데이터 - 실제로는 API에서 가져와야 함
+        customScreens = [
+            {
+                id: 1,
+                title: '조직 목록',
+                description: '조직 관리를 위한 목록 화면입니다.',
+                type: 'list',
+                created_at: '2025-09-09 03:36:47'
+            },
+            {
+                id: 2,
+                title: '조직 목록 (복사본)',
+                description: '조직 관리를 위한 목록 화면입니다.',
+                type: 'list',
+                created_at: '2025-09-09 03:43:23'
+            },
+            {
+                id: 3,
+                title: '프로젝트 목록',
+                description: '프로젝트 목록을 보여주는 화면입니다',
+                type: 'list',
+                created_at: '2025-09-09 03:50:20'
+            }
+        ]
+    ">
     <!-- 페이지 설정 탭 네비게이션 -->
     @include('300-page-service.309-page-settings-name.100-tab-navigation')
 
@@ -38,18 +64,109 @@
                 </div>
             </div>
 
-            <!-- 샌드박스 선택 시 커스텀 화면 설정 폼 (구현필요) -->
-            <div x-show="sandboxSelected" style="display: none;">
+            <!-- 샌드박스 선택 시 커스텀 화면 설정 폼 -->
+            <div x-show="sandboxSelected">
                 <form action="#" method="POST" class="space-y-6">
                     @csrf
                     
+                    <!-- 커스텀 화면 사용 안함 옵션 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">
-                            커스텀 화면 선택
+                            커스텀 화면 설정
                         </label>
                         
-                        <div class="text-center py-8 text-gray-500">
-                            구현필요
+                        <div class="space-y-3">
+                            <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+                                <input 
+                                    type="radio" 
+                                    id="custom_screen_none" 
+                                    name="custom_screen" 
+                                    value="" 
+                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    x-model="selectedCustomScreen"
+                                    checked
+                                >
+                                <label for="custom_screen_none" class="ml-3 flex-1">
+                                    <div class="font-medium text-gray-900">커스텀 화면 사용 안함</div>
+                                    <div class="text-sm text-gray-500">기본 페이지 레이아웃을 사용합니다.</div>
+                                </label>
+                            </div>
+                            
+                            <!-- 사용 가능한 커스텀 화면들 -->
+                            <template x-for="screen in customScreens" :key="screen.id">
+                                <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <input 
+                                        type="radio" 
+                                        :id="'custom_screen_' + screen.id" 
+                                        name="custom_screen" 
+                                        :value="screen.id" 
+                                        class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                        x-model="selectedCustomScreen"
+                                    >
+                                    <label :for="'custom_screen_' + screen.id" class="ml-3 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <div class="font-medium text-gray-900" x-text="screen.title"></div>
+                                                <div class="text-sm text-gray-500" x-text="screen.description"></div>
+                                                <div class="flex items-center space-x-3 text-xs text-gray-400 mt-1">
+                                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full" 
+                                                          x-text="screen.type.charAt(0).toUpperCase() + screen.type.slice(1)"></span>
+                                                    <span x-text="screen.created_at"></span>
+                                                </div>
+                                            </div>
+                                            <!-- 미리보기 버튼 -->
+                                            <div class="ml-4">
+                                                <button 
+                                                    type="button"
+                                                    @click="window.open('/sandbox/custom-screen/preview/' + screen.id, 'preview', 'width=1200,height=800')"
+                                                    class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                >
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    미리보기
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </template>
+                            
+                            <!-- 샌드박스로 이동해서 새 화면 만들기 -->
+                            <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-700">새 커스텀 화면 만들기</div>
+                                    <div class="text-sm text-gray-500">샌드박스에서 새로운 커스텀 화면을 생성할 수 있습니다.</div>
+                                </div>
+                                <a href="/sandbox/custom-screen-creator" target="_blank"
+                                   class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    생성하기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 선택된 화면 정보 -->
+                    <div x-show="selectedCustomScreen && selectedCustomScreen !== ''" x-transition>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-blue-800">선택된 커스텀 화면</h4>
+                                    <div class="mt-1 text-sm text-blue-700">
+                                        <span x-text="customScreens.find(s => s.id == selectedCustomScreen)?.title"></span>
+                                        화면이 이 페이지에 적용됩니다.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

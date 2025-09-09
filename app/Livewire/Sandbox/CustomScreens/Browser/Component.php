@@ -103,7 +103,8 @@ class Component extends LivewireComponent
     public function openPreviewInNewWindow($screenId)
     {
         // JavaScript로 새 창을 열도록 이벤트 디스패치
-        $this->dispatch('openPreviewWindow', ['url' => $this->getPreviewUrl($screenId)]);
+        $url = $this->getPreviewUrl($screenId);
+        $this->dispatch('openPreviewWindow', url: $url);
     }
 
     public function editScreen($id)

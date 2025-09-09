@@ -49,9 +49,49 @@
                             </label>
                         </div>
                         
-                        <!-- 구현필요: 실제 샌드박스 목록 -->
-                        <div class="text-center py-8 text-gray-500">
-                            구현필요
+                        <!-- 샌드박스 템플릿 -->
+                        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+                            <input 
+                                type="radio" 
+                                id="sandbox_template" 
+                                name="sandbox" 
+                                value="template" 
+                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                            >
+                            <label for="sandbox_template" class="ml-3 flex-1">
+                                <div class="font-medium text-gray-900">템플릿 샌드박스</div>
+                                <div class="text-sm text-gray-500">기본 템플릿이 포함된 샌드박스 환경입니다.</div>
+                            </label>
+                        </div>
+
+                        <!-- 샌드박스 1 -->
+                        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+                            <input 
+                                type="radio" 
+                                id="sandbox_1" 
+                                name="sandbox" 
+                                value="1" 
+                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                            >
+                            <label for="sandbox_1" class="ml-3 flex-1">
+                                <div class="font-medium text-gray-900">개발용 샌드박스 1</div>
+                                <div class="text-sm text-gray-500">개발 및 테스트를 위한 샌드박스 환경입니다.</div>
+                            </label>
+                        </div>
+
+                        <!-- 사용자 정의 샌드박스 생성 옵션 -->
+                        <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-700">새 샌드박스 생성</div>
+                                <div class="text-sm text-gray-500">새로운 샌드박스 환경을 생성하여 사용할 수 있습니다.</div>
+                            </div>
+                            <a href="/sandbox/storage-manager" 
+                               class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                생성
+                            </a>
                         </div>
                     </div>
                 </div>
