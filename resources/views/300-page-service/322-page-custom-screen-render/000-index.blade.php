@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $screen['title'] }}</title>
+    <title>{{ $customScreen['title'] ?? '커스텀 화면' }}</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -69,14 +69,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <h1 class="text-lg font-semibold text-gray-900">{{ $screen['title'] }}</h1>
+                    <h1 class="text-lg font-semibold text-gray-900">{{ $customScreen['title'] ?? '커스텀 화면' }}</h1>
                     <span class="ml-3 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                        {{ ucfirst($screen['type']) }}
+                        {{ ucfirst($customScreen['type'] ?? 'custom') }}
                     </span>
                 </div>
                 
                 <div class="text-sm text-gray-500">
-                    조직 {{ $orgId }} · 프로젝트 {{ $projectId }} · 페이지 {{ $pageId }}
+                    조직 {{ $organization->id ?? 'N/A' }} · 프로젝트 {{ $project->id ?? 'N/A' }} · 페이지 {{ $page->id ?? 'N/A' }}
                 </div>
             </div>
         </div>
@@ -85,12 +85,20 @@
     <!-- 메인 컨텐츠 -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="mb-6">
-            <p class="text-gray-600">{{ $screen['description'] }}</p>
+            <p class="text-gray-600">{{ $customScreen['description'] ?? '' }}</p>
         </div>
         
         <!-- 커스텀 화면 컨텐츠 렌더링 -->
         <div class="custom-screen-content">
-            {!! $screen['content'] !!}
+            @if(!empty($customScreen['blade_template']))
+                {!! App\Services\CustomScreenRenderer::render($customScreen['blade_template'], $customScreen) !!}
+            @elseif(!empty($customScreen['content']))
+                {!! $customScreen['content'] !!}
+            @else
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p class="text-yellow-800">렌더링할 컨텐츠가 없습니다.</p>
+                </div>
+            @endif
         </div>
     </div>
     
@@ -102,7 +110,7 @@
                     샌드박스에서 생성된 커스텀 화면
                 </div>
                 <div>
-                    생성일: {{ $screen['created_at'] }}
+                    생성일: {{ $customScreen['created_at'] ?? 'N/A' }}
                 </div>
             </div>
         </div>

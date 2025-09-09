@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 // 인증이 필요한 페이지들을 위한 라우트 그룹
 Route::group(['middleware' => 'loginRequired.auth'], function () {
@@ -98,13 +99,41 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $organization = \App\Models\Organization::find($id);
         $project = \App\Models\Project::find($projectId);
         $page = \App\Models\ProjectPage::find($pageId);
-        
+
+        // 커스텀 화면이 있는지 확인 (현재 세션의 샌드박스에서)
+        $customScreen = null;
+        if ($page && !empty($page->sandbox_type)) {
+            try {
+                // 현재 세션의 샌드박스 스토리지를 확인
+                $currentStorage = session('sandbox_storage', $page->sandbox_type);
+                $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+                if (File::exists($dbPath)) {
+                    $pdo = new \PDO("sqlite:$dbPath");
+                    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+                    $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
+                    $stmt->execute([$pageId]);
+                    $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+                }
+            } catch (\Exception $e) {
+                // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
+                \Log::info('커스텀 화면 로드 실패', [
+                    'pageId' => $pageId,
+                    'sandbox_type' => $page->sandbox_type,
+                    'storage' => $currentStorage ?? 'unknown',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        // 기존 프로젝트 대시보드 뷰를 사용하되, 커스텀 화면 데이터도 함께 전달
         return view('300-page-service.308-page-project-dashboard.000-index', [
-            'currentPageId' => $pageId, 
+            'currentPageId' => $pageId,
             'activeTab' => 'overview',
             'organization' => $organization,
             'project' => $project,
-            'page' => $page
+            'page' => $page,
+            'customScreen' => $customScreen
         ]);
     })->name('project.dashboard.page');
 
@@ -305,11 +334,12 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     $currentSandboxType = $page ? $page->sandbox_type : null;
     $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
 
-    // 실제 커스텀 화면 데이터 가져오기
+    // 실제 커스텀 화면 데이터 가져오기 (현재 세션의 샌드박스에서)
     $customScreens = [];
     if (!empty($currentSandboxType)) {
         try {
-            $currentStorage = session('sandbox_storage', 'template');
+            // 현재 세션의 샌드박스 스토리지를 확인
+            $currentStorage = session('sandbox_storage', $currentSandboxType);
             $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
 
             if (file_exists($dbPath)) {
@@ -320,7 +350,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
                 $customScreens = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             }
         } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage()]);
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType, 'storage' => $currentStorage ?? 'unknown']);
             $customScreens = [];
         }
     }
@@ -899,3 +929,44 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mypage/delete', [\App\Http\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
     Route::get('/api/user/organization-status', [\App\Http\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
 });
+
+// 테스트용 커스텀 화면 렌더링 라우트 (인증 우회) - 실제 라우트 구조와 동일하게
+Route::get('/test/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
+    // 실제 페이지 데이터를 가져와서 sandbox_type 확인
+    $page = \App\Models\ProjectPage::find($pageId);
+
+    // 커스텀 화면이 있는지 확인 (현재 세션의 샌드박스에서)
+    $customScreen = null;
+    if ($page && !empty($page->sandbox_type)) {
+        try {
+            // 현재 세션의 샌드박스 스토리지를 확인
+            $currentStorage = session('sandbox_storage', $page->sandbox_type);
+            $dbPath = storage_path("sandbox-storage/storage-sandbox-{$currentStorage}/database/sqlite.db");
+            if (File::exists($dbPath)) {
+                $pdo = new \PDO("sqlite:$dbPath");
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
+                $stmt->execute([$pageId]);
+                $customScreen = $stmt->fetch(\PDO::FETCH_ASSOC);
+            }
+        } catch (\Exception $e) {
+            return "데이터베이스 오류: " . $e->getMessage();
+        }
+    }
+
+    // 기존 프로젝트 대시보드 레이아웃을 사용하여 렌더링
+    return view('300-page-service.308-page-project-dashboard.000-index', [
+        'currentPageId' => $pageId,
+        'activeTab' => 'overview',
+        'organization' => (object) ['id' => $id, 'name' => '테스트 조직'],
+        'project' => (object) ['id' => $projectId, 'name' => '테스트 프로젝트'],
+        'page' => $page ?: (object) [  // 실제 페이지 데이터 사용, 없으면 mock 데이터
+            'id' => $pageId,
+            'title' => '테스트 페이지',
+            'sandbox_type' => null,
+            'custom_screen_settings' => null
+        ],
+        'customScreen' => $customScreen  // 커스텀 화면 데이터 추가
+    ]);
+})->name('test.custom-screen');

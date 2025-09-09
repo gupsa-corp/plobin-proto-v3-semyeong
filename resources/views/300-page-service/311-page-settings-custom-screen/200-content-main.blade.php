@@ -1,32 +1,11 @@
 <script>
 // Initialize custom screens data safely before Alpine.js loads
-window.customScreensData = [
-    {
-        "id": "1",
-        "title": "조직 목록",
-        "description": "조직 관리를 위한 목록 화면입니다.",
-        "type": "list",
-        "created_at": "2024-01-01"
-    },
-    {
-        "id": "2", 
-        "title": "조직 목록 (복사본)",
-        "description": "조직 관리를 위한 목록 화면입니다.",
-        "type": "list",
-        "created_at": "2024-01-02"
-    },
-    {
-        "id": "3",
-        "title": "프로젝트 목록", 
-        "description": "프로젝트 목록을 보여주는 화면입니다",
-        "type": "list",
-        "created_at": "2024-01-03"
-    }
-];
+// 백엔드에서 전달받은 실제 커스텀 화면 데이터 사용
+window.customScreensData = @json($customScreens ?? []);
 </script>
 
 <div class="px-6 py-6" x-data="{
-    sandboxSelected: true,
+    sandboxSelected: {{ !empty($currentSandboxType) ? 'true' : 'false' }},
     selectedCustomScreen: '{{ $currentCustomScreenSettings['screen_id'] ?? '' }}',
     customScreens: window.customScreensData || []
 }"
