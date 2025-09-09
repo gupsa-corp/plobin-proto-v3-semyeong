@@ -1,5 +1,8 @@
 <!-- 변경 로그 콘텐츠 -->
 <div class="px-6 py-6">
+    <!-- 프로젝트 설정 탭 네비게이션 -->
+    @include('300-page-service.314-page-project-settings-name.100-tab-navigation')
+
     <!-- 프로젝트로 이동 버튼 -->
     <div class="mb-6">
         <a href="{{ route('project.dashboard', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 

@@ -1,5 +1,8 @@
 <!-- 샌드박스 관리 콘텐츠 -->
 <div class="px-6 py-6" x-data="{ showAddForm: false, selectedSandbox: '', newSandboxName: '', newSandboxType: 'development', newSandboxDescription: '' }">
+    <!-- 프로젝트 설정 탭 네비게이션 -->
+    @include('300-page-service.314-page-project-settings-name.100-tab-navigation')
+
     <!-- 성공/에러 메시지 -->
     @if(session('success'))
         <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
