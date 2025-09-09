@@ -1,6 +1,6 @@
 <?php
 namespace App\Functions\DataProcessor;
-##
+
 class DataProcessor
 {
     public function __invoke($params)

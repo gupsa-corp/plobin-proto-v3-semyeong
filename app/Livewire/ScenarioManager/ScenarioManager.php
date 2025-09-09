@@ -3,11 +3,11 @@
 namespace App\Livewire\Sandbox;
 
 use Livewire\Component;
-use App\Models\SandboxScenarioGroup;
-use App\Models\SandboxScenario;
-use App\Models\SandboxSubScenario;
-use App\Models\SandboxScenarioStep;
-use App\Models\SandboxScenarioComment;
+use App\Models\ScenarioGroup;
+use App\Models\Scenario;
+use App\Models\SubScenario;
+use App\Models\ScenarioStep;
+use App\Models\ScenarioComment;
 use Illuminate\Support\Facades\Auth;
 
 class ScenarioManager extends Component
@@ -16,11 +16,6 @@ class ScenarioManager extends Component
     public $activeTab = 'list';
     public $selectedScenarioId = null;
     public $selectedScenario = null;
-    public $selectedSubScenario = null;
-    public $selectedStep = null;
-
-    // 브레드크럼 네비게이션
-    public $breadcrumb = [];
 
     // 검색 및 필터링
     public $searchTerm = '';
@@ -52,7 +47,7 @@ class ScenarioManager extends Component
     public function mount()
     {
         // 기본 그룹이 없으면 생성
-        if (SandboxScenarioGroup::count() === 0) {
+        if (ScenarioGroup::count() === 0) {
             $this->createDefaultGroups();
         }
     }
@@ -69,7 +64,7 @@ class ScenarioManager extends Component
         ];
 
         foreach ($defaultGroups as $group) {
-            SandboxScenarioGroup::create(array_merge($group, [
+            ScenarioGroup::create(array_merge($group, [
                 'created_by' => Auth::id(),
             ]));
         }
@@ -80,7 +75,7 @@ class ScenarioManager extends Component
      */
     public function getFilteredScenarios()
     {
-        $query = SandboxScenario::with(['group', 'assignee', 'subScenarios.steps']);
+        $query = Scenario::with(['group', 'assignee', 'subScenarios.steps']);
 
         // 검색어 필터링
         if ($this->searchTerm) {
@@ -113,7 +108,7 @@ class ScenarioManager extends Component
      */
     public function getGroups()
     {
-        return SandboxScenarioGroup::orderBy('sort_order')->orderBy('created_at', 'desc')->get();
+        return ScenarioGroup::orderBy('sort_order')->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -129,7 +124,7 @@ class ScenarioManager extends Component
         ]);
 
         try {
-            $scenario = SandboxScenario::create([
+            $scenario = Scenario::create([
                 'group_id' => $this->newScenario['group_id'],
                 'title' => $this->newScenario['title'],
                 'description' => $this->newScenario['description'],
@@ -152,62 +147,9 @@ class ScenarioManager extends Component
     public function selectScenario($scenarioId)
     {
         $this->selectedScenarioId = $scenarioId;
-        $this->selectedScenario = SandboxScenario::with(['group', 'assignee', 'reporter', 'subScenarios.steps'])
+        $this->selectedScenario = Scenario::with(['group', 'assignee', 'reporter', 'subScenarios.steps'])
             ->findOrFail($scenarioId);
-        $this->selectedSubScenario = null;
-        $this->selectedStep = null;
         $this->activeTab = 'detail';
-        $this->breadcrumb = [
-            ['type' => 'scenario', 'id' => $scenarioId, 'title' => $this->selectedScenario->title]
-        ];
-    }
-
-    public function selectSubScenario($subScenarioId)
-    {
-        $this->selectedSubScenario = SandboxSubScenario::with(['scenario.group', 'assignee', 'steps', 'comments'])
-            ->findOrFail($subScenarioId);
-        $this->selectedStep = null;
-        $this->breadcrumb = [
-            ['type' => 'scenario', 'id' => $this->selectedSubScenario->scenario->id, 'title' => $this->selectedSubScenario->scenario->title],
-            ['type' => 'sub-scenario', 'id' => $subScenarioId, 'title' => $this->selectedSubScenario->title]
-        ];
-    }
-
-    public function selectStep($stepId)
-    {
-        $this->selectedStep = SandboxScenarioStep::with(['subScenario.scenario.group', 'assignee', 'comments'])
-            ->findOrFail($stepId);
-        $this->breadcrumb = [
-            ['type' => 'scenario', 'id' => $this->selectedStep->subScenario->scenario->id, 'title' => $this->selectedStep->subScenario->scenario->title],
-            ['type' => 'sub-scenario', 'id' => $this->selectedStep->subScenario->id, 'title' => $this->selectedStep->subScenario->title],
-            ['type' => 'step', 'id' => $stepId, 'title' => $this->selectedStep->title]
-        ];
-    }
-
-    public function navigateToBreadcrumb($index)
-    {
-        // 선택한 브레드크럼 위치까지 네비게이션
-        $this->breadcrumb = array_slice($this->breadcrumb, 0, $index + 1);
-
-        $lastCrumb = end($this->breadcrumb);
-
-        if ($lastCrumb['type'] === 'scenario') {
-            $this->selectScenario($lastCrumb['id']);
-        } elseif ($lastCrumb['type'] === 'sub-scenario') {
-            $this->selectSubScenario($lastCrumb['id']);
-        } elseif ($lastCrumb['type'] === 'step') {
-            $this->selectStep($lastCrumb['id']);
-        }
-    }
-
-    public function goBackToList()
-    {
-        $this->activeTab = 'list';
-        $this->selectedScenarioId = null;
-        $this->selectedScenario = null;
-        $this->selectedSubScenario = null;
-        $this->selectedStep = null;
-        $this->breadcrumb = [];
     }
 
     /**
@@ -215,7 +157,7 @@ class ScenarioManager extends Component
      */
     public function startEditingScenario($scenarioId)
     {
-        $scenario = SandboxScenario::findOrFail($scenarioId);
+        $scenario = Scenario::findOrFail($scenarioId);
         $this->editingScenario = [
             'id' => $scenario->id,
             'title' => $scenario->title,
@@ -276,7 +218,7 @@ class ScenarioManager extends Component
     public function deleteScenario($scenarioId)
     {
         try {
-            $scenario = SandboxScenario::findOrFail($scenarioId);
+            $scenario = Scenario::findOrFail($scenarioId);
             $scenario->delete();
 
             $this->showMessage('시나리오가 성공적으로 삭제되었습니다.', 'success');
@@ -338,7 +280,7 @@ class ScenarioManager extends Component
 
     public function render()
     {
-        return view('livewire.sandbox.scenario-manager', [
+        return view('scenario-manager.scenario-manager', [
             'scenarios' => $this->getFilteredScenarios(),
             'groups' => $this->getGroups(),
         ]);
