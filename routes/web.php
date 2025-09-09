@@ -243,45 +243,64 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $customScreen = null;
         if (!empty($sandboxType) && !empty($customScreenSettings)) {
             try {
-                // 커스텀 화면 설정에서 screen_id 가져오기
+                // 커스텀 화면 설정에서 screen_id 또는 template_path 가져오기
                 $customScreenSettings = is_string($customScreenSettings) 
                     ? json_decode($customScreenSettings, true) 
                     : $customScreenSettings;
                 
                 $screenId = $customScreenSettings['screen_id'] ?? null;
+                $templatePath = $customScreenSettings['template_path'] ?? null;
+                $enabled = $customScreenSettings['enabled'] ?? true; // template_path 방식은 기본적으로 enabled
                 
-                if ($screenId && isset($customScreenSettings['enabled']) && $customScreenSettings['enabled']) {
-                    // 메인 데이터베이스에서 커스텀 화면 조회
-                    $screen = \App\Models\SandboxCustomScreen::find($screenId);
+                // screen_id 방식 처리 (새로운 방식)
+                if ($screenId && $enabled) {
+                    $storagePath = storage_path('sandbox/storage-sandbox-template/frontend');
                     
-                    if ($screen && $screen->fileExists()) {
-                        // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
-                        $renderer = new \App\Services\CustomScreenRenderer();
+                    if (\File::exists($storagePath)) {
+                        $folders = \File::directories($storagePath);
+                        
+                        foreach ($folders as $folder) {
+                            $folderName = basename($folder);
+                            $contentFile = $folder . '/000-content.blade.php';
+                            $templateId = 'template_' . $folderName;
+                            
+                            if ($templateId === $screenId && \File::exists($contentFile)) {
+                                // 템플릿 파일 내용 읽기
+                                $fileContent = \File::get($contentFile);
+                                
+                                // 폴더명에서 화면 정보 추출
+                                $parts = explode('-', $folderName, 3);
+                                $screenName = $parts[2] ?? 'unnamed';
+                                
+                                $customScreen = [
+                                    'id' => $templateId,
+                                    'title' => str_replace('-', ' ', $screenName),
+                                    'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                                    'type' => 'template',
+                                    'content' => $fileContent
+                                ];
+                                break;
+                            }
+                        }
+                    }
+                }
+                // template_path 방식 처리 (기존 방식)
+                elseif ($templatePath) {
+                    $fullPath = storage_path('sandbox/storage-sandbox-template/' . $templatePath);
+                    
+                    if (\File::exists($fullPath)) {
+                        // 템플릿 파일 내용 읽기
+                        $fileContent = \File::get($fullPath);
+                        
+                        // 화면 타입에서 제목 추출
+                        $screenType = $customScreenSettings['screen_type'] ?? 'custom screen';
+                        
                         $customScreen = [
-                            'id' => $screen->id,
-                            'title' => $screen->title,
-                            'description' => $screen->description,
-                            'type' => $screen->type,
-                            'content' => $renderer->render($screen->getFullFilePath(), [
-                                'title' => $screen->title,
-                                'description' => $screen->description,
-                                'organizations' => collect([
-                                    ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15],
-                                    ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
-                                ]),
-                                'projects' => collect([
-                                    ['id' => 1, 'name' => '프로젝트 A', 'status' => '진행중'],
-                                    ['id' => 2, 'name' => '프로젝트 B', 'status' => '완료'],
-                                ]),
-                                'users' => collect([
-                                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com'],
-                                    ['id' => 2, 'name' => '김영희', 'email' => 'kim@example.com'],
-                                ]),
-                                'activities' => collect([
-                                    ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
-                                    ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
-                                ])
-                            ])
+                            'id' => 'template_' . str_replace(['/', '\\'], '-', $templatePath),
+                            'title' => $screenType,
+                            'description' => '템플릿 화면 - ' . $screenType,
+                            'type' => 'template',
+                            'content' => $fileContent
                         ];
                     }
                 }
@@ -588,36 +607,52 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     $currentSandboxType = $page ? $page->sandbox_type : null;
     $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
 
-    // 메인 데이터베이스에서 커스텀 화면 데이터 가져오기
+    // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
     $customScreens = [];
     if (!empty($currentSandboxType)) {
         try {
-            // 샌드박스 타입에서 실제 스토리지 이름 추출
-            if (strpos($currentSandboxType, 'storage-sandbox-') === 0) {
-                $storageType = substr($currentSandboxType, 16); // 'storage-sandbox-' 제거
-            } else {
-                $storageType = $currentSandboxType;
+            $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+
+            if (\File::exists($templatePath)) {
+                $folders = \File::directories($templatePath);
+
+                foreach ($folders as $folder) {
+                    $folderName = basename($folder);
+                    $contentFile = $folder . '/000-content.blade.php';
+
+                    if (\File::exists($contentFile)) {
+                        // 폴더명에서 화면 정보 추출
+                        $parts = explode('-', $folderName, 3);
+                        $screenId = $parts[0] ?? '000';
+                        $screenType = $parts[1] ?? 'screen';
+                        $screenName = $parts[2] ?? 'unnamed';
+
+                        // 파일 내용 읽기
+                        $fileContent = \File::get($contentFile);
+
+                        $customScreens[] = [
+                            'id' => 'template_' . $folderName, // 전체 폴더명을 사용해서 고유한 ID 생성
+                            'title' => str_replace('-', ' ', $screenName),
+                            'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                            'type' => $screenType,
+                            'folder_name' => $folderName,
+                            'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
+                            'created_at' => date('Y-m-d H:i:s', \File::lastModified($contentFile)),
+                            'file_exists' => true,
+                            'full_path' => $contentFile,
+                            'file_size' => \File::size($contentFile),
+                            'file_modified' => date('Y-m-d H:i:s', \File::lastModified($contentFile)),
+                            'is_template' => true,
+                            'blade_template' => $fileContent,
+                        ];
+                    }
+                }
             }
-            
-            // 메인 데이터베이스에서 해당 샌드박스 타입의 커스텀 화면 조회
-            $screens = \App\Models\SandboxCustomScreen::where('sandbox_type', $storageType)
-                ->orderBy('created_at', 'desc')
-                ->get();
-                
-            $customScreens = $screens->map(function($screen) {
-                return [
-                    'id' => $screen->id,
-                    'title' => $screen->title,
-                    'description' => $screen->description,
-                    'type' => $screen->type,
-                    'folder_name' => $screen->folder_name,
-                    'file_path' => $screen->file_path,
-                    'created_at' => $screen->created_at->format('Y-m-d H:i:s'),
-                    'file_exists' => $screen->fileExists(),
-                    'size' => $screen->getFileSize(),
-                    'directory' => dirname($screen->file_path)
-                ];
-            })->toArray();
+
+            // 생성 날짜 기준 내림차순 정렬
+            usort($customScreens, function($a, $b) {
+                return strcmp($b['created_at'], $a['created_at']);
+            });
             
         } catch (\Exception $e) {
             \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType]);
