@@ -12,6 +12,7 @@ return [
     '/organizations/create' => ['view' => '300-page-service.306-page-organizations-list.000-index', 'name' => 'organizations.create'],
     '/mypage' => ['view' => '300-page-service.303-page-mypage-profile.000-index', 'name' => 'profile'],
     '/mypage/edit' => ['view' => '300-page-service.304-page-mypage-edit.000-index', 'name' => 'profile.edit'],
+    '/mypage/permissions' => ['view' => '300-page-service.306-page-mypage-permissions.000-index', 'name' => 'profile.permissions'],
     '/mypage/delete' => ['view' => '300-page-service.305-page-mypage-delete.000-index', 'name' => 'account.delete'],
     '/organizations/{id}/dashboard' => ['view' => '300-page-service.302-page-organization-dashboard.000-index', 'name' => 'organization.dashboard'],
     '/organizations/{id}/projects' => ['view' => '300-page-service.307-page-organization-projects.000-index', 'name' => 'organization.projects'],
@@ -68,4 +69,6 @@ return [
     '/sandbox/custom-screen/preview/{id}' => ['view' => '700-page-sandbox.714-page-custom-screen-preview.000-index', 'name' => 'sandbox.custom-screen-preview'],
     '/sandbox/using-projects' => ['view' => '700-page-sandbox.716-page-using-projects.000-index', 'name' => 'sandbox.using-projects'],
     '/sandbox/projects-list' => ['view' => '700-page-sandbox.715-page-projects-list.000-index', 'name' => 'sandbox.projects-list'],
+
+    '/sandbox/custom-screen-1757421612' => ['view' => '700-page-sandbox.717-page-custom-screen-1757421612.000-index', 'name' => 'sandbox.custom-screen-1757421612'],
 ];

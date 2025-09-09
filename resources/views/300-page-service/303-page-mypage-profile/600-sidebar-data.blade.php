@@ -11,6 +11,14 @@ return [
                       </svg>'
         ],
         [
+            'title' => '권한',
+            'url' => '/mypage/permissions',
+            'active' => request()->is('mypage/permissions'),
+            'icon' => '<svg width="20" height="20" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" fill="currentColor"/>
+                      </svg>'
+        ],
+        [
             'title' => '회원탈퇴',
             'url' => '/mypage/delete',
             'active' => request()->is('mypage/delete'),

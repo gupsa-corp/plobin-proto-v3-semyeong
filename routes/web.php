@@ -776,16 +776,20 @@ Route::get('/sandbox/custom-screen-creator', function () {
 Route::get('/sandbox/organizations-list', function () {
     return view('700-page-sandbox.713-page-organizations-list.000-index');
 })->name('sandbox.organizations-list');
+// 화면 (Generated Custom Screen)
+Route::get('/sandbox/custom-screen-1757421612', function () {
+    return view('700-page-sandbox.717-page-custom-screen-1757421612.000-index');
+})->name('sandbox.custom-screen-1757421612');
 // 프로젝트 목록 (Generated Custom Screen)
 Route::get('/sandbox/projects-list', function () {
     return view('700-page-sandbox.715-page-projects-list.000-index');
 })->name('sandbox.projects-list');
 
 // Custom Screen Preview
-Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\Controllers\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
+Route::get('/sandbox/custom-screen/preview/{id}', [\App\Http\CoreApi\Sandbox\CustomScreenPreviewController::class, 'show'])->name('sandbox.custom-screen-preview');
 
 // 샌드박스 사용 프로젝트 목록
-Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
+Route::get('/sandbox/using-projects', [\App\Http\CoreApi\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
 
 // Global Functions 파일 다운로드
 Route::get('/sandbox/download/{filename}', function ($filename) {

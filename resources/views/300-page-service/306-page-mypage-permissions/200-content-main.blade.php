@@ -1,0 +1,1 @@
+@livewire('profile.view-permissions')
