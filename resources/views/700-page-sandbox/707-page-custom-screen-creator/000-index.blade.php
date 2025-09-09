@@ -8,7 +8,7 @@
     
     <div class="min-h-screen sandbox-container">
         <div class="sandbox-card">
-            @livewire('sandbox.custom-screens.creator.component', ['edit' => request('edit')])
+            @livewire('sandbox.custom-screens.creator-component', ['edit' => request('edit')])
         </div>
     </div>
     

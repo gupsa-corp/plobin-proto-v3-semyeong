@@ -140,7 +140,7 @@
                             <div class="border rounded-lg p-4 bg-gray-50">
                                 <div class="mb-2 text-sm text-gray-600">렌더링 결과:</div>
                                 <div class="bg-white border rounded-lg p-4 min-h-[300px]">
-                                    @livewire('sandbox.custom-screens.renderer.component', ['screenData' => $selectedScreen], key('renderer-'.$selectedScreen['id']))
+                                    @livewire('sandbox.custom-screens.renderer-component', ['screenData' => $selectedScreen], key('renderer-'.$selectedScreen['id']))
                                 </div>
                             </div>
                         @else
