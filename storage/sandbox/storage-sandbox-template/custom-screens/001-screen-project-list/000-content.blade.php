@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">프로젝트 관리</h2>
-            <p class="text-gray-600">모든 프로젝트를 관리하고 모니터링할 수 있습니다.</p>
+            <p class="text-gray-600">모든 프로젝트를 관리하고 모니터링할 수 있습니다.222</p>
         </div>
         <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -11,11 +11,11 @@
             새 프로젝트
         </button>
     </div>
-    
+
     <!-- 필터 및 검색 -->
     <div class="mb-6 flex flex-col sm:flex-row gap-4">
         <div class="flex-1">
-            <input type="text" placeholder="프로젝트 이름으로 검색..." 
+            <input type="text" placeholder="프로젝트 이름으로 검색..."
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
         <div class="flex gap-2">
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="bg-green-50 p-4 rounded-lg border border-green-200">
             <div class="flex items-center justify-between">
                 <div>
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
             <div class="flex items-center justify-between">
                 <div>
@@ -77,7 +77,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
             <div class="flex items-center justify-between">
                 <div>
@@ -92,7 +92,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 프로젝트 테이블 -->
     <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
@@ -157,7 +157,7 @@
                         <button class="text-red-600 hover:text-red-900">삭제</button>
                     </td>
                 </tr>
-                
+
                 <!-- 샘플 프로젝트 2 -->
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -196,7 +196,7 @@
                         <button class="text-red-600 hover:text-red-900">삭제</button>
                     </td>
                 </tr>
-                
+
                 <!-- 샘플 프로젝트 3 -->
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -238,7 +238,7 @@
             </tbody>
         </table>
     </div>
-    
+
     <!-- 페이지네이션 -->
     <div class="mt-6 flex items-center justify-between">
         <div class="text-sm text-gray-700">

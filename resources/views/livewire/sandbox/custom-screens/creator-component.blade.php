@@ -131,7 +131,7 @@
                     <h3 class="font-semibold text-gray-900">블레이드 템플릿</h3>
                 </div>
                 <div class="p-4">
-                    <textarea wire:model="bladeTemplate" class="w-full h-64 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm" placeholder="블레이드 템플릿 코드를 입력하세요..."></textarea>
+                    <textarea wire:model="bladeTemplate" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm resize-y" placeholder="블레이드 템플릿 코드를 입력하세요..."></textarea>
                     @error('bladeTemplate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -142,7 +142,7 @@
                     <h3 class="font-semibold text-gray-900">라이브와이어 컴포넌트</h3>
                 </div>
                 <div class="p-4">
-                    <textarea wire:model="livewireComponent" class="w-full h-64 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm" placeholder="라이브와이어 컴포넌트 PHP 코드를 입력하세요..."></textarea>
+                    <textarea wire:model="livewireComponent" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm resize-y" placeholder="라이브와이어 컴포넌트 PHP 코드를 입력하세요..."></textarea>
                     @error('livewireComponent') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>

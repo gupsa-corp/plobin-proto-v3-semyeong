@@ -5,6 +5,7 @@ namespace App\Livewire\Sandbox\CustomScreens\Creator;
 use Livewire\Component as LivewireComponent;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
+use App\Models\SandboxCustomScreen;
 
 class Component extends LivewireComponent
 {
@@ -112,28 +113,32 @@ class Component extends LivewireComponent
     private function loadScreenForEdit($id)
     {
         try {
-            $dbPath = $this->getSandboxDbPath();
-            if (File::exists($dbPath)) {
-                $pdo = new \PDO("sqlite:$dbPath");
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $pdo->prepare('SELECT * FROM custom_screens WHERE id = ?');
-                $stmt->execute([$id]);
-                $screen = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-                if ($screen) {
-                    $this->title = $screen['title'];
-                    $this->description = $screen['description'];
-                    $this->type = $screen['type'];
-                    $this->bladeTemplate = $screen['blade_template'] ?? '';
-                    $this->livewireComponent = $screen['livewire_component'] ?? '';
-                    $this->connectedFunctions = json_decode($screen['connected_functions'] ?? '[]', true);
-                    $this->dbQueries = json_decode($screen['db_queries'] ?? '[]', true);
-                    $this->previewData = json_decode($screen['preview_data'] ?? '[]', true);
+            $screen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)->find($id);
+            if ($screen) {
+                $this->title = $screen->title;
+                $this->description = $screen->description;
+                $this->type = $screen->type;
+                
+                // 파일에서 실제 내용을 읽어옴
+                $filePath = $screen->getFullFilePath();
+                if (File::exists($filePath)) {
+                    $this->bladeTemplate = File::get($filePath);
+                } else {
+                    $this->bladeTemplate = $this->getDefaultBladeTemplate();
                 }
+                
+                // Livewire 컴포넌트는 기본 템플릿으로 설정 (기존 '#' 대신)
+                $this->livewireComponent = $this->getDefaultLivewireComponent();
+                
+                $this->connectedFunctions = [];
+                $this->dbQueries = [];
+                $this->previewData = [];
+            } else {
+                session()->flash('error', '화면을 찾을 수 없습니다.');
+                $this->initializeNewScreen();
             }
         } catch (\Exception $e) {
-            session()->flash('error', '화면을 불러올 수 없습니다.');
+            session()->flash('error', '화면을 불러올 수 없습니다: ' . $e->getMessage());
             $this->initializeNewScreen();
         }
     }
@@ -200,47 +205,50 @@ class Component extends LivewireComponent
         ]);
 
         try {
-            $dbPath = $this->getSandboxDbPath();
-            $this->ensureDbPath($dbPath);
-
-            $pdo = new \PDO("sqlite:$dbPath");
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            $this->createScreensTableIfNotExists($pdo);
-
             if ($this->editMode) {
-                $stmt = $pdo->prepare('UPDATE custom_screens SET title = ?, description = ?, type = ?, blade_template = ?, livewire_component = ?, connected_functions = ?, db_queries = ?, preview_data = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
-                $stmt->execute([
-                    $this->title,
-                    $this->description,
-                    $this->type,
-                    $this->bladeTemplate,
-                    $this->livewireComponent,
-                    json_encode($this->connectedFunctions),
-                    json_encode($this->dbQueries),
-                    json_encode($this->previewData),
-                    $this->editId
-                ]);
-                session()->flash('message', '화면이 수정되었습니다.');
+                // 기존 화면 수정
+                $screen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)->find($this->editId);
+                if ($screen) {
+                    $screen->update([
+                        'title' => $this->title,
+                        'description' => $this->description,
+                        'type' => $this->type
+                    ]);
+                    
+                    // 파일 내용 업데이트
+                    $filePath = $screen->getFullFilePath();
+                    if (File::exists(dirname($filePath))) {
+                        File::put($filePath, $this->bladeTemplate);
+                    }
+                    
+                    session()->flash('message', '화면이 수정되었습니다.');
+                } else {
+                    session()->flash('error', '수정할 화면을 찾을 수 없습니다.');
+                    return;
+                }
             } else {
-                $stmt = $pdo->prepare('INSERT INTO custom_screens (title, description, type, blade_template, livewire_component, connected_functions, db_queries, preview_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([
-                    $this->title,
-                    $this->description,
-                    $this->type,
-                    $this->bladeTemplate,
-                    $this->livewireComponent,
-                    json_encode($this->connectedFunctions),
-                    json_encode($this->dbQueries),
-                    json_encode($this->previewData)
+                // 새 화면 생성
+                $folderName = $this->generateFolderName($this->title);
+                $filePath = "custom-screens/{$folderName}/000-content.blade.php";
+                
+                $screen = SandboxCustomScreen::create([
+                    'title' => $this->title,
+                    'description' => $this->description,
+                    'type' => $this->type,
+                    'folder_name' => $folderName,
+                    'file_path' => $filePath,
+                    'sandbox_type' => $this->currentStorage
                 ]);
+                
+                // 실제 파일 생성
+                $fullFilePath = $screen->getFullFilePath();
+                $directory = dirname($fullFilePath);
+                if (!File::exists($directory)) {
+                    File::makeDirectory($directory, 0755, true);
+                }
+                File::put($fullFilePath, $this->bladeTemplate);
+                
                 session()->flash('message', '화면이 생성되었습니다.');
-            }
-
-            // 화면 생성 후 실제 폴더와 파일 생성
-            if (!$this->editMode) {
-                $this->generateScreenFiles($this->title);
-                $this->updateRoutes($this->title);
             }
 
             return redirect()->route('sandbox.custom-screens');
@@ -252,6 +260,26 @@ class Component extends LivewireComponent
     public function cancel()
     {
         return redirect()->route('sandbox.custom-screens');
+    }
+
+    private function generateFolderName($title)
+    {
+        // 타이틀을 안전한 폴더명으로 변환
+        $folderName = preg_replace('/[^a-zA-Z0-9가-힣\s\-_]/', '', $title);
+        $folderName = preg_replace('/\s+/', '-', trim($folderName));
+        $folderName = strtolower($folderName);
+        
+        // 중복 방지를 위해 타임스탬프 추가
+        return sprintf('%03d-screen-%s', $this->getNextScreenNumber(), $folderName);
+    }
+
+    private function getNextScreenNumber()
+    {
+        $maxNumber = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)
+            ->whereRaw("folder_name REGEXP '^[0-9]{3}-screen-'")
+            ->max('id');
+        
+        return $maxNumber ? $maxNumber + 1 : 1;
     }
 
     private function getDefaultBladeTemplate()
