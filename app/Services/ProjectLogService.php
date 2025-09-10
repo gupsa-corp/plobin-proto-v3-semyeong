@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\ProjectLog;
+use App\Models\ProjectChangeLog;
 use Illuminate\Support\Facades\Auth;
 
-class ProjectLogService
+class ProjectChangeLogService
 {
     /**
      * 프로젝트 로그 기록
      */
     public static function log(
-        int $projectId, 
-        string $action, 
+        int $projectId,
+        string $action,
         string $description = null,
         string $entityType = null,
         int $entityId = null,
@@ -21,7 +21,7 @@ class ProjectLogService
     ) {
         $userId = $userId ?: (Auth::id() ?? 1);
 
-        return ProjectLog::create([
+        return ProjectChangeLog::create([
             'project_id' => $projectId,
             'user_id' => $userId,
             'action' => $action,
@@ -41,7 +41,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_PROJECT_CREATED,
+            action: ProjectChangeLog::ACTION_PROJECT_CREATED,
             description: "프로젝트 '{$projectName}'가 생성되었습니다.",
             entityType: 'project',
             entityId: $projectId,
@@ -60,7 +60,7 @@ class ProjectLogService
 
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_SETTINGS_UPDATED,
+            action: ProjectChangeLog::ACTION_SETTINGS_UPDATED,
             description: $description,
             entityType: 'project',
             entityId: $projectId,
@@ -76,7 +76,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_PAGE_CREATED,
+            action: ProjectChangeLog::ACTION_PAGE_CREATED,
             description: "페이지 '{$pageTitle}'가 생성되었습니다.",
             entityType: 'page',
             entityId: $pageId,
@@ -97,7 +97,7 @@ class ProjectLogService
 
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_PAGE_UPDATED,
+            action: ProjectChangeLog::ACTION_PAGE_UPDATED,
             description: $description,
             entityType: 'page',
             entityId: $pageId,
@@ -116,7 +116,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_PAGE_DELETED,
+            action: ProjectChangeLog::ACTION_PAGE_DELETED,
             description: "페이지 '{$pageTitle}'가 삭제되었습니다.",
             entityType: 'page',
             entityId: $pageId,
@@ -132,7 +132,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_USER_ADDED,
+            action: ProjectChangeLog::ACTION_USER_ADDED,
             description: "사용자 '{$userName}'가 프로젝트에 추가되었습니다.",
             entityType: 'user',
             entityId: $addedUserId,
@@ -148,7 +148,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_USER_REMOVED,
+            action: ProjectChangeLog::ACTION_USER_REMOVED,
             description: "사용자 '{$userName}'가 프로젝트에서 제거되었습니다.",
             entityType: 'user',
             entityId: $removedUserId,
@@ -164,7 +164,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_PERMISSION_CHANGED,
+            action: ProjectChangeLog::ACTION_PERMISSION_CHANGED,
             description: "사용자 '{$userName}'의 권한이 '{$oldPermission}'에서 '{$newPermission}'로 변경되었습니다.",
             entityType: 'user',
             entityId: $targetUserId,
@@ -185,7 +185,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_SANDBOX_CREATED,
+            action: ProjectChangeLog::ACTION_SANDBOX_CREATED,
             description: "샌드박스 '{$sandboxName}'가 생성되었습니다.",
             entityType: 'sandbox',
             entityId: $sandboxId,
@@ -206,7 +206,7 @@ class ProjectLogService
 
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_SANDBOX_UPDATED,
+            action: ProjectChangeLog::ACTION_SANDBOX_UPDATED,
             description: $description,
             entityType: 'sandbox',
             entityId: $sandboxId,
@@ -225,7 +225,7 @@ class ProjectLogService
     {
         return self::log(
             projectId: $projectId,
-            action: ProjectLog::ACTION_SANDBOX_DELETED,
+            action: ProjectChangeLog::ACTION_SANDBOX_DELETED,
             description: "샌드박스 '{$sandboxName}'가 삭제되었습니다.",
             entityType: 'sandbox',
             entityId: $sandboxId,
