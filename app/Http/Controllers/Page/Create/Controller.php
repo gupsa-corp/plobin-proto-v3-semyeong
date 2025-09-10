@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Page\Create;
 use App\Models\Project;
 use App\Models\ProjectPage;
 use App\Models\OrganizationMember;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
