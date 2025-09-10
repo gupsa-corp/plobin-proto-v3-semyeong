@@ -18,6 +18,19 @@
                 loading: false,
                 error: null,
 
+                getCurrentScreenId() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('screen') || '';
+                },
+
+                getCurrentScreenTitle() {
+                    const currentId = this.getCurrentScreenId();
+                    if (!currentId) return '{{ $customScreen['title'] ?? '이름 없음' }}';
+                    
+                    const currentScreen = this.customScreens.find(screen => screen.id === currentId);
+                    return currentScreen ? currentScreen.title : '{{ $customScreen['title'] ?? '이름 없음' }}';
+                },
+
                 async loadCustomScreens() {
                     if (this.customScreens.length > 0) return; // 이미 로드됨
 
@@ -56,11 +69,8 @@
                 <div class="flex items-center">
                     <span class="text-sm text-blue-600 mr-2">커스텀 화면:</span>
                     <button @click="openDropdown()"
-                            class="inline-flex items-center px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-medium rounded-md transition-colors duration-200">
-                        {{ $customScreen['title'] ?? '이름 없음' }}
-                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
+                            class="inline-flex items-center px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-medium rounded-md transition-colors duration-200"
+                            x-text="getCurrentScreenTitle()">
                     </button>
                 </div>
 
@@ -120,7 +130,7 @@
                             <button
                                 @click="changeCustomScreenDynamic(screen.id, screen.title, $event)"
                                 class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                :class="{ 'bg-blue-50 text-blue-700': screen.id === '{{ $customScreen['id'] ?? '' }}' }">
+                                :class="{ 'bg-blue-50 text-blue-700': screen.id === getCurrentScreenId() }">
 
                                 <!-- 화면 타입별 아이콘 -->
                                 <div class="w-4 h-4 mr-3 flex-shrink-0">
@@ -141,6 +151,13 @@
                                         <span>•</span>
                                         <span x-text="screen.modified_at"></span>
                                     </div>
+                                </div>
+
+                                <!-- 현재 활성화된 화면 표시 -->
+                                <div x-show="screen.id === getCurrentScreenId()" class="ml-2 text-blue-600">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
                                 </div>
 
                                 <!-- 미리보기 버튼 -->

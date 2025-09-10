@@ -18,17 +18,21 @@ class TableViewComponent extends Component
     
     public $projects = [];
     public $stats = [];
+    public $screenId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
         'sortBy' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
         'filterStatus' => ['except' => ''],
+        'screen' => ['except' => ''],
         'page' => ['except' => 1],
     ];
 
     public function mount()
     {
+        // URL에서 screen 파라미터 가져오기
+        $this->screenId = request()->get('screen', '');
         $this->loadData();
     }
 
@@ -80,41 +84,170 @@ class TableViewComponent extends Component
             ];
             
         } catch (\Exception $e) {
-            // 기본값 설정
-            $this->projects = [
-                (object)[
-                    'id' => 1,
-                    'name' => '웹사이트 리뉴얼 프로젝트',
-                    'description' => '기존 웹사이트의 전면적인 개편',
-                    'status' => 'active',
-                    'created_at' => now()->subDays(5),
-                    'updated_at' => now()->subDays(1),
-                    'created_by_name' => '홍길동',
-                    'organization_name' => '테크 스타트업'
-                ],
-                (object)[
-                    'id' => 2,
-                    'name' => '모바일 앱 개발',
-                    'description' => 'iOS/Android 네이티브 앱 개발',
-                    'status' => 'in_progress',
-                    'created_at' => now()->subDays(10),
-                    'updated_at' => now()->subDays(3),
-                    'created_by_name' => '김철수',
-                    'organization_name' => '디지털 에이전시'
-                ],
-                (object)[
-                    'id' => 3,
-                    'name' => 'API 플랫폼 구축',
-                    'description' => 'RESTful API 서버 구축 및 문서화',
-                    'status' => 'completed',
-                    'created_at' => now()->subDays(20),
-                    'updated_at' => now()->subDays(5),
-                    'created_by_name' => '이영희',
-                    'organization_name' => '클라우드 솔루션'
-                ]
-            ];
+            // screen 파라미터에 따라 다른 데이터 세트 제공
+            $this->projects = $this->getProjectDataForScreen();
+            $this->stats = $this->getStatsDataForScreen();
+        }
+    }
 
-            $this->stats = [
+    /**
+     * Screen ID에 따라 다른 프로젝트 데이터 반환
+     */
+    private function getProjectDataForScreen()
+    {
+        // 기본 데이터 세트 (screen 파라미터가 2059a206aa5bcf8f404e5ae486859b73 또는 빈값)
+        $defaultProjects = [
+            (object)[
+                'id' => 1,
+                'name' => '프로젝트 1',
+                'description' => '프로젝트 1에 대한 상세 설명입니다. 이 프로젝트는 현재 완료 상태입니다.',
+                'status' => '완료',
+                'progress' => 59,
+                'team_members' => 8,
+                'created_at' => '2025-08-25',
+                'updated_at' => now()->subDays(1),
+                'created_by_name' => '홍길동',
+                'organization_name' => '테크 스타트업'
+            ],
+            (object)[
+                'id' => 2,
+                'name' => '프로젝트 2',
+                'description' => '프로젝트 2에 대한 상세 설명입니다. 이 프로젝트는 현재 진행 중 상태입니다.',
+                'status' => '진행 중',
+                'progress' => 44,
+                'team_members' => 7,
+                'created_at' => '2025-09-07',
+                'updated_at' => now()->subDays(3),
+                'created_by_name' => '김철수',
+                'organization_name' => '디지털 에이전시'
+            ],
+            (object)[
+                'id' => 3,
+                'name' => '프로젝트 3',
+                'description' => '프로젝트 3에 대한 상세 설명입니다. 이 프로젝트는 현재 완료 상태입니다.',
+                'status' => '완료',
+                'progress' => 43,
+                'team_members' => 5,
+                'created_at' => '2025-08-27',
+                'updated_at' => now()->subDays(5),
+                'created_by_name' => '이영희',
+                'organization_name' => '클라우드 솔루션'
+            ],
+            (object)[
+                'id' => 4,
+                'name' => '프로젝트 4',
+                'description' => '프로젝트 4에 대한 상세 설명입니다. 이 프로젝트는 현재 진행 중 상태입니다.',
+                'status' => '진행 중',
+                'progress' => 75,
+                'team_members' => 8,
+                'created_at' => '2025-08-26',
+                'updated_at' => now()->subDays(2),
+                'created_by_name' => '박민수',
+                'organization_name' => '스타트업 허브'
+            ],
+            (object)[
+                'id' => 5,
+                'name' => '프로젝트 5',
+                'description' => '프로젝트 5에 대한 상세 설명입니다. 이 프로젝트는 현재 계획 상태입니다.',
+                'status' => '계획',
+                'progress' => 85,
+                'team_members' => 5,
+                'created_at' => '2025-08-24',
+                'updated_at' => now()->subDays(4),
+                'created_by_name' => '최지연',
+                'organization_name' => '이노베이션 랩'
+            ],
+        ];
+
+        // 대체 데이터 세트 (screen=01c4f4304b6bd4325479dc32037e6cf0)
+        $alternativeProjects = [
+            (object)[
+                'id' => 1,
+                'name' => '프로젝트 1',
+                'description' => '프로젝트 1에 대한 상세 설명입니다. 이 프로젝트는 현재 보류 상태입니다.',
+                'status' => '보류',
+                'progress' => 26,
+                'team_members' => 8,
+                'created_at' => '2025-08-16',
+                'updated_at' => now()->subDays(1),
+                'created_by_name' => '홍길동',
+                'organization_name' => '테크 스타트업'
+            ],
+            (object)[
+                'id' => 2,
+                'name' => '프로젝트 2',
+                'description' => '프로젝트 2에 대한 상세 설명입니다. 이 프로젝트는 현재 완료 상태입니다.',
+                'status' => '완료',
+                'progress' => 74,
+                'team_members' => 5,
+                'created_at' => '2025-08-29',
+                'updated_at' => now()->subDays(3),
+                'created_by_name' => '김철수',
+                'organization_name' => '디지털 에이전시'
+            ],
+            (object)[
+                'id' => 3,
+                'name' => '프로젝트 3',
+                'description' => '프로젝트 3에 대한 상세 설명입니다. 이 프로젝트는 현재 계획 상태입니다.',
+                'status' => '계획',
+                'progress' => 100,
+                'team_members' => 7,
+                'created_at' => '2025-08-19',
+                'updated_at' => now()->subDays(5),
+                'created_by_name' => '이영희',
+                'organization_name' => '클라우드 솔루션'
+            ],
+            (object)[
+                'id' => 4,
+                'name' => '프로젝트 4',
+                'description' => '프로젝트 4에 대한 상세 설명입니다. 이 프로젝트는 현재 완료 상태입니다.',
+                'status' => '완료',
+                'progress' => 53,
+                'team_members' => 2,
+                'created_at' => '2025-08-12',
+                'updated_at' => now()->subDays(2),
+                'created_by_name' => '박민수',
+                'organization_name' => '스타트업 허브'
+            ],
+            (object)[
+                'id' => 5,
+                'name' => '프로젝트 5',
+                'description' => '프로젝트 5에 대한 상세 설명입니다. 이 프로젝트는 현재 진행 중 상태입니다.',
+                'status' => '진행 중',
+                'progress' => 42,
+                'team_members' => 8,
+                'created_at' => '2025-08-17',
+                'updated_at' => now()->subDays(4),
+                'created_by_name' => '최지연',
+                'organization_name' => '이노베이션 랩'
+            ],
+        ];
+
+        // Screen ID에 따라 다른 데이터 반환
+        if ($this->screenId === '01c4f4304b6bd4325479dc32037e6cf0') {
+            return $alternativeProjects;
+        } else {
+            // 기본값 또는 screen=2059a206aa5bcf8f404e5ae486859b73
+            return $defaultProjects;
+        }
+    }
+
+    /**
+     * Screen ID에 따라 다른 통계 데이터 반환
+     */
+    private function getStatsDataForScreen()
+    {
+        if ($this->screenId === '01c4f4304b6bd4325479dc32037e6cf0') {
+            // 대체 데이터의 통계
+            return [
+                'total_projects' => 15,
+                'active_projects' => 6,
+                'completed_projects' => 7,
+                'total_organizations' => 4
+            ];
+        } else {
+            // 기본 데이터의 통계
+            return [
                 'total_projects' => 15,
                 'active_projects' => 8,
                 'completed_projects' => 5,
