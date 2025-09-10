@@ -316,33 +316,6 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                         }
                     }
                 }
-                // template_path 방식 처리 (기존 방식)
-                elseif ($templatePath) {
-                    $fullPath = storage_path('sandbox/storage-sandbox-template/' . $templatePath);
-
-                    if (\File::exists($fullPath)) {
-                        // 템플릿 파일 내용 읽기
-                        $fileContent = \File::get($fullPath);
-
-                        // 화면 타입에서 제목 추출
-                        $screenType = $customScreenSettings['screen_type'] ?? 'custom screen';
-
-                        $screenData = [
-                            'title' => $screenType,
-                            'description' => '템플릿 화면 - ' . $screenType,
-                        ];
-
-                        $renderedContent = $renderer::render($fullPath, $screenData);
-
-                        $customScreen = [
-                            'id' => 'template_' . str_replace(['/', '\\'], '-', $templatePath),
-                            'title' => $screenType,
-                            'description' => '템플릿 화면 - ' . $screenType,
-                            'type' => 'template',
-                            'content' => $renderedContent
-                        ];
-                    }
-                }
             } catch (\Exception $e) {
                 // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
                 \Log::info('커스텀 화면 로드 실패', [
@@ -629,10 +602,6 @@ foreach ($routes as $path => $config) {
 
             // 조직 관련 페이지들에 조직 데이터 전달
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
-                // 조직 관련 페이지는 인증이 필요
-                if (!Auth::check()) {
-                    return redirect('/login');
-                }
 
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
@@ -696,22 +665,9 @@ foreach ($routes as $path => $config) {
     if ($routeName) {
         $route->name($routeName);
     }
-
-    // // 인증 미들웨어 적용
-    // $protectedPages = ['/dashboard', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations'];
-    // $protectedPatterns = ['/organizations/{id}/dashboard', '/organizations/{id}/projects', '/organizations/{id}/projects/{projectId}', '/organizations/{id}/projects/{projectId}/dashboard'];
-
-    // if (in_array($path, $protectedPages) || in_array($path, $protectedPatterns)) {
-    //     $route->middleware(\App\Http\Middleware\SimpleAuth::class);
-    // }
 }
 
-// 위의 loginRequired.auth 그룹으로 이동된 라우트들
-
-// 중복된 라우트들 제거됨 - loginRequired.auth 그룹에서 처리
-
-// 페이지 설정 관련 라우트들 (더 구체적인 라우트를 먼저 등록)
-// 페이지 설정 탭별 라우트들
+// 페이지 설정 관련 라우트들
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/name', function ($id, $projectId, $pageId) {
     return view('300-page-service.309-page-settings-name.000-index', ['currentPageId' => $pageId, 'activeTab' => 'name']);
 })->name('project.dashboard.page.settings.name');
@@ -1254,7 +1210,6 @@ Route::prefix('sandbox/form-publisher')->group(function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'editor']);
     })->name('sandbox.form-publisher.editor.post');
 
-
     Route::get('/preview/{id}', function ($id) {
         return view('700-page-sandbox.700-form-publisher.200-preview', compact('id'));
     })->name('sandbox.form-publisher.preview');
@@ -1271,22 +1226,6 @@ Route::prefix('sandbox/form-publisher')->group(function () {
         return view('700-page-sandbox.900-form-publisher-gateway', ['page' => 'list']);
     })->name('sandbox.form-publisher.list.post');
 });
-
-
-// 로그인 처리 라우트 추가 (모달용)
-Route::post('/login', function () {
-    $credentials = request()->only('email', 'password');
-
-    if (Auth::attempt($credentials)) {
-        request()->session()->regenerate();
-        return response()->json(['success' => true]);
-    }
-
-    return response()->json([
-        'success' => false,
-        'message' => '이메일 또는 비밀번호가 일치하지 않습니다.'
-    ], 401);
-})->name('login.post');
 
 // 로그아웃 라우트 추가
 Route::post('/logout', function () {
