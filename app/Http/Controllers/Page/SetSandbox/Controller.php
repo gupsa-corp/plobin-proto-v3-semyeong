@@ -30,7 +30,7 @@ class Controller extends \App\Http\Controllers\Controller
             }
 
             $page->update([
-                'sandbox_name' => $sandboxName
+                'sandbox_folder' => $sandboxName
             ]);
 
             return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');

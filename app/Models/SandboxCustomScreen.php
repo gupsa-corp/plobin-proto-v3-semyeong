@@ -13,7 +13,7 @@ class SandboxCustomScreen extends Model
         'type',
         'folder_name',
         'file_path',
-        'sandbox_name'
+        'sandbox_folder'
     ];
 
     /**
@@ -30,7 +30,7 @@ class SandboxCustomScreen extends Model
      */
     public function getFolderPath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->sandbox_name}");
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_folder}");
     }
 
     /**
@@ -38,7 +38,7 @@ class SandboxCustomScreen extends Model
      */
     public function getFullFilePath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->sandbox_name}/{$this->file_path}");
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_folder}/{$this->file_path}");
     }
 
     /**

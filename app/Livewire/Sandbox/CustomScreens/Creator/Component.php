@@ -113,7 +113,7 @@ class Component extends LivewireComponent
     private function loadScreenForEdit($id)
     {
         try {
-            $screen = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)->find($id);
+            $screen = SandboxCustomScreen::where('sandbox_folder', $this->currentStorage)->find($id);
             if ($screen) {
                 $this->title = $screen->title;
                 $this->description = $screen->description;
@@ -207,7 +207,7 @@ class Component extends LivewireComponent
         try {
             if ($this->editMode) {
                 // 기존 화면 수정
-                $screen = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)->find($this->editId);
+                $screen = SandboxCustomScreen::where('sandbox_folder', $this->currentStorage)->find($this->editId);
                 if ($screen) {
                     $screen->update([
                         'title' => $this->title,
@@ -237,7 +237,7 @@ class Component extends LivewireComponent
                     'type' => $this->type,
                     'folder_name' => $folderName,
                     'file_path' => $filePath,
-                    'sandbox_name' => $this->currentStorage
+                    'sandbox_folder' => $this->currentStorage
                 ]);
 
                 // 실제 파일 생성
@@ -275,7 +275,7 @@ class Component extends LivewireComponent
 
     private function getNextScreenNumber()
     {
-        $maxNumber = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)
+        $maxNumber = SandboxCustomScreen::where('sandbox_folder', $this->currentStorage)
             ->whereRaw("folder_name REGEXP '^[0-9]{3}-screen-'")
             ->max('id');
 

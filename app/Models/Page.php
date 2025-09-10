@@ -19,7 +19,7 @@ class Page extends Model
         'parent_id',
         'user_id',
         'sort_order',
-        'sandbox_name',
+        'sandbox_folder',
         'custom_screen_settings'
     ];
 

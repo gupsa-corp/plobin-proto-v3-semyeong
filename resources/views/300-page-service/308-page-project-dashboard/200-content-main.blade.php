@@ -19,13 +19,13 @@
     $sandboxLevel = null; // 'page' 또는 'project' 구분용
 
     // 우선순위: 페이지 레벨 > 프로젝트 레벨
-    if ($page && !empty($page->sandbox_name)) {
-        $sandboxName = $page->sandbox_name;
+    if ($page && !empty($page->sandbox_folder)) {
+        $sandboxName = $page->sandbox_folder;
         $sandboxLevel = 'page';
         $hasSandbox = true;
         $hasCustomScreen = !empty($page->custom_screen_settings);
-    } elseif ($project && !empty($project->sandbox_name)) {
-        $sandboxName = $project->sandbox_name;
+    } elseif ($project && !empty($project->sandbox_folder)) {
+        $sandboxName = $project->sandbox_folder;
         $sandboxLevel = 'project';
         $hasSandbox = true;
         $hasCustomScreen = false; // 프로젝트 레벨에서는 커스텀 화면 설정 없음

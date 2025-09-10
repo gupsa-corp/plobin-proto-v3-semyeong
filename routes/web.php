@@ -127,17 +127,17 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $sandboxName = null;
 
         // 우선순위: 페이지 레벨 > 프로젝트 레벨
-        if ($page && !empty($page->sandbox_name)) {
-            $sandboxName = $page->sandbox_name;
-        } elseif ($project && !empty($project->sandbox_name)) {
-            $sandboxName = $project->sandbox_name;
+        if ($page && !empty($page->sandbox_folder)) {
+            $sandboxName = $page->sandbox_folder;
+        } elseif ($project && !empty($project->sandbox_folder)) {
+            $sandboxName = $project->sandbox_folder;
         }
 
         // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
         $customScreen = null;
         if (!empty($sandboxName) && $page && $page->custom_screen_enabled) {
             try {
-                $screenId = $page->custom_screen_id;
+                $screenId = $page->sandbox_custom_screen_folder;
                 $templatePath = $page->template_path;
                 $enabled = $page->custom_screen_enabled;
 
@@ -217,8 +217,8 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
                 \Log::info('커스텀 화면 로드 실패', [
                     'pageId' => $pageId,
-                    'sandbox_name' => $sandboxName,
-                    'custom_screen_id' => $page ? $page->custom_screen_id : null,
+                    'sandbox_folder' => $sandboxName,
+                    'sandbox_custom_screen_folder' => $page ? $page->sandbox_custom_screen_folder : null,
                     'custom_screen_enabled' => $page ? $page->custom_screen_enabled : false,
                     'error' => $e->getMessage()
                 ]);
@@ -263,7 +263,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 });
 
             } catch (\Exception $e) {
-                \Log::error('커스텀 화면 목록 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $sandboxName]);
+                \Log::error('커스텀 화면 목록 로드 오류', ['error' => $e->getMessage(), 'sandbox_folder' => $sandboxName]);
                 $customScreens = [];
             }
         }
@@ -323,7 +323,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 $query->where('id', $id);
             })->first();
 
-        $currentSandboxName = $project ? $project->sandbox_name : null;
+        $currentSandboxName = $project ? $project->sandbox_folder : null;
 
         return view('300-page-service.315-page-project-settings-sandbox.000-index', [
             'currentProjectId' => $projectId,
@@ -535,7 +535,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/san
                   });
         })->first();
 
-    $currentSandboxName = $page ? $page->sandbox_name : null;
+    $currentSandboxName = $page ? $page->sandbox_folder : null;
 
     return view('300-page-service.310-page-settings-sandbox.000-index', [
         'currentPageId' => $pageId,
@@ -553,8 +553,8 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         });
     })->first();
 
-    $currentSandboxName = $page ? $page->sandbox_name : null;
-    $currentCustomScreenId = $page ? $page->custom_screen_id : null;
+    $currentSandboxName = $page ? $page->sandbox_folder : null;
+    $currentCustomScreenId = $page ? $page->sandbox_custom_screen_folder : null;
 
     // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
     $customScreens = [];
@@ -604,7 +604,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
             });
 
         } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $currentSandboxName]);
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_folder' => $currentSandboxName]);
             $customScreens = [];
         }
     }

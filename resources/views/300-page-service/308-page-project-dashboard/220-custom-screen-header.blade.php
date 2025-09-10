@@ -26,7 +26,7 @@
                 getCurrentScreenTitle() {
                     const currentId = this.getCurrentScreenId();
                     if (!currentId) return '{{ $customScreen['title'] ?? '이름 없음' }}';
-                    
+
                     const currentScreen = this.customScreens.find(screen => screen.id === currentId);
                     return currentScreen ? currentScreen.title : '{{ $customScreen['title'] ?? '이름 없음' }}';
                 },
@@ -44,7 +44,7 @@
                             sandboxName = sandboxName.replace('storage-sandbox-', '');
                         }
 
-                        const response = await fetch(`/api/sandbox/screens?sandbox_name=${sandboxName}`);
+                        const response = await fetch(`/api/sandbox/screens?sandbox_folder=${sandboxName}`);
                         if (!response.ok) throw new Error('Failed to fetch screens');
 
                         const data = await response.json();

@@ -10,7 +10,7 @@ class SandboxSqlExecution extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sandbox_name',
+        'sandbox_folder',
         'sql_query',
         'query_type',
         'status',
@@ -38,7 +38,7 @@ class SandboxSqlExecution extends Model
         int $executionTimeMs = null
     ) {
         return static::create([
-            'sandbox_name' => $sandboxName,
+            'sandbox_folder' => $sandboxName,
             'sql_query' => $sqlQuery,
             'query_type' => $queryType,
             'status' => $status,
@@ -53,7 +53,7 @@ class SandboxSqlExecution extends Model
     public static function getQueryType(string $sql): string
     {
         $sql = trim(strtoupper($sql));
-        
+
         if (preg_match('/^SELECT\s/', $sql)) return 'SELECT';
         if (preg_match('/^INSERT\s/', $sql)) return 'INSERT';
         if (preg_match('/^UPDATE\s/', $sql)) return 'UPDATE';
@@ -61,7 +61,7 @@ class SandboxSqlExecution extends Model
         if (preg_match('/^CREATE\s/', $sql)) return 'CREATE';
         if (preg_match('/^DROP\s/', $sql)) return 'DROP';
         if (preg_match('/^ALTER\s/', $sql)) return 'ALTER';
-        
+
         return 'OTHER';
     }
 }

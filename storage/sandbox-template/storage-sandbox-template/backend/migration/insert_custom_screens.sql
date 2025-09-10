@@ -1,5 +1,5 @@
 -- 샌드박스 커스텀 화면 메타데이터 추가
-INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_path, sandbox_name, created_at, updated_at) VALUES
+INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_path, sandbox_folder, created_at, updated_at) VALUES
 (
     '프로젝트 테이블 뷰',
     '프로젝트 데이터를 테이블 형식으로 관리하고 필터링, 정렬, 검색 기능을 제공합니다.',
@@ -56,7 +56,7 @@ SELECT
     title,
     type,
     folder_name,
-    sandbox_name,
+    sandbox_folder,
     created_at
 FROM sandbox_custom_screens
 ORDER BY folder_name;

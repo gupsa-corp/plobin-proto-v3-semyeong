@@ -189,7 +189,7 @@ class ProjectChangeLogService
             description: "샌드박스 '{$sandboxName}'가 생성되었습니다.",
             entityType: 'sandbox',
             entityId: $sandboxId,
-            metadata: ['sandbox_name' => $sandboxName],
+            metadata: ['sandbox_folder' => $sandboxName],
             userId: $userId
         );
     }
@@ -211,7 +211,7 @@ class ProjectChangeLogService
             entityType: 'sandbox',
             entityId: $sandboxId,
             metadata: [
-                'sandbox_name' => $sandboxName,
+                'sandbox_folder' => $sandboxName,
                 'changes' => $changes
             ],
             userId: $userId
@@ -229,7 +229,7 @@ class ProjectChangeLogService
             description: "샌드박스 '{$sandboxName}'가 삭제되었습니다.",
             entityType: 'sandbox',
             entityId: $sandboxId,
-            metadata: ['sandbox_name' => $sandboxName],
+            metadata: ['sandbox_folder' => $sandboxName],
             userId: $userId
         );
     }

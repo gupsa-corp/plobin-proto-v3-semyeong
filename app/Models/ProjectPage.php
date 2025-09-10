@@ -24,11 +24,9 @@ class ProjectPage extends Model
         'sort_order',
         'access_level',
         'allowed_roles',
-        'sandbox_name',
+        'sandbox_folder',
         'sandbox_folder',
         'sandbox_custom_screen_folder',
-        'custom_screen_id',
-        'custom_screen_type',
         'custom_screen_enabled',
         'custom_screen_applied_at',
         'template_path',
@@ -177,7 +175,7 @@ class ProjectPage extends Model
                     return true;
                 }
             }
-            // 사용자 ID로 체크  
+            // 사용자 ID로 체크
             elseif (is_numeric($allowedItem)) {
                 if ($user->id == $allowedItem) {
                     return true;
@@ -269,7 +267,7 @@ class ProjectPage extends Model
      */
     public function hasSandboxSettings(): bool
     {
-        return !empty($this->sandbox_name) || !empty($this->sandbox_folder) || !empty($this->sandbox_custom_screen_folder);
+        return !empty($this->sandbox_folder) || !empty($this->sandbox_folder) || !empty($this->sandbox_custom_screen_folder);
     }
 
     /**
@@ -278,7 +276,7 @@ class ProjectPage extends Model
     public function getSandboxSettings(): array
     {
         return [
-            'name' => $this->sandbox_name,
+            'name' => $this->sandbox_folder,
             'folder' => $this->getSandboxFolder(),
             'custom_screen_folder' => $this->getSandboxCustomScreenFolder(),
         ];

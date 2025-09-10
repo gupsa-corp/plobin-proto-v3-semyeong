@@ -12,7 +12,7 @@ class Controller extends \App\Http\Controllers\ApiController
      */
     public function listScreens(Request $request)
     {
-        $sandboxName = $request->get('sandbox_name');
+        $sandboxName = $request->get('sandbox_folder');
 
         if (!$sandboxName) {
             return response()->json(['error' => '샌드박스 이름이 필요합니다.'], 400);
@@ -29,7 +29,7 @@ class Controller extends \App\Http\Controllers\ApiController
             $screens = $this->findScreenFiles($sandboxPath);
 
             return response()->json([
-                'sandbox_name' => $sandboxName,
+                'sandbox_folder' => $sandboxName,
                 'screens' => $screens,
                 'total_count' => count($screens)
             ]);
@@ -56,7 +56,7 @@ class Controller extends \App\Http\Controllers\ApiController
             $screens = $this->findScreenFolders($sandboxFrontendPath);
 
             return response()->json([
-                'sandbox_name' => $sandboxName,
+                'sandbox_folder' => $sandboxName,
                 'screens' => $screens,
                 'total_count' => count($screens)
             ]);

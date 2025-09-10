@@ -21,23 +21,19 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('project_pages')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('sort_order')->default(0);
-            
+
             // Access control columns
             $table->string('access_level')->nullable();
             $table->json('allowed_roles')->nullable();
-            
+
             // Sandbox related columns
-            $table->string('sandbox_name')->nullable(); // 샌드박스 타입 (none, template, 1, 2, etc.)
             $table->string('sandbox_folder')->nullable();
             $table->string('sandbox_custom_screen_folder')->nullable();
-            
-            // Custom screen settings - expanded to individual columns
-            $table->string('custom_screen_id')->nullable();
-            $table->string('custom_screen_type')->default('template');
+
             $table->boolean('custom_screen_enabled')->default(true);
             $table->timestamp('custom_screen_applied_at')->nullable();
             $table->string('template_path')->nullable();
-            
+
             // Screen configuration columns
             $table->string('screen_title')->nullable();
             $table->text('screen_description')->nullable();
@@ -56,12 +52,12 @@ return new class extends Migration
             $table->integer('screen_max_width')->nullable();
             $table->string('screen_font_family')->nullable();
             $table->integer('screen_font_size')->nullable();
-            
+
             // Soft deletes
             $table->softDeletes();
-            
+
             $table->timestamps();
-            
+
             $table->unique(['project_id', 'slug']);
         });
     }

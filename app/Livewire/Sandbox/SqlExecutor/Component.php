@@ -256,7 +256,7 @@ class Component extends LivewireComponent
         try {
             $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
 
-            return SandboxSqlExecution::where('sandbox_name', $selectedSandbox)
+            return SandboxSqlExecution::where('sandbox_folder', $selectedSandbox)
                 ->where('user_session_id', session()->getId())
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);

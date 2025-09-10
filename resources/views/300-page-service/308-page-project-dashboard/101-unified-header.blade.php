@@ -14,10 +14,10 @@
     $sandboxLevel = null;
     $customScreen = $customScreen ?? null;
 
-    if ($page && !empty($page->sandbox_name)) {
+    if ($page && !empty($page->sandbox_folder)) {
         $sandboxLevel = 'page';
         $hasCustomScreen = !empty($page->custom_screen_settings);
-    } elseif ($project && !empty($project->sandbox_name)) {
+    } elseif ($project && !empty($project->sandbox_folder)) {
         $sandboxLevel = 'project';
     }
 @endphp

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('sandbox_name')->nullable(); // 샌드박스 타입
+            $table->string('sandbox_folder')->nullable(); // 샌드박스 타입
             $table->string('default_access_level')->default('member'); // 기본 접근 레벨
             $table->json('project_roles')->nullable(); // 프로젝트 역할
             $table->foreignId('organization_id')->constrained()->onDelete('cascade');

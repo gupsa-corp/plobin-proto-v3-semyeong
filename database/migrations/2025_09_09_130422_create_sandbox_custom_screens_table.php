@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('type')->default('dashboard'); // dashboard, list, form, detail, report
             $table->string('folder_name')->unique();
             $table->string('file_path');
-            $table->string('sandbox_name')->default('template'); // template, custom, etc
+            $table->string('sandbox_folder')->default('template'); // template, custom, etc
             $table->timestamps();
         });
     }

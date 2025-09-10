@@ -27,13 +27,13 @@ class UsingProjectsController
                     p.description,
                     o.name as organization_name,
                     o.id as organization_id,
-                    ps.sandbox_name,
+                    ps.sandbox_folder,
                     ps.created_at as sandbox_assigned_at,
                     ps.updated_at as sandbox_updated_at
                 FROM projects p
                 INNER JOIN organizations o ON p.organization_id = o.id
                 INNER JOIN project_sandboxes ps ON p.id = ps.project_id
-                WHERE ps.sandbox_name = ?
+                WHERE ps.sandbox_folder = ?
                 ORDER BY ps.updated_at DESC, p.name ASC
             ", [$storage]);
 

@@ -27,7 +27,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'updated_at' => now(),
             ]);
             $user = \DB::table('users')->where('email', 'test@example.com')->first();
-            
+
             if (!$user) {
                 throw new \Exception('Failed to create test user');
             }
@@ -43,7 +43,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'updated_at' => now(),
             ]);
             $organization = \DB::table('organizations')->where('name', '테스트 조직')->first();
-            
+
             if (!$organization) {
                 throw new \Exception('Failed to create test organization');
             }
@@ -61,7 +61,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'updated_at' => now(),
             ]);
             $project = \DB::table('projects')->where('name', '샘플 프로젝트')->first();
-            
+
             if (!$project) {
                 throw new \Exception('Failed to create test project');
             }
@@ -73,8 +73,8 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📊 대시보드',
                 'slug' => 'dashboard',
                 'content' => '실시간 프로젝트 통계와 최근 활동을 확인할 수 있는 대시보드입니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'dashboard',
+                'sandbox_folder' => 'storage-sandbox-template',
+
                 'template_path' => 'frontend/001-screen-dashboard/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_id' => null,
@@ -83,7 +83,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📋 프로젝트 관리',
                 'slug' => 'project-management',
                 'content' => '프로젝트를 다양한 방식으로 관리할 수 있는 화면들입니다.',
-                'custom_screen_type' => 'template',
+
                 'custom_screen_enabled' => false,
                 'parent_id' => null,
             ],
@@ -91,8 +91,8 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📝 프로젝트 목록',
                 'slug' => 'project-list',
                 'content' => '프로젝트 목록을 확인하고 관리할 수 있습니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'project list',
+                'sandbox_folder' => 'storage-sandbox-template',
+
                 'template_path' => 'frontend/002-screen-project-list/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_title' => '📋 프로젝트 관리',
@@ -101,8 +101,8 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '🗂️ 테이블 뷰',
                 'slug' => 'table-view',
                 'content' => '프로젝트 데이터를 테이블 형태로 보고 관리할 수 있습니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'table view',
+                'sandbox_folder' => 'storage-sandbox-template',
+
                 'template_path' => 'frontend/003-screen-table-view/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_title' => '📋 프로젝트 관리',
@@ -111,8 +111,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📋 칸반 보드',
                 'slug' => 'kanban-board',
                 'content' => '프로젝트를 칸반 보드 형태로 관리할 수 있습니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'kanban board',
+                'sandbox_folder' => 'storage-sandbox-template',
                 'template_path' => 'frontend/004-screen-kanban-board/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_title' => '📋 프로젝트 관리',
@@ -121,8 +120,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📈 간트 차트',
                 'slug' => 'gantt-chart',
                 'content' => '프로젝트 일정을 간트 차트로 시각화하여 관리할 수 있습니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'gantt chart',
+                'sandbox_folder' => 'storage-sandbox-template',
                 'template_path' => 'frontend/005-screen-gantt-chart/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_title' => '📋 프로젝트 관리',
@@ -131,8 +129,8 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📅 달력 뷰',
                 'slug' => 'calendar-view',
                 'content' => '프로젝트 일정을 달력 형태로 확인할 수 있습니다.',
-                'sandbox_name' => 'storage-sandbox-template',
-                'custom_screen_type' => 'calendar view',
+                'sandbox_folder' => 'storage-sandbox-template',
+
                 'template_path' => 'frontend/006-screen-calendar-view/000-content.blade.php',
                 'custom_screen_enabled' => true,
                 'parent_title' => '📋 프로젝트 관리',
@@ -150,8 +148,8 @@ class SandboxProjectPagesSeeder extends Seeder
                     'title' => $pageData['title'],
                     'slug' => $pageData['slug'],
                     'content' => $pageData['content'],
-                    'sandbox_name' => $pageData['sandbox_name'] ?? null,
-                    'custom_screen_type' => $pageData['custom_screen_type'] ?? 'template',
+                    'sandbox_folder' => $pageData['sandbox_folder'] ?? null,
+
                     'template_path' => $pageData['template_path'] ?? null,
                     'custom_screen_enabled' => $pageData['custom_screen_enabled'] ?? true,
                     'parent_id' => null,
@@ -190,8 +188,8 @@ class SandboxProjectPagesSeeder extends Seeder
                         'title' => $pageData['title'],
                         'slug' => $pageData['slug'],
                         'content' => $pageData['content'],
-                        'sandbox_name' => $pageData['sandbox_name'] ?? null,
-                        'custom_screen_type' => $pageData['custom_screen_type'] ?? 'template',
+                        'sandbox_folder' => $pageData['sandbox_folder'] ?? null,
+
                         'template_path' => $pageData['template_path'] ?? null,
                         'custom_screen_enabled' => $pageData['custom_screen_enabled'] ?? true,
                         'parent_id' => $parentId,
