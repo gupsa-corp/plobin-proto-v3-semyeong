@@ -9,25 +9,25 @@ use Illuminate\Support\Facades\File;
 class Component extends LivewireComponent
 {
     public $screens = [];
-    
+
     #[Url]
     public $search = '';
-    
+
     #[Url]
     public $filterType = '';
-    
+
     #[Url(as: 'screen')]
     public $selectedScreenId = null;
-    
+
     public $selectedScreen = null;
-    
+
     #[Url]
     public $previewMode = false;
 
     public function mount()
     {
         $this->loadScreens();
-        
+
         // URL에서 선택된 화면이 있다면 해당 화면을 선택 (화면 목록 로딩 후)
         if ($this->selectedScreenId) {
             $this->selectScreenById($this->selectedScreenId);
@@ -73,7 +73,7 @@ class Component extends LivewireComponent
                     $fileContent = File::get($contentFile);
 
                     $screens[] = [
-                        'id' => 'template_' . $screenId,
+                        'id' => $screenId,
                         'title' => str_replace('-', ' ', $screenName),
                         'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
                         'type' => $screenType,
@@ -103,14 +103,14 @@ class Component extends LivewireComponent
     {
         $this->selectedScreenId = $id;
         $this->selectScreenById($id);
-        
+
         // JavaScript를 통해 URL 업데이트
         $this->dispatch('update-url', [
             'screen' => $id,
             'previewMode' => $this->previewMode ? '1' : '0'
         ]);
     }
-    
+
     protected function selectScreenById($id)
     {
         $screen = collect($this->screens)->firstWhere('id', $id);
@@ -123,7 +123,7 @@ class Component extends LivewireComponent
     public function togglePreview()
     {
         $this->previewMode = !$this->previewMode;
-        
+
         // URL 업데이트
         if ($this->selectedScreenId) {
             $this->dispatch('update-url', [
@@ -238,7 +238,7 @@ class Component extends LivewireComponent
     {
         $this->applyFilters();
     }
-    
+
     public function updatedSelectedScreenId()
     {
         if ($this->selectedScreenId) {

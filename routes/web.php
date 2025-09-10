@@ -153,7 +153,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                             $contentFile = $folder . '/000-content.blade.php';
 
                             // screen_id 매칭 로직 수정: template_005-screen-calendar-view => 005-screen-calendar-view
-                            $templateId = 'template_' . $folderName;
+                            $templateId = $folderName;
 
 
                             if ($templateId === $screenId && \File::exists($contentFile)) {
@@ -247,7 +247,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                             $screenName = $parts[2] ?? 'unnamed';
 
                             $customScreens[] = [
-                                'id' => 'template_' . $folderName,
+                                'id' => $folderName,
                                 'title' => str_replace('-', ' ', $screenName),
                                 'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
                                 'folder_name' => $folderName,
@@ -580,7 +580,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
                         $fileContent = \File::get($contentFile);
 
                         $customScreens[] = [
-                            'id' => 'template_' . $folderName, // 전체 폴더명을 사용해서 고유한 ID 생성
+                            'id' => $folderName, // 전체 폴더명을 사용해서 고유한 ID 생성
                             'title' => str_replace('-', ' ', $screenName),
                             'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
                             'type' => $screenType,
