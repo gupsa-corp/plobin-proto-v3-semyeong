@@ -103,121 +103,10 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     })->name('project.dashboard.full');
 
     // 페이지 생성 라우트
-    Route::post('/organizations/{id}/projects/{projectId}/pages/create', function ($id, $projectId) {
-        try {
-            // 프로젝트 존재 확인
-            $project = \App\Models\Project::where('id', $projectId)
-                ->whereHas('organization', function($query) use ($id) {
-                    $query->where('id', $id);
-                })
-                ->first();
-
-            if (!$project) {
-                return response()->json(['success' => false, 'error' => '프로젝트를 찾을 수 없습니다.']);
-            }
-
-            // 권한 확인 (프로젝트 소유자이거나 조직 멤버여야 함)
-            $hasAccess = $project->user_id === Auth::id() ||
-                \App\Models\OrganizationMember::where('organization_id', $id)
-                    ->where('user_id', Auth::id())
-                    ->where('invitation_status', 'accepted')
-                    ->exists();
-
-            if (!$hasAccess) {
-                return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
-            }
-
-            // 요청에서 parent_id와 title 가져오기
-            $parentId = request()->input('parent_id');
-            $title = request()->input('title', '새 페이지');
-
-            // 페이지 순서 계산 (같은 parent_id를 가진 페이지들 기준)
-            $sortOrder = \App\Models\ProjectPage::where('project_id', $projectId)
-                ->where(function($query) use ($parentId) {
-                    if ($parentId) {
-                        $query->where('parent_id', $parentId);
-                    } else {
-                        $query->whereNull('parent_id');
-                    }
-                })
-                ->max('sort_order') + 1;
-
-            // 새 페이지 생성
-            $page = \App\Models\ProjectPage::create([
-                'project_id' => $projectId,
-                'title' => $title,
-                'slug' => 'new-page-' . time(), // 고유한 slug 생성
-                'content' => '',
-                'sort_order' => $sortOrder,
-                'parent_id' => $parentId,
-                'user_id' => Auth::id() // 현재 사용자 ID 추가
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'redirect_url' => route('project.dashboard.page', [
-                    'id' => $id,
-                    'projectId' => $projectId,
-                    'pageId' => $page->id
-                ])
-            ]);
-
-        } catch (\Exception $e) {
-            \Log::error('페이지 생성 오류: ' . $e->getMessage());
-            return response()->json(['success' => false, 'error' => '페이지 생성 중 오류가 발생했습니다.']);
-        }
-    });
+    Route::post('/organizations/{id}/projects/{projectId}/pages/create', [\App\Http\CoreApi\Page\Create\Controller::class, '__invoke']);
 
     // 페이지 제목 업데이트 라우트
-    Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', function ($id, $projectId, $pageId) {
-        try {
-            // 프로젝트 존재 확인
-            $project = \App\Models\Project::where('id', $projectId)
-                ->whereHas('organization', function($query) use ($id) {
-                    $query->where('id', $id);
-                })
-                ->first();
-
-            if (!$project) {
-                return response()->json(['success' => false, 'error' => '프로젝트를 찾을 수 없습니다.']);
-            }
-
-            // 권한 확인 (프로젝트 소유자이거나 조직 멤버여야 함)
-            $hasAccess = $project->user_id === Auth::id() ||
-                \App\Models\OrganizationMember::where('organization_id', $id)
-                    ->where('user_id', Auth::id())
-                    ->where('invitation_status', 'accepted')
-                    ->exists();
-
-            if (!$hasAccess) {
-                return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
-            }
-
-            // 페이지 존재 확인
-            $page = \App\Models\ProjectPage::where('id', $pageId)
-                ->where('project_id', $projectId)
-                ->first();
-
-            if (!$page) {
-                return response()->json(['success' => false, 'error' => '페이지를 찾을 수 없습니다.']);
-            }
-
-            // 제목 업데이트
-            $title = request()->input('title');
-            if (empty($title)) {
-                return response()->json(['success' => false, 'error' => '제목을 입력해주세요.']);
-            }
-
-            $page->title = $title;
-            $page->save();
-
-            return response()->json(['success' => true, 'message' => '페이지 제목이 변경되었습니다.']);
-
-        } catch (\Exception $e) {
-            \Log::error('페이지 제목 업데이트 오류: ' . $e->getMessage());
-            return response()->json(['success' => false, 'error' => '페이지 제목 변경 중 오류가 발생했습니다.']);
-        }
-    });
+    Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', [\App\Http\CoreApi\Page\UpdateTitle\Controller::class, '__invoke']);
 
     // 프로젝트 페이지 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
@@ -392,34 +281,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         ]);
     })->name('project.dashboard.project.settings.sandbox');
 
-    Route::post('/organizations/{id}/projects/{projectId}/settings/sandbox', function ($id, $projectId, Illuminate\Http\Request $request) {
-        try {
-            // 프로젝트 존재 여부 확인
-            $project = \App\Models\Project::where('id', $projectId)
-                ->whereHas('organization', function($query) use ($id) {
-                    $query->where('id', $id);
-                })->first();
-
-            if (!$project) {
-                return redirect()->back()->with('error', '프로젝트를 찾을 수 없습니다.');
-            }
-
-            // 샌드박스 설정 저장
-            $sandboxName = $request->input('sandbox', '');
-            if (empty($sandboxName)) {
-                $sandboxName = null; // 빈 값을 null로 변환
-            }
-
-            $project->update([
-                'sandbox_name' => $sandboxName
-            ]);
-
-            return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
-        } catch (\Exception $e) {
-            \Log::error('샌드박스 설정 저장 오류', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
-        }
-    })->name('project.dashboard.project.settings.sandbox.post');
+    Route::post('/organizations/{id}/projects/{projectId}/settings/sandbox', [\App\Http\CoreApi\Project\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.project.settings.sandbox.post');
 
     Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
         // 프로젝트 정보 가져오기
@@ -486,73 +348,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     })->name('project.dashboard.project.settings.page-delete');
 
     // 페이지 삭제 API
-    Route::delete('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-        try {
-            // 프로젝트 존재 확인
-            $project = \App\Models\Project::where('id', $projectId)
-                ->whereHas('organization', function($query) use ($id) {
-                    $query->where('id', $id);
-                })
-                ->first();
-
-            if (!$project) {
-                return response()->json(['success' => false, 'error' => '프로젝트를 찾을 수 없습니다.']);
-            }
-
-            // 권한 확인 (프로젝트 소유자이거나 조직 멤버여야 함)
-            $hasAccess = $project->user_id === Auth::id() ||
-                \App\Models\OrganizationMember::where('organization_id', $id)
-                    ->where('user_id', Auth::id())
-                    ->where('invitation_status', 'accepted')
-                    ->exists();
-
-            if (!$hasAccess) {
-                return response()->json(['success' => false, 'error' => '권한이 없습니다.']);
-            }
-
-            // 페이지 존재 확인
-            $page = \App\Models\ProjectPage::where('id', $pageId)
-                ->where('project_id', $projectId)
-                ->first();
-
-            if (!$page) {
-                return response()->json(['success' => false, 'error' => '페이지를 찾을 수 없습니다.']);
-            }
-
-            // 하위 페이지가 있는지 확인
-            $hasChildren = \App\Models\ProjectPage::where('parent_id', $pageId)->exists();
-            if ($hasChildren) {
-                return response()->json(['success' => false, 'error' => '하위 페이지가 있는 페이지는 삭제할 수 없습니다. 먼저 하위 페이지를 삭제해주세요.']);
-            }
-
-            // 페이지 삭제
-            $page->delete();
-
-            // 프로젝트의 첫 번째 페이지로 리다이렉트할 URL 생성
-            $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
-                ->whereNull('parent_id')
-                ->orderBy('sort_order')
-                ->first();
-
-            $redirectUrl = $firstPage
-                ? route('project.dashboard.page', [
-                    'id' => $id,
-                    'projectId' => $projectId,
-                    'pageId' => $firstPage->id
-                ])
-                : route('project.dashboard', ['id' => $id, 'projectId' => $projectId]);
-
-            return response()->json([
-                'success' => true,
-                'message' => '페이지가 삭제되었습니다.',
-                'redirect_url' => $redirectUrl
-            ]);
-
-        } catch (\Exception $e) {
-            \Log::error('페이지 삭제 오류: ' . $e->getMessage());
-            return response()->json(['success' => false, 'error' => '페이지 삭제 중 오류가 발생했습니다.']);
-        }
-    })->name('pages.delete');
+    Route::delete('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\CoreApi\Page\Delete\Controller::class, '__invoke'])->name('pages.delete');
 });
 
 // 웹 라우트 일괄 등록 (대시보드 제외)
@@ -695,37 +491,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/san
     ]);
 })->name('project.dashboard.page.settings.sandbox');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId, Illuminate\Http\Request $request) {
-    try {
-        // 페이지 존재 여부 확인
-        $page = \App\Models\Page::where('id', $pageId)
-            ->whereHas('project', function($query) use ($projectId, $id) {
-                $query->where('id', $projectId)
-                      ->whereHas('organization', function($q) use ($id) {
-                          $q->where('id', $id);
-                      });
-            })->first();
-
-        if (!$page) {
-            return redirect()->back()->with('error', '페이지를 찾을 수 없습니다.');
-        }
-
-        // 샌드박스 설정 저장
-        $sandboxName = $request->input('sandbox', '');
-        if (empty($sandboxName)) {
-            $sandboxName = null; // 빈 값을 null로 변환
-        }
-
-        $page->update([
-            'sandbox_name' => $sandboxName
-        ]);
-
-        return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
-    } catch (\Exception $e) {
-        \Log::error('샌드박스 설정 저장 오류', ['error' => $e->getMessage()]);
-        return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
-    }
-})->name('project.dashboard.page.settings.sandbox.post');
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', [\App\Http\CoreApi\Page\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
     $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
@@ -800,50 +566,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     ]);
 })->name('project.dashboard.page.settings.custom-screen');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId, Illuminate\Http\Request $request) {
-    try {
-        $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
-            $query->where('id', $projectId)->whereHas('organization', function($q) use ($id) {
-                $q->where('id', $id);
-            });
-        })->first();
-
-        if (!$page) {
-            return redirect()->back()->with('error', '페이지를 찾을 수 없습니다.');
-        }
-
-        // 샌드박스가 설정되어 있는지 확인
-        if (empty($page->sandbox_name)) {
-            return redirect()->back()->with('error', '커스텀 화면을 사용하려면 먼저 샌드박스를 선택해야 합니다.');
-        }
-
-        $customScreenId = $request->input('custom_screen', '');
-
-        if (!empty($customScreenId)) {
-            $page->update([
-                'custom_screen_id' => $customScreenId,
-                'custom_screen_type' => 'template',
-                'custom_screen_enabled' => true,
-                'custom_screen_applied_at' => now(),
-                'template_path' => null, // 필요시 추가 설정
-            ]);
-        } else {
-            // 커스텀 화면 비활성화
-            $page->update([
-                'custom_screen_id' => null,
-                'custom_screen_type' => null,
-                'custom_screen_enabled' => false,
-                'custom_screen_applied_at' => null,
-                'template_path' => null,
-            ]);
-        }
-
-        return redirect()->back()->with('success', '커스텀 화면 설정이 저장되었습니다.');
-    } catch (\Exception $e) {
-        \Log::error('커스텀 화면 설정 저장 오류', ['error' => $e->getMessage()]);
-        return redirect()->back()->with('error', '설정 저장 중 오류가 발생했습니다.');
-    }
-})->name('project.dashboard.page.settings.custom-screen.post');
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', [\App\Http\CoreApi\Page\SetCustomScreen\Controller::class, '__invoke'])->name('project.dashboard.page.settings.custom-screen.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
     return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
@@ -1091,6 +814,15 @@ Route::post('/sandbox/storage-manager/create', [App\Http\CoreApi\Sandbox\Storage
 Route::post('/sandbox/storage-manager/select', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
 Route::delete('/sandbox/storage-manager/delete', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
 
+// Query Log API
+Route::get('/api/query-logs/test', function() {
+    return response()->json(['message' => 'Query log API test working']);
+})->name('api.query-logs.test');
+
+Route::get('/api/query-logs', [App\Http\CoreApi\QueryLog\GetLogs\Controller::class, '__invoke'])->name('api.query-logs.get');
+Route::get('/api/query-logs/stats', [App\Http\CoreApi\QueryLog\GetStats\Controller::class, '__invoke'])->name('api.query-logs.stats');
+Route::delete('/api/query-logs/cleanup', [App\Http\CoreApi\QueryLog\Cleanup\Controller::class, '__invoke'])->name('api.query-logs.cleanup');
+
 // Form Creator
 Route::get('/sandbox/form-creator', function () {
     return view('700-page-sandbox.709-page-form-creator.000-index');
@@ -1171,30 +903,6 @@ Route::get('/sandbox/downloads', function () {
 Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
 Route::get('/sandbox/downloads/stats', [\App\Http\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
 
-// Global Functions 파일 다운로드
-Route::get('/sandbox/download/{filename}', function ($filename) {
-    $filePath = storage_path('app/sandbox-exports/' . $filename);
-
-    // 파일 존재 여부 확인
-    if (!file_exists($filePath)) {
-        abort(404, '파일을 찾을 수 없습니다.');
-    }
-
-    // 파일명 검증 (보안)
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_[a-zA-Z0-9._-]+\.(xlsx|csv|pdf|txt)$/', $filename)) {
-        abort(403, '잘못된 파일 형식입니다.');
-    }
-
-    // 원본 파일명 추출 (타임스탬프 제거)
-    $originalFilename = preg_replace('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_/', '', $filename);
-
-    return response()->download($filePath, $originalFilename, [
-        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Cache-Control' => 'no-store, no-cache, must-revalidate',
-        'Pragma' => 'no-cache',
-        'Expires' => '0'
-    ]);
-})->name('sandbox.download');
 
 // Form Publisher - 샌드박스 폼 생성 및 관리 도구 (Livewire + Filament)
 Route::prefix('sandbox/form-publisher')->group(function () {

@@ -6,7 +6,9 @@
         <input 
             type="email" 
             id="email"
+            name="email"
             wire:model="email"
+            autocomplete="email"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="이메일을 입력하세요"
         />
@@ -20,7 +22,9 @@
         <input 
             type="password" 
             id="password"
+            name="password"
             wire:model="password"
+            autocomplete="current-password"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="비밀번호를 입력하세요"
         />
