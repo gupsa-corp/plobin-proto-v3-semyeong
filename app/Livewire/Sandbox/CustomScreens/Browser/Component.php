@@ -36,7 +36,9 @@ class Component extends LivewireComponent
 
     public function render()
     {
-        return view('livewire.sandbox.custom-screens.browser-component');
+        return view('livewire.sandbox.custom-screens.browser-component', [
+            'selectedSandbox' => 'storage-sandbox-template'
+        ]);
     }
 
     public function loadScreens()
@@ -135,7 +137,17 @@ class Component extends LivewireComponent
 
     public function getPreviewUrl($screenId)
     {
-        return route('sandbox.custom-screen-preview', ['id' => $screenId]);
+        // 선택된 화면에서 폴더명 찾기
+        $screen = collect($this->screens)->firstWhere('id', $screenId);
+        if (!$screen) {
+            return '#';
+        }
+        
+        // storage-sandbox-template과 화면 폴더명으로 URL 구성
+        $storageName = 'storage-sandbox-template';
+        $screenFolderName = $screen['folder_name'];
+        
+        return "/sandbox/{$storageName}/{$screenFolderName}";
     }
 
     public function openPreviewInNewWindow($screenId)

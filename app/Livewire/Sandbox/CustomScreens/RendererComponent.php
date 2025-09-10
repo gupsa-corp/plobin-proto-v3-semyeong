@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\File;
 class RendererComponent extends Component
 {
     public $screenData;
-    
+
     public function mount($screenData = null)
     {
         $this->screenData = $screenData;
@@ -17,7 +17,7 @@ class RendererComponent extends Component
     public function render()
     {
         $renderedContent = '';
-        
+
         if ($this->screenData && isset($this->screenData['blade_template'])) {
             try {
                 // 샘플 데이터 설정
@@ -38,16 +38,21 @@ class RendererComponent extends Component
                         ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
                     ])
                 ];
-                
+
                 // 임시 블레이드 파일 생성 및 렌더링
                 $tempViewPath = 'sandbox-renderer-temp-' . time() . '-' . rand(1000, 9999);
                 $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
-                
-                File::put($tempViewFile, $this->screenData['blade_template']);
-                
+
+                // 사용자 템플릿에 단일 root element 보장을 위해 div로 감싸기
+                $wrappedTemplate = '<div class="user-template-wrapper">' . $this->screenData['blade_template'] . '</div>';
+                File::put($tempViewFile, $wrappedTemplate);
+
                 try {
                     // 블레이드 템플릿 렌더링
-                    $renderedContent = view($tempViewPath, $sampleData)->render();
+                    $rawContent = view($tempViewPath, $sampleData)->render();
+                    
+                    // Livewire 호환성을 위해 항상 단일 div로 감싸기
+                    $renderedContent = '<div class="rendered-screen-content">' . trim($rawContent) . '</div>';
                 } catch (\Exception $e) {
                     $renderedContent = '<div class="text-red-600 p-4">렌더링 오류: ' . $e->getMessage() . '</div>';
                 } finally {
@@ -56,16 +61,19 @@ class RendererComponent extends Component
                         File::delete($tempViewFile);
                     }
                 }
-                
+
             } catch (\Exception $e) {
                 $renderedContent = '<div class="text-red-600 p-4">템플릿 처리 오류: ' . $e->getMessage() . '</div>';
             }
         } else {
             $renderedContent = '<div class="text-gray-500 p-8 text-center">렌더링할 템플릿이 없습니다.</div>';
         }
-        
-        return view('sandbox.custom-screens.renderer-component', [
-            'renderedContent' => $renderedContent
+
+        return view('livewire.sandbox.custom-screens.renderer-component', [
+            'renderedContent' => $renderedContent,
+            'error' => null,
+            'screen' => $this->screenData
         ]);
     }
+
 }

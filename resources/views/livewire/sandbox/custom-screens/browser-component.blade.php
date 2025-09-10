@@ -86,6 +86,12 @@
                                         class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
                                     ✏️ 편집
                                 </button>
+                                <a href="/sandbox/{{ $selectedSandbox }}/{{ sprintf('%03d', $screen['id']) }}-screen-{{ str_replace(' ', '-', strtolower($screen['title'])) }}" 
+                                   target="_blank"
+                                   onclick="event.stopPropagation()"
+                                   class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 inline-block text-center">
+                                    🚀 새창보기
+                                </a>
                                 <button wire:click.stop="duplicateScreen('{{ $screen['id'] }}')"
                                         class="text-green-600 hover:text-green-800 text-xs px-2 py-1 rounded hover:bg-green-50">
                                     📄 복사
@@ -213,9 +219,8 @@
             {{ session('error') }}
         </div>
     @endif
-</div>
 
-<script>
+    <script>
     document.addEventListener('livewire:initialized', () => {
         // 팝업 창 열기 이벤트
         Livewire.on('openPreviewWindow', (event) => {
@@ -232,12 +237,23 @@
             const top = (screen.height - height) / 2;
             
             console.log('Opening URL:', url);
-            const newWindow = window.open(url, '_blank', 
-                `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
             
-            if (!newWindow) {
-                console.error('Failed to open popup window - may be blocked');
-                // 팝업이 차단된 경우 현재 탭에서 열기
+            try {
+                // 팝업 창 열기 시도
+                const newWindow = window.open(url, `preview_${Date.now()}`, 
+                    `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes,menubar=no,toolbar=no,status=no`);
+                
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    console.warn('Popup blocked, opening in new tab instead');
+                    // 팝업이 차단된 경우 새 탭으로 열기
+                    window.open(url, '_blank');
+                } else {
+                    // 팝업이 성공적으로 열렸으면 포커스 설정
+                    newWindow.focus();
+                }
+            } catch (error) {
+                console.error('Error opening window:', error);
+                // 오류 발생 시 새 탭으로 열기
                 window.open(url, '_blank');
             }
         });
@@ -268,4 +284,5 @@
             console.log('URL updated to:', url.toString());
         });
     });
-</script>
+    </script>
+</div>

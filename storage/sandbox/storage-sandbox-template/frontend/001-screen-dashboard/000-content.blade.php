@@ -1,4 +1,10 @@
 {{-- 샌드박스 대시보드 템플릿 --}}
+<?php 
+    $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
+    require_once $commonPath;
+    $screenInfo = getCurrentScreenInfo();
+    $uploadPaths = getUploadPaths();
+?>
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
     {{-- 헤더 --}}
     <div class="mb-8">

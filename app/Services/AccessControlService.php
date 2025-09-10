@@ -79,7 +79,7 @@ class AccessControlService
 
         if ($organizationMember) {
             // 조직 역할을 프로젝트 역할로 매핑
-            return $this->mapOrganizationRoleToProjectRole($organizationMember->role);
+            return $this->mapOrganizationRoleToProjectRole($organizationMember->role_name);
         }
 
         // 기본값은 게스트
@@ -210,7 +210,7 @@ class AccessControlService
                 'user' => $orgMember->user,
                 'role' => $projectRole,
                 'is_owner' => $project->user_id === $orgMember->user->id,
-                'organization_role' => $orgMember->role,
+                'organization_role' => $orgMember->role_name,
             ];
         }
 

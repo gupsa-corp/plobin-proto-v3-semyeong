@@ -1,67 +1,67 @@
 <div>
     <style>
         /* 렌더링된 콘텐츠를 위한 기본 스타일 */
-        .rendered-content {
+        .rendered-content, .rendered-screen-content {
             /* Tailwind CSS 스타일이 적용되도록 */
         }
         
-        .rendered-content h1 {
+        .rendered-content h1, .rendered-screen-content h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: #111827;
             margin-bottom: 1rem;
         }
         
-        .rendered-content h2 {
+        .rendered-content h2, .rendered-screen-content h2 {
             font-size: 1.25rem;
             font-weight: 600;
             color: #1f2937;
         }
         
-        .rendered-content h3 {
+        .rendered-content h3, .rendered-screen-content h3 {
             font-size: 1.125rem;
             font-weight: 500;
             color: #374151;
         }
         
-        .rendered-content p {
+        .rendered-content p, .rendered-screen-content p {
             color: #4b5563;
         }
         
-        .rendered-content .space-y-4 > * + * {
+        .rendered-content .space-y-4 > * + *, .rendered-screen-content .space-y-4 > * + * {
             margin-top: 1rem;
         }
         
-        .rendered-content .border {
+        .rendered-content .border, .rendered-screen-content .border {
             border-color: #e5e7eb;
             border-width: 1px;
         }
         
-        .rendered-content .rounded {
+        .rendered-content .rounded, .rendered-screen-content .rounded {
             border-radius: 0.5rem;
         }
         
-        .rendered-content .p-4 {
+        .rendered-content .p-4, .rendered-screen-content .p-4 {
             padding: 1rem;
         }
         
-        .rendered-content .bg-white {
+        .rendered-content .bg-white, .rendered-screen-content .bg-white {
             background-color: #ffffff;
         }
         
-        .rendered-content .shadow {
+        .rendered-content .shadow, .rendered-screen-content .shadow {
             box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
         
-        .rendered-content .text-gray-500 {
+        .rendered-content .text-gray-500, .rendered-screen-content .text-gray-500 {
             color: #6b7280;
         }
         
-        .rendered-content .font-semibold {
+        .rendered-content .font-semibold, .rendered-screen-content .font-semibold {
             font-weight: 600;
         }
         
-        .rendered-content .text-gray-600 {
+        .rendered-content .text-gray-600, .rendered-screen-content .text-gray-600 {
             color: #4b5563;
         }
     </style>

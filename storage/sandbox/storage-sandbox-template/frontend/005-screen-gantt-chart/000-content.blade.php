@@ -1,5 +1,10 @@
 {{-- 샌드박스 간트 차트 템플릿 --}}
-<div class="min-h-screen bg-gray-50 p-6">
+<?php 
+    $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
+    require_once $commonPath;
+    $screenInfo = getCurrentScreenInfo();
+    $uploadPaths = getUploadPaths();
+?><div class="min-h-screen bg-gray-50 p-6">
     {{-- 헤더 --}}
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex items-center justify-between">

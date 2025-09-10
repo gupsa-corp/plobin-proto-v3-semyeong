@@ -1,5 +1,8 @@
 # Plobin Proto V3 개발 가이드
 
+계정 : admin@example.com
+비번 : password
+
 ## 최우선 준수 규칙
 
 ### 파일 구조 및 URL 설계 규칙

@@ -10,6 +10,12 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     Route::get('/dashboard', function () {
         // 조직 관련 페이지들에 조직 데이터 전달
         $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+            ->selectSub(function($query) {
+                $query->from('organization_members')
+                      ->whereColumn('organization_id', 'organizations.id')
+                      ->where('invitation_status', 'accepted')
+                      ->selectRaw('count(*)');
+            }, 'members_count')
             ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
             ->where('organization_members.user_id', Auth::id())
             ->where('organization_members.invitation_status', 'accepted')
@@ -62,6 +68,12 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     // 조직 대시보드
     Route::get('/organizations/{id}/dashboard', function ($id) {
         $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+            ->selectSub(function($query) {
+                $query->from('organization_members')
+                      ->whereColumn('organization_id', 'organizations.id')
+                      ->where('invitation_status', 'accepted')
+                      ->selectRaw('count(*)');
+            }, 'members_count')
             ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
             ->where('organization_members.user_id', Auth::id())
             ->where('organization_members.invitation_status', 'accepted')
@@ -77,19 +89,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $organization = \App\Models\Organization::find($id);
         $project = \App\Models\Project::find($projectId);
 
-        $firstPage = \App\Models\ProjectPage::where('project_id', $projectId)
-            ->whereNull('parent_id')
-            ->orderBy('sort_order')
-            ->first();
-
-        if ($firstPage) {
-            return redirect()->route('project.dashboard.page', [
-                'id' => $id,
-                'projectId' => $projectId,
-                'pageId' => $firstPage->id
-            ]);
-        }
-
+        // 프로젝트 대시보드를 표시 (자동 리다이렉트 제거)
         return view('300-page-service.308-page-project-dashboard.000-index', [
             'currentPageId' => null,
             'organization' => $organization,
@@ -257,6 +257,7 @@ foreach ($routes as $path => $config) {
         $viewName = $config['view'] ?? null;
         $routeName = $config['name'] ?? null;
         $redirectTo = $config['redirect'] ?? null;
+        $controller = $config['controller'] ?? null;
     }
 
     // 리다이렉트 처리
@@ -264,6 +265,9 @@ foreach ($routes as $path => $config) {
         $route = Route::get($path, function () use ($redirectTo) {
             return redirect($redirectTo);
         });
+    } elseif ($controller) {
+        // 컨트롤러 처리
+        $route = Route::get($path, $controller);
     } else {
         $route = Route::get($path, function () use ($viewName, $path) {
             // /mypage/edit 경로는 특별 처리 - 비밀번호 확인 후 접근
@@ -281,6 +285,12 @@ foreach ($routes as $path => $config) {
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
 
                 $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+                    ->selectSub(function($query) {
+                        $query->from('organization_members')
+                              ->whereColumn('organization_id', 'organizations.id')
+                              ->where('invitation_status', 'accepted')
+                              ->selectRaw('count(*)');
+                    }, 'members_count')
                     ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
                     ->where('organization_members.user_id', Auth::id())
                     ->where('organization_members.invitation_status', 'accepted')
@@ -638,6 +648,7 @@ Route::get('/sandbox/documentation-manager', function () {
 Route::get('/sandbox/custom-screens', function () {
     return view('700-page-sandbox.706-page-custom-screens.000-index');
 })->name('sandbox.custom-screens');
+
 
 // 실시간 템플릿 화면들 - 직접 경로
 Route::get('/sandbox/live-dashboard', function () {

@@ -37,6 +37,7 @@ use App\Http\Controllers\OrganizationBilling\DownloadReceipt\Controller as Downl
 use App\Http\Controllers\OrganizationBilling\GetAvailablePlans\Controller as GetAvailablePlansController;
 use App\Http\Controllers\User\SearchUsers\Controller as SearchUsersController;
 use App\Http\Controllers\Sandbox\FileList\Controller as SandboxFileListController;
+use App\Http\Controllers\Sandbox\FileUpload\Controller as SandboxFileUploadController;
 use App\Http\Controllers\Sandbox\ListSandboxes\Controller as ListSandboxesController;
 use App\Http\Controllers\Sandbox\ListScreens\Controller as ListScreensController;
 use App\Http\Controllers\Sandbox\ProjectSandboxController;
@@ -199,6 +200,16 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/list', [ListSandboxesController::class, 'listSandboxes']);
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     Route::get('/screens', [ListScreensController::class, 'listScreens']);
+
+    // 파일 업로드 관련 API
+    Route::post('/file-upload', [SandboxFileUploadController::class, 'upload']);
+    Route::get('/uploaded-files', [SandboxFileUploadController::class, 'index']);
+    Route::get('/uploaded-files/{id}', [SandboxFileUploadController::class, 'show']);
+    Route::get('/uploaded-files/{id}/download', [SandboxFileUploadController::class, 'download']);
+    Route::delete('/uploaded-files/{id}', [SandboxFileUploadController::class, 'destroy']);
+    
+    // 샌드박스 템플릿 downloads 파일 목록 API
+    Route::get('/sandbox-files', [SandboxFileUploadController::class, 'getSandboxFiles']);
 
     // 샌드박스 템플릿 관리 API
     Route::get('/templates', [SandboxTemplateController::class, 'index']);
