@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             PricingPlanSeeder::class,
+            SandboxProjectPagesSeeder::class,
         ]);
 
         // 테스트용 관리자 계정 생성
