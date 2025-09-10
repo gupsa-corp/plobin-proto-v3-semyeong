@@ -64,28 +64,31 @@
     </div>
 
     @if($ownedOrganizations->isNotEmpty())
-    <!-- 조직 소유자 경고 -->
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
+    <!-- 조직 소유자로 인한 탈퇴 제한 -->
+    <div class="bg-amber-50 border-l-4 border-amber-400 p-6 mb-6">
         <div class="flex">
             <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-6 w-6 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-sm font-medium text-yellow-800">회원 탈퇴 불가</h3>
-                <div class="mt-2 text-sm text-yellow-700">
-                    <p>다음 조직의 소유자이므로 회원 탈퇴를 할 수 없습니다:</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1">
+                <h3 class="text-lg font-semibold text-amber-800">조직 소유자로 인한 탈퇴 제한</h3>
+                <div class="mt-3 text-sm text-amber-700">
+                    <p class="text-base leading-relaxed">귀하께서는 현재 다음 조직의 <strong>소유자</strong>이십니다:</p>
+                    <ul class="list-disc list-inside mt-3 space-y-2 bg-amber-100 p-4 rounded-md">
                         @foreach($ownedOrganizations as $org)
-                        <li><strong>{{ $org->name }}</strong></li>
+                        <li class="text-amber-900"><strong class="font-semibold">{{ $org->name }}</strong></li>
                         @endforeach
                     </ul>
-                    <p class="mt-3 font-medium">회원 탈퇴를 원하시면 다음 중 하나를 선택하세요:</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1">
-                        <li>조직을 다른 멤버에게 양도</li>
-                        <li>조직을 완전 삭제</li>
-                    </ul>
+                    <div class="mt-4 p-4 bg-amber-100 rounded-md border border-amber-200">
+                        <p class="font-medium text-amber-900 mb-2">조직 소유자이신 관계로 회원 탈퇴가 제한됩니다.</p>
+                        <p class="text-sm text-amber-800">회원 탈퇴를 원하시면 먼저 다음 중 하나의 조치를 취해주세요:</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-sm text-amber-800">
+                            <li>조직을 신뢰할 수 있는 다른 멤버에게 소유권을 양도</li>
+                            <li>조직을 완전히 삭제 (모든 멤버와 데이터가 사라집니다)</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,7 +107,7 @@
             <div class="ml-3">
                 <h3 class="text-sm font-medium text-blue-800">조직 멤버십 정보</h3>
                 <div class="mt-2 text-sm text-blue-700">
-                    <p>현재 다음 조직의 소유자입니다:</p>
+                    <p>현재 다음 조직의 멤버입니다:</p>
                     <ul class="list-disc list-inside mt-2 space-y-1">
                         @foreach($organizations as $org)
                         @php $member = $org->members->first(); @endphp
@@ -125,12 +128,21 @@
         </div>
         <div class="p-6">
             @if($ownedOrganizations->isNotEmpty())
-            <div class="text-center py-8">
-                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                <h4 class="text-lg font-medium text-gray-900 mb-2">회원 탈퇴가 제한되었습니다</h4>
-                <p class="text-gray-600">소유하고 있는 조직을 먼저 처리해주세요.</p>
+            <div class="text-center py-12 px-6">
+                <div class="mx-auto w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-3">조직 소유자로 인해 탈퇴가 불가능합니다</h4>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">안전한 조직 관리를 위해 소유자이신 조직들을 먼저 다른 멤버에게 양도하거나 삭제하신 후 탈퇴를 진행해주세요.</p>
+                <div class="bg-gray-50 p-4 rounded-lg max-w-md mx-auto">
+                    <p class="text-sm text-gray-700 font-medium mb-2">진행 가능한 조치:</p>
+                    <ul class="text-sm text-gray-600 space-y-1 text-left">
+                        <li>• 조직 설정에서 소유권을 다른 멤버에게 양도</li>
+                        <li>• 조직을 삭제 (단, 모든 멤버와 데이터가 사라집니다)</li>
+                    </ul>
+                </div>
             </div>
             @else
             <form id="account-delete-form" class="space-y-6">

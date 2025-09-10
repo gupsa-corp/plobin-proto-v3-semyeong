@@ -28,6 +28,18 @@ class PageMenuDropdown extends Component
         $this->dispatch('deletePage', pageId: $pageId);
     }
 
+    public function openPageSettings($pageId)
+    {
+        $orgId = request()->route('id');
+        $projectId = request()->route('projectId');
+        
+        return redirect()->route('project.dashboard.page.settings', [
+            'id' => $orgId,
+            'projectId' => $projectId,
+            'pageId' => $pageId
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.page-menu-dropdown');
