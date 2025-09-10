@@ -251,6 +251,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 $screenId = $customScreenSettings['screen_id'] ?? null;
                 $templatePath = $customScreenSettings['template_path'] ?? null;
                 $enabled = $customScreenSettings['enabled'] ?? true; // template_path 방식은 기본적으로 enabled
+                
 
                 // screen_type에서 screenId 생성 (예: "table view" -> "screen-table-view")
                 if (!$screenId && isset($customScreenSettings['screen_type'])) {
@@ -268,42 +269,19 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                         foreach ($folders as $folder) {
                             $folderName = basename($folder);
                             $contentFile = $folder . '/000-content.blade.php';
+                            
+                            // screen_id 매칭 로직 수정: template_005-screen-calendar-view => 005-screen-calendar-view
                             $templateId = 'template_' . $folderName;
-
+                            
+                            
                             if ($templateId === $screenId && \File::exists($contentFile)) {
-                                // CustomScreenRenderer를 사용하여 템플릿 렌더링
-                                $renderer = new \App\Services\CustomScreenRenderer();
-                                $renderedContent = $renderer->render($contentFile, []);
-
                                 // 폴더명에서 화면 정보 추출
                                 $parts = explode('-', $folderName, 3);
                                 $screenName = $parts[2] ?? 'unnamed';
 
-                                // 샘플 데이터 준비
-                                $title = str_replace('-', ' ', $screenName);
-                                $description = '템플릿 화면 - ' . str_replace('-', ' ', $screenName);
-                                $organizations = collect([
-                                    ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15, 'created_at' => '2025-09-01'],
-                                    ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8, 'created_at' => '2025-08-15'],
-                                ]);
-                                $projects = collect([
-                                    ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75],
-                                    ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30],
-                                    ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100]
-                                ]);
-                                $users = collect([
-                                    ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active'],
-                                    ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive'],
-                                    ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active']
-                                ]);
-                                $activities = collect([
-                                    ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
-                                    ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
-                                ]);
-
-                                // Blade 템플릿을 샘드박스 방식으로 렌더링
+                                // Blade 템플릿을 실제 데이터로 렌더링
                                 try {
-                                    // 임시 블레이드 파일 생성 및 렌더링 (샌드박스 성공 방식 적용)
+                                    // 임시 블레이드 파일 생성 및 렌더링
                                     $tempViewPath = 'project-renderer-temp-' . time() . '-' . rand(1000, 9999);
                                     $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
 
@@ -311,9 +289,18 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                                     File::put($tempViewFile, $templateContent);
 
                                     try {
-                                        $renderedContent = view($tempViewPath, compact(
-                                            'title', 'description', 'organizations', 'projects', 'users', 'activities'
-                                        ))->render();
+                                        // 실제 프로젝트 데이터 사용
+                                        $renderedContent = view($tempViewPath, [
+                                            'title' => $page->title ?? str_replace('-', ' ', $screenName),
+                                            'description' => $page->content ?? '프로젝트 페이지',
+                                            'organization' => $organization,
+                                            'project' => $project,
+                                            'page' => $page,
+                                            'organizations' => collect([$organization]),
+                                            'projects' => collect([$project]),
+                                            'users' => collect([]),
+                                            'activities' => collect([])
+                                        ])->render();
                                     } catch (\Exception $e) {
                                         $renderedContent = '<div class="p-4 bg-red-50 border border-red-200 rounded">
                                             <h3 class="text-red-800 font-bold">템플릿 렌더링 오류</h3>
@@ -334,10 +321,9 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
 
                                 $customScreen = [
                                     'id' => $templateId,
-                                    'title' => str_replace('-', ' ', $screenName),
-                                    'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                                    'title' => $page->title ?? str_replace('-', ' ', $screenName),
+                                    'description' => $page->content ?? '프로젝트 페이지',
                                     'type' => 'template',
-                                    'content' => $renderedContent
                                     'content' => $renderedContent
                                 ];
                                 break;
@@ -350,9 +336,8 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                     $fullPath = storage_path('sandbox/storage-sandbox-template/' . $templatePath);
 
                     if (\File::exists($fullPath)) {
-                        // CustomScreenRenderer를 사용하여 템플릿 렌더링
-                        $renderer = new \App\Services\CustomScreenRenderer();
-                        $renderedContent = $renderer->render($fullPath, []);
+                        // 템플릿 파일 내용 읽기
+                        $fileContent = \File::get($fullPath);
 
                         // 화면 타입에서 제목 추출
                         $screenType = $customScreenSettings['screen_type'] ?? 'custom screen';
@@ -370,7 +355,6 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                             'description' => '템플릿 화면 - ' . $screenType,
                             'type' => 'template',
                             'content' => $renderedContent
-                            'content' => $renderedContent
                         ];
                     }
                 }
@@ -384,6 +368,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 ]);
             }
         }
+
 
         // 기존 프로젝트 대시보드 뷰를 사용하되, 커스텀 화면 데이터도 함께 전달
         return view('300-page-service.308-page-project-dashboard.000-index', [
@@ -1321,77 +1306,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/user/organization-status', [\App\Http\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
 });
 
-// 테스트용 커스텀 화면 렌더링 라우트 (인증 우회) - 실제 라우트 구조와 동일하게
-Route::get('/test/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-    // 실제 페이지 데이터를 가져와서 sandbox_type 확인
-    $page = \App\Models\ProjectPage::find($pageId);
 
-    // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
-    $customScreen = null;
-    if ($page && !empty($page->sandbox_type) && !empty($page->custom_screen_settings)) {
-        try {
-            // 커스텀 화면 설정에서 screen_id 가져오기
-            $customScreenSettings = is_string($page->custom_screen_settings)
-                ? json_decode($page->custom_screen_settings, true)
-                : $page->custom_screen_settings;
-
-            $screenId = $customScreenSettings['screen_id'] ?? null;
-
-            if ($screenId && isset($customScreenSettings['enabled']) && $customScreenSettings['enabled']) {
-                // 메인 데이터베이스에서 커스텀 화면 조회
-                $screen = \App\Models\SandboxCustomScreen::find($screenId);
-
-                if ($screen && $screen->fileExists()) {
-                    // CustomScreenRenderer를 사용하여 파일 기반 콘텐츠 렌더링
-                    $renderer = new \App\Services\CustomScreenRenderer();
-                    $customScreen = [
-                        'id' => $screen->id,
-                        'title' => $screen->title,
-                        'description' => $screen->description,
-                        'type' => $screen->type,
-                        'content' => $renderer->render($screen->getFullFilePath(), [
-                            'title' => $screen->title,
-                            'description' => $screen->description,
-                            'organizations' => collect([
-                                ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15],
-                                ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8],
-                            ]),
-                            'projects' => collect([
-                                ['id' => 1, 'name' => '프로젝트 A', 'status' => '진행중'],
-                                ['id' => 2, 'name' => '프로젝트 B', 'status' => '완료'],
-                            ]),
-                            'users' => collect([
-                                ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com'],
-                                ['id' => 2, 'name' => '김영희', 'email' => 'kim@example.com'],
-                            ]),
-                            'activities' => collect([
-                                ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
-                                ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
-                            ])
-                        ])
-                    ];
-                }
-            }
-        } catch (\Exception $e) {
-            return "커스텀 화면 로드 오류: " . $e->getMessage();
-        }
-    }
-
-    // 기존 프로젝트 대시보드 레이아웃을 사용하여 렌더링
-    return view('300-page-service.308-page-project-dashboard.000-index', [
-        'currentPageId' => $pageId,
-        'activeTab' => 'overview',
-        'organization' => (object) ['id' => $id, 'name' => '테스트 조직'],
-        'project' => (object) ['id' => $projectId, 'name' => '테스트 프로젝트'],
-        'page' => $page ?: (object) [  // 실제 페이지 데이터 사용, 없으면 mock 데이터
-            'id' => $pageId,
-            'title' => '테스트 페이지',
-            'sandbox_type' => null,
-            'custom_screen_settings' => null
-        ],
-        'customScreen' => $customScreen  // 커스텀 화면 데이터 추가
-    ]);
-})->name('test.custom-screen');
 
 // 샌드박스 템플릿 전용 프리뷰 (새창에서 보기)
 Route::get('/sandbox/custom-screen/preview/{id}', function ($id) {
