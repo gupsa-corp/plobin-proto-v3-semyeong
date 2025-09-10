@@ -9,10 +9,25 @@ class ProjectChangeLog extends Model
 {
     use HasFactory;
 
+    // Action constants
+    public const ACTION_PROJECT_CREATED = 'project_created';
+    public const ACTION_SETTINGS_UPDATED = 'settings_updated';
+    public const ACTION_PAGE_CREATED = 'page_created';
+    public const ACTION_PAGE_UPDATED = 'page_updated';
+    public const ACTION_PAGE_DELETED = 'page_deleted';
+    public const ACTION_USER_ADDED = 'user_added';
+    public const ACTION_USER_REMOVED = 'user_removed';
+    public const ACTION_PERMISSION_CHANGED = 'permission_changed';
+    public const ACTION_SANDBOX_CREATED = 'sandbox_created';
+    public const ACTION_SANDBOX_UPDATED = 'sandbox_updated';
+    public const ACTION_SANDBOX_DELETED = 'sandbox_deleted';
+
     protected $fillable = [
         'project_id',
         'user_id',
         'action',
+        'entity_type',
+        'entity_id',
         'description',
         'metadata',
         'ip_address',
