@@ -6,7 +6,7 @@
             <a href="/profile" class="text-blue-600 hover:text-blue-700 text-sm">← 프로필로 돌아가기</a>
         </div>
     </div>
-    
+
     <!-- 경고 섹션 -->
     <div class="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
         <div class="flex">
@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 현재 계정 정보 -->
     <div class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -104,7 +104,7 @@
             <div class="ml-3">
                 <h3 class="text-sm font-medium text-blue-800">조직 멤버십 정보</h3>
                 <div class="mt-2 text-sm text-blue-700">
-                    <p>현재 다음 조직의 멤버입니다:</p>
+                    <p>현재 다음 조직의 소유자입니다:</p>
                     <ul class="list-disc list-inside mt-2 space-y-1">
                         @foreach($organizations as $org)
                         @php $member = $org->members->first(); @endphp
@@ -117,7 +117,7 @@
         </div>
     </div>
     @endif
-    
+
     <!-- 탈퇴 처리 폼 -->
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -146,40 +146,40 @@
                         <option value="other">기타</option>
                     </select>
                 </div>
-                
+
                 <!-- 기타 사유 입력 -->
                 <div id="other-reason-section" class="hidden">
                     <label for="other-reason" class="block text-sm font-medium text-gray-700 mb-2">기타 사유</label>
                     <textarea id="other-reason" name="other_reason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="탈퇴 사유를 상세히 입력해주세요"></textarea>
                 </div>
-                
+
                 <!-- 비밀번호 확인 -->
                 <div>
                     <label for="password-confirm" class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인 <span class="text-red-500">*</span></label>
                     <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" id="password-confirm" name="password" placeholder="현재 비밀번호를 입력하세요" required>
                     <p class="text-xs text-gray-500 mt-1">본인 확인을 위해 현재 비밀번호를 입력해주세요.</p>
                 </div>
-                
+
                 <!-- 확인 체크박스 -->
                 <div class="space-y-3">
                     <div class="flex items-start">
                         <input type="checkbox" id="confirm-understand" class="mt-0.5 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" required>
                         <label for="confirm-understand" class="ml-2 text-sm text-gray-700">위 주의사항을 모두 확인했으며, 회원탈퇴 시 모든 데이터가 영구적으로 삭제됨을 이해합니다.</label>
                     </div>
-                    
+
                     <div class="flex items-start">
                         <input type="checkbox" id="confirm-final" class="mt-0.5 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" required>
                         <label for="confirm-final" class="ml-2 text-sm text-gray-700">회원탈퇴를 최종 확인하며, 이 작업은 되돌릴 수 없음을 인지합니다.</label>
                     </div>
                 </div>
-                
+
                 <!-- 확인 텍스트 입력 -->
                 <div>
                     <label for="delete-confirmation-text" class="block text-sm font-medium text-gray-700 mb-2">확인 텍스트 <span class="text-red-500">*</span></label>
                     <input type="text" id="delete-confirmation-text" name="confirmation" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="계정삭제" required>
                     <p class="text-xs text-gray-500 mt-1">확인을 위해 <strong>"계정삭제"</strong>를 정확히 입력해주세요.</p>
                 </div>
-                
+
                 <!-- 버튼 -->
                 <div class="flex justify-between pt-6 border-t border-gray-200">
                     <a href="/profile" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
