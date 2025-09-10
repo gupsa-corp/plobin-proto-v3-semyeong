@@ -75,24 +75,55 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @for($i = 1; $i <= 10; $i++)
+                    @php
+                        // screen 파라미터에 따라 다른 데이터 세트 정의
+                        $screenId = $screenId ?? request()->get('screen', '');
+                        
+                        if ($screenId === '01c4f4304b6bd4325479dc32037e6cf0') {
+                            // 대체 데이터 세트
+                            $projectsData = [
+                                ['name' => '프로젝트 1', 'status' => '보류', 'progress' => 26, 'team' => 8, 'date' => '2025-08-16'],
+                                ['name' => '프로젝트 2', 'status' => '완료', 'progress' => 74, 'team' => 5, 'date' => '2025-08-29'],
+                                ['name' => '프로젝트 3', 'status' => '계획', 'progress' => 100, 'team' => 7, 'date' => '2025-08-19'],
+                                ['name' => '프로젝트 4', 'status' => '완료', 'progress' => 53, 'team' => 2, 'date' => '2025-08-12'],
+                                ['name' => '프로젝트 5', 'status' => '진행 중', 'progress' => 42, 'team' => 8, 'date' => '2025-08-17'],
+                                ['name' => '프로젝트 6', 'status' => '계획', 'progress' => 29, 'team' => 3, 'date' => '2025-08-20'],
+                                ['name' => '프로젝트 7', 'status' => '보류', 'progress' => 64, 'team' => 3, 'date' => '2025-08-24'],
+                                ['name' => '프로젝트 8', 'status' => '진행 중', 'progress' => 80, 'team' => 3, 'date' => '2025-08-22'],
+                                ['name' => '프로젝트 9', 'status' => '진행 중', 'progress' => 86, 'team' => 5, 'date' => '2025-09-09'],
+                            ];
+                        } else {
+                            // 기본 데이터 세트 (screen=2059a206aa5bcf8f404e5ae486859b73 또는 빈값)
+                            $projectsData = [
+                                ['name' => '프로젝트 1', 'status' => '완료', 'progress' => 59, 'team' => 8, 'date' => '2025-08-25'],
+                                ['name' => '프로젝트 2', 'status' => '진행 중', 'progress' => 44, 'team' => 7, 'date' => '2025-09-07'],
+                                ['name' => '프로젝트 3', 'status' => '완료', 'progress' => 43, 'team' => 5, 'date' => '2025-08-27'],
+                                ['name' => '프로젝트 4', 'status' => '진행 중', 'progress' => 75, 'team' => 8, 'date' => '2025-08-26'],
+                                ['name' => '프로젝트 5', 'status' => '계획', 'progress' => 85, 'team' => 5, 'date' => '2025-08-24'],
+                                ['name' => '프로젝트 6', 'status' => '계획', 'progress' => 28, 'team' => 8, 'date' => '2025-09-07'],
+                                ['name' => '프로젝트 7', 'status' => '진행 중', 'progress' => 84, 'team' => 7, 'date' => '2025-08-12'],
+                                ['name' => '프로젝트 8', 'status' => '보류', 'progress' => 95, 'team' => 3, 'date' => '2025-09-05'],
+                                ['name' => '프로젝트 9', 'status' => '보류', 'progress' => 48, 'team' => 4, 'date' => '2025-09-04'],
+                            ];
+                        }
+                        
+                        $statusColors = [
+                            '진행 중' => 'bg-blue-100 text-blue-800',
+                            '완료' => 'bg-green-100 text-green-800',
+                            '보류' => 'bg-yellow-100 text-yellow-800',
+                            '계획' => 'bg-purple-100 text-purple-800'
+                        ];
+                        $priorities = ['높음', '보통', '낮음'];
+                        $priorityColors = [
+                            '높음' => 'bg-red-100 text-red-800',
+                            '보통' => 'bg-yellow-100 text-yellow-800',
+                            '낮음' => 'bg-green-100 text-green-800'
+                        ];
+                    @endphp
+                    
+                    @foreach($projectsData as $i => $project)
                         @php 
-                            $statuses = ['진행 중', '완료', '보류', '검토 중'];
-                            $priorities = ['높음', '보통', '낮음'];
-                            $status = $statuses[array_rand($statuses)];
                             $priority = $priorities[array_rand($priorities)];
-                            $progress = rand(20, 100);
-                            $statusColors = [
-                                '진행 중' => 'bg-blue-100 text-blue-800',
-                                '완료' => 'bg-green-100 text-green-800',
-                                '보류' => 'bg-yellow-100 text-yellow-800',
-                                '검토 중' => 'bg-purple-100 text-purple-800'
-                            ];
-                            $priorityColors = [
-                                '높음' => 'bg-red-100 text-red-800',
-                                '보통' => 'bg-yellow-100 text-yellow-800',
-                                '낮음' => 'bg-green-100 text-green-800'
-                            ];
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -101,33 +132,33 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
-                                        <span class="text-gray-600 text-sm">P{{ $i }}</span>
+                                        <span class="text-gray-600 text-sm">P{{ $i + 1 }}</span>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">프로젝트 {{ $i }}</div>
-                                        <div class="text-sm text-gray-500">{{ $i }}번째 프로젝트</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $project['name'] }}</div>
+                                        <div class="text-sm text-gray-500">{{ $project['name'] }}에 대한 상세 설명입니다. 이 프로젝트는 현재 {{ $project['status'] }} 상태입니다.</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusColors[$status] }}">
-                                    {{ $status }}
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusColors[$project['status']] }}">
+                                    {{ $project['status'] }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $progress }}%"></div>
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $project['progress'] }}%"></div>
                                 </div>
-                                <div class="text-xs text-gray-500 mt-1">{{ $progress }}%</div>
+                                <div class="text-xs text-gray-500 mt-1">{{ $project['progress'] }}%</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
-                                    <div class="text-sm text-gray-900">담당자{{ $i }}</div>
+                                    <div class="text-sm text-gray-900">팀 멤버 {{ $project['team'] }}명</div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ now()->addDays(rand(1, 30))->format('Y-m-d') }}
+                                생성일: {{ $project['date'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs font-medium rounded-full {{ $priorityColors[$priority] }}">

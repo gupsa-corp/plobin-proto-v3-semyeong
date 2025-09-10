@@ -862,7 +862,7 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cu
         }
 
         $customScreenId = $request->input('custom_screen', '');
-        
+
         if (!empty($customScreenId)) {
             $page->update([
                 'custom_screen_id' => $customScreenId,
@@ -1302,102 +1302,3 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mypage/delete', [\App\Http\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
     Route::get('/api/user/organization-status', [\App\Http\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
 });
-
-
-
-// 샌드박스 템플릿 전용 프리뷰 (새창에서 보기)
-Route::get('/sandbox/custom-screen/preview/{id}', function ($id) {
-    $sandboxPath = storage_path('sandbox/storage-sandbox-template/frontend');
-
-    if (!File::exists($sandboxPath)) {
-        abort(404, '샌드박스 폴더를 찾을 수 없습니다.');
-    }
-
-    // 템플릿 폴더 찾기
-    $folders = File::directories($sandboxPath);
-    $contentFile = null;
-    $screenName = 'unknown';
-
-    foreach ($folders as $folder) {
-        $folderName = basename($folder);
-        $templateId = explode('-', $folderName, 2)[1] ?? '';
-
-        if ($templateId === $id) {
-            $contentFile = $folder . '/000-content.blade.php';
-            $parts = explode('-', $folderName, 3);
-            $screenName = $parts[2] ?? 'unnamed';
-            break;
-        }
-    }
-
-    if (!$contentFile || !File::exists($contentFile)) {
-        abort(404, '템플릿 파일을 찾을 수 없습니다.');
-    }
-
-    // 샘플 데이터 준비
-    $title = str_replace('-', ' ', $screenName);
-    $description = '템플릿 화면 - ' . str_replace('-', ' ', $screenName);
-    $organizations = collect([
-        ['id' => 1, 'name' => '샘플 조직 1', 'members' => 15, 'created_at' => '2025-09-01'],
-        ['id' => 2, 'name' => '샘플 조직 2', 'members' => 8, 'created_at' => '2025-08-15'],
-    ]);
-    $projects = collect([
-        ['id' => 1, 'name' => '프로젝트 A', 'status' => 'active', 'progress' => 75],
-        ['id' => 2, 'name' => '프로젝트 B', 'status' => 'pending', 'progress' => 30],
-        ['id' => 3, 'name' => '프로젝트 C', 'status' => 'completed', 'progress' => 100]
-    ]);
-    $users = collect([
-        ['id' => 1, 'name' => '홍길동', 'email' => 'hong@example.com', 'status' => 'active'],
-        ['id' => 2, 'name' => '김철수', 'email' => 'kim@example.com', 'status' => 'inactive'],
-        ['id' => 3, 'name' => '이영희', 'email' => 'lee@example.com', 'status' => 'active']
-    ]);
-    $activities = collect([
-        ['action' => '새 프로젝트 생성', 'user' => '홍길동', 'timestamp' => '5분 전'],
-        ['action' => '사용자 추가', 'user' => '김영희', 'timestamp' => '1시간 전'],
-    ]);
-
-    // Blade 템플릿을 샘드박스 방식으로 렌더링
-    try {
-        // 임시 블레이드 파일 생성 및 렌더링 (샌드박스 성공 방식 적용)
-        $tempViewPath = 'preview-renderer-temp-' . time() . '-' . rand(1000, 9999);
-        $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
-
-        $templateContent = File::get($contentFile);
-        File::put($tempViewFile, $templateContent);
-
-        try {
-            $renderedContent = view($tempViewPath, compact(
-                'title', 'description', 'organizations', 'projects', 'users', 'activities'
-            ))->render();
-        } catch (\Exception $e) {
-            $renderedContent = '<div class="p-4 bg-red-50 border border-red-200 rounded">
-                <h3 class="text-red-800 font-bold">템플릿 렌더링 오류</h3>
-                <p class="text-red-700 mt-2">' . $e->getMessage() . '</p>
-            </div>';
-        } finally {
-            // 임시 파일 삭제
-            if (File::exists($tempViewFile)) {
-                File::delete($tempViewFile);
-            }
-        }
-    } catch (Exception $e) {
-        $renderedContent = '<div class="p-4 bg-red-50 border border-red-200 rounded">
-            <h3 class="text-red-800 font-bold">파일 처리 오류</h3>
-            <p class="text-red-700 mt-2">' . $e->getMessage() . '</p>
-        </div>';
-    }
-
-    // 화면 데이터 객체 생성 (뷰에서 사용하기 위해)
-    $screen = (object) [
-        'id' => $id,
-        'title' => $title,
-        'description' => $description,
-        'type' => 'template',
-        'content' => $renderedContent
-    ];
-
-    return view('700-page-sandbox.714-page-custom-screen-preview.000-index', [
-        'screen' => $screen,
-        'customContent' => $renderedContent
-    ]);
-})->name('sandbox.custom-screen-preview');
