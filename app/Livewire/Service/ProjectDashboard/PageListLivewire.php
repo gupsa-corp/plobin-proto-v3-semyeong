@@ -5,7 +5,7 @@ namespace App\Livewire\Service\ProjectDashboard;
 use App\Models\Page;
 use App\Models\Project;
 use App\Models\ProjectPage;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -235,7 +235,7 @@ class PageListLivewire extends Component
                 $page->update(['title' => $newTitle]);
                 
                 // 로그 기록
-                ProjectLogService::logPageUpdated(
+                ProjectChangeLogService::logPageUpdated(
                     $page->project_id,
                     $page->id,
                     $newTitle,
@@ -302,7 +302,7 @@ class PageListLivewire extends Component
             $page->update(['title' => $newTitle]);
             
             // 로그 기록
-            ProjectLogService::logPageUpdated(
+            ProjectChangeLogService::logPageUpdated(
                 $page->project_id,
                 $page->id,
                 $newTitle,
@@ -351,7 +351,7 @@ class PageListLivewire extends Component
             $page->delete();
 
             // 로그 기록
-            ProjectLogService::logPageDeleted(
+            ProjectChangeLogService::logPageDeleted(
                 $page->project_id,
                 $pageId,
                 $page->title

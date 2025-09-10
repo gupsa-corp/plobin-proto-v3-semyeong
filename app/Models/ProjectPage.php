@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\PageAccessLevel;
 use App\Enums\ProjectRole;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 
 class ProjectPage extends Model
 {
@@ -50,7 +50,7 @@ class ProjectPage extends Model
     protected static function booted(): void
     {
         static::created(function ($page) {
-            ProjectLogService::logPageCreated($page->project_id, $page->id, $page->title);
+            ProjectChangeLogService::logPageCreated($page->project_id, $page->id, $page->title);
         });
 
         static::updated(function ($page) {
@@ -60,13 +60,13 @@ class ProjectPage extends Model
                 unset($changes['updated_at'], $changes['created_at'], $changes['deleted_at']);
 
                 if (!empty($changes)) {
-                    ProjectLogService::logPageUpdated($page->project_id, $page->id, $page->title, $changes);
+                    ProjectChangeLogService::logPageUpdated($page->project_id, $page->id, $page->title, $changes);
                 }
             }
         });
 
         static::deleted(function ($page) {
-            ProjectLogService::logPageDeleted($page->project_id, $page->id, $page->title);
+            ProjectChangeLogService::logPageDeleted($page->project_id, $page->id, $page->title);
         });
     }
 

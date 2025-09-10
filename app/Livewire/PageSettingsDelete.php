@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\ProjectPage;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 
 class PageSettingsDelete extends Component
 {
@@ -43,7 +43,7 @@ class PageSettingsDelete extends Component
         $pageTitle = $page->title;
 
         // 로그 기록
-        ProjectLogService::logPageDeleted($projectId, $this->pageId, $pageTitle);
+        ProjectChangeLogService::logPageDeleted($projectId, $this->pageId, $pageTitle);
 
         // 페이지 삭제
         $page->delete();
