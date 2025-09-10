@@ -12,6 +12,7 @@ class QueryLogger
     private static $startTime;
     private static $currentQuery;
     private static $currentBindings;
+    private static $isLogging = false; // 무한 루프 방지 플래그
     
     /**
      * 쿼리 로깅 활성화/비활성화
@@ -149,12 +150,24 @@ class QueryLogger
      */
     private static function saveLogAsync($logData)
     {
+        // 무한 루프 방지: 이미 로그 저장 중이면 중단
+        if (self::$isLogging) {
+            return;
+        }
+        
         try {
-            // 무한 루프 방지를 위해 항상 동기 처리
+            // 로그 저장 중임을 표시
+            self::$isLogging = true;
+            
+            // 실제 로그 저장
             DB::table('query_logs')->insert($logData);
+            
         } catch (\Exception $e) {
             // 로그 저장 실패 시 에러 로그만 남기고 원래 작업은 계속 진행
             \Log::error('Query log save failed: ' . $e->getMessage());
+        } finally {
+            // 로그 저장 완료 후 플래그 초기화
+            self::$isLogging = false;
         }
     }
     
