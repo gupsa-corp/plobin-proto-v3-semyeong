@@ -4,12 +4,81 @@
 
     {{-- 프로젝트 정보 섹션 --}}
     <div style="padding: 20px; border-bottom: 1px solid #E1E1E4;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 16 16" fill="none">
-                <path d="M2 3C2 2.44772 2.44772 2 3 2H6.58579C6.851 2 7.10536 2.10536 7.29289 2.29289L8.41421 3.41421C8.60174 3.60174 8.85609 3.70711 9.12132 3.70711H13C13.5523 3.70711 14 4.15482 14 4.70711V12C14 12.5523 13.5523 13 13 13H3C2.44772 13 2 12.5523 2 12V3Z" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-            <h2 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">프로젝트</h2>
+        @php
+            $projectId = request()->route('projectId') ?? 1;
+            $project = \App\Models\Project::find($projectId);
+        @endphp
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 3C2 2.44772 2.44772 2 3 2H6.58579C6.851 2 7.10536 2.10536 7.29289 2.29289L8.41421 3.41421C8.60174 3.60174 8.85609 3.70711 9.12132 3.70711H13C13.5523 3.70711 14 4.15482 14 4.70711V12C14 12.5523 13.5523 13 13 13H3C2.44772 13 2 12.5523 2 12V3Z" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <h2 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0; cursor: pointer;" 
+                    onclick="editProjectName()" 
+                    title="프로젝트 이름 변경하려면 클릭하세요">
+                    {{ $project->name ?? '프로젝트' }}
+                </h2>
+            </div>
+            
+            {{-- 프로젝트 설정 버튼 --}}
+            <div class="project-settings-container" style="position: relative;">
+                <button onclick="toggleProjectSettings()"
+                        style="width: 24px; height: 24px; border: 1px solid #D1D5DB; border-radius: 4px; background: #F8F9FA; color: #495057; font-size: 14px; font-weight: bold; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                        onmouseover="this.style.background='#E9ECEF'; this.style.borderColor='#ADB5BD';"
+                        onmouseout="this.style.background='#F8F9FA'; this.style.borderColor='#D1D5DB';"
+                        title="프로젝트 설정">
+                    ⚙
+                </button>
+                
+                <div id="project-settings-dropdown" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 180px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                    
+                    {{-- 프로젝트 이름 변경 --}}
+                    <button onclick="editProjectName(); closeProjectSettings();"
+                            style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.background='#F9FAFB'"
+                            onmouseout="this.style.background='white'">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        프로젝트 이름 변경
+                    </button>
+                    
+                    {{-- 구분선 --}}
+                    <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>
+                    
+                    {{-- 프로젝트 설정 --}}
+                    <a href="{{ route('project.dashboard.project.settings.name', ['id' => request()->route('id'), 'projectId' => $projectId]) }}"
+                       onclick="closeProjectSettings();"
+                       style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none;"
+                       onmouseover="this.style.background='#F9FAFB'"
+                       onmouseout="this.style.background='white'">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        프로젝트 설정
+                    </a>
+                    
+                    {{-- 프로젝트 정보 --}}
+                    <button onclick="showProjectInfo(); closeProjectSettings();"
+                            style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.background='#F9FAFB'"
+                            onmouseout="this.style.background='white'">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        프로젝트 정보
+                    </button>
+                </div>
+            </div>
         </div>
+        
+        @if($project)
+        <div style="font-size: 12px; color: #9CA3AF; margin-top: 4px;">
+            {{ $project->description ?? '' }}
+        </div>
+        @endif
     </div>
 
     {{-- 페이지 네비게이션 --}}
@@ -194,21 +263,17 @@
 
     {{-- 빠른 액션 섹션 --}}
     <div style="padding: 20px; border-top: 1px solid #E5E7EB;">
-        <span style="font-size: 12px; font-weight: 500; color: #6B7280; display: block; margin-bottom: 12px;">프로젝트 관리</span>
-
-        <a href="{{ route('project.dashboard.project.settings.name', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}"
-           style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; color: #6B7280; text-decoration: none; border-radius: 6px; cursor: pointer; margin-bottom: 4px;"
-           onmouseover="this.style.background='white'"
-           onmouseout="this.style.background='none'">
-            <span style="font-size: 14px;">프로젝트 설정</span>
-        </a>
+        <span style="font-size: 12px; font-weight: 500; color: #6B7280; display: block; margin-bottom: 12px;">빠른 액션</span>
 
         @if(request()->route('pageId'))
         <a href="{{ route('project.dashboard.page.settings', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}"
            style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; color: #6B7280; text-decoration: none; border-radius: 6px; cursor: pointer;"
-           onmouseover="this.style.background='white'"
+           onmouseover="this.style.background='#F9FAFB'"
            onmouseout="this.style.background='none'">
-            <span style="font-size: 14px;">페이지 설정</span>
+            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
+            </svg>
+            <span style="font-size: 14px;">현재 페이지 설정</span>
         </a>
         @endif
     </div>
@@ -261,6 +326,7 @@ async function createNewPage() {
 
 // 드롭다운 관리
 let currentOpenDropdownId = null;
+let projectSettingsOpen = false;
 
 function toggleDropdown(pageId) {
     closeAllDropdowns();
@@ -281,11 +347,33 @@ function closeAllDropdowns() {
         dropdown.style.display = 'none';
     });
     currentOpenDropdownId = null;
+    projectSettingsOpen = false;
+}
+
+// 프로젝트 설정 드롭다운 관리
+function toggleProjectSettings() {
+    closeAllDropdowns();
+    
+    if (!projectSettingsOpen) {
+        const dropdown = document.getElementById('project-settings-dropdown');
+        if (dropdown) {
+            dropdown.style.display = 'block';
+            projectSettingsOpen = true;
+        }
+    }
+}
+
+function closeProjectSettings() {
+    const dropdown = document.getElementById('project-settings-dropdown');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        projectSettingsOpen = false;
+    }
 }
 
 // 문서 클릭 시 드롭다운 닫기
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.page-dropdown-container')) {
+    if (!e.target.closest('.page-dropdown-container') && !e.target.closest('.project-settings-container')) {
         closeAllDropdowns();
     }
 });
@@ -388,5 +476,66 @@ async function deletePage(pageId) {
         console.error('Page deletion error:', error);
         alert('페이지 삭제 중 오류가 발생했습니다.');
     }
+}
+
+// 프로젝트 이름 편집
+async function editProjectName() {
+    @php
+        $projectId = request()->route('projectId') ?? 1;
+        $project = \App\Models\Project::find($projectId);
+    @endphp
+    
+    const currentName = '{{ addslashes($project->name ?? "프로젝트") }}';
+    const newName = prompt('새로운 프로젝트 이름을 입력하세요:', currentName);
+    
+    if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
+        try {
+            const pathParts = window.location.pathname.split('/');
+            const orgId = pathParts[2];
+            const projectId = pathParts[4];
+            
+            const response = await fetch(`/organizations/${orgId}/projects/${projectId}/name`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    name: newName.trim()
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // 페이지 새로고침으로 변경사항 반영
+                window.location.reload();
+            } else {
+                alert(result.error || '프로젝트 이름 변경에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Project name update error:', error);
+            alert('프로젝트 이름 변경 중 오류가 발생했습니다.');
+        }
+    }
+}
+
+// 프로젝트 정보 표시
+function showProjectInfo() {
+    @php
+        $project = \App\Models\Project::find($projectId);
+        $createdAt = $project ? $project->created_at->format('Y-m-d H:i') : '';
+        $updatedAt = $project ? $project->updated_at->format('Y-m-d H:i') : '';
+    @endphp
+    
+    const projectInfo = `프로젝트 정보
+    
+이름: {{ addslashes($project->name ?? "프로젝트") }}
+설명: {{ addslashes($project->description ?? "설명 없음") }}
+생성일: {{ $createdAt }}
+수정일: {{ $updatedAt }}
+프로젝트 ID: {{ $projectId }}`;
+    
+    alert(projectInfo);
 }
 </script>
