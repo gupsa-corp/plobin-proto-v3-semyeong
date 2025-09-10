@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\OrganizationMember;
 use App\Services\DynamicPermissionService;
 use App\Exceptions\ApiException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 

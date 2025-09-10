@@ -661,16 +661,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', f
 // 프로젝트 설정 라우트들은 loginRequired.auth 그룹으로 이동됨
 
 // 조직 관리자 페이지 라우트들
-Route::get('/organizations/{id}/admin/members', function ($id) {
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.801-page-members.000-index', compact('id', 'organizations'));
-})->name('organization.admin.members');
+Route::get('/organizations/{id}/admin/members', [\App\Http\Controllers\Organization\Admin\Members\Controller::class, '__invoke'])->name('organization.admin.members');
 
 // 권한 관리 기본 라우트 - 개요 탭으로 리다이렉트
 Route::get('/organizations/{id}/admin/permissions', function ($id) {
@@ -678,56 +669,16 @@ Route::get('/organizations/{id}/admin/permissions', function ($id) {
 })->name('organization.admin.permissions');
 
 // 권한 개요 탭
-Route::get('/organizations/{id}/admin/permissions/overview', function ($id) {
-    // 조직 선택 드롭다운을 위한 모든 조직 목록
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.805-page-permissions-overview.000-index', compact('organizations'));
-})->name('organization.admin.permissions.overview');
+Route::get('/organizations/{id}/admin/permissions/overview', [\App\Http\Controllers\Organization\Admin\Permissions\Overview\Controller::class, '__invoke'])->name('organization.admin.permissions.overview');
 
 // 역할 관리 탭
-Route::get('/organizations/{id}/admin/permissions/roles', function ($id) {
-    // 조직 선택 드롭다운을 위한 모든 조직 목록
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.806-page-permissions-roles.000-index', compact('organizations'));
-})->name('organization.admin.permissions.roles');
+Route::get('/organizations/{id}/admin/permissions/roles', [\App\Http\Controllers\Organization\Admin\Permissions\Roles\Controller::class, '__invoke'])->name('organization.admin.permissions.roles');
 
 // 권한 관리 탭
-Route::get('/organizations/{id}/admin/permissions/management', function ($id) {
-    // 조직 선택 드롭다운을 위한 모든 조직 목록
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.807-page-permissions-management.000-index', compact('organizations'))->with('activeTab', 'management');
-})->name('organization.admin.permissions.management');
+Route::get('/organizations/{id}/admin/permissions/management', [\App\Http\Controllers\Organization\Admin\Permissions\Management\Controller::class, '__invoke'])->name('organization.admin.permissions.management');
 
 // 동적 규칙 탭
-Route::get('/organizations/{id}/admin/permissions/rules', function ($id) {
-    // 조직 선택 드롭다운을 위한 모든 조직 목록
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.808-page-permissions-rules.000-index', compact('organizations'))->with('activeTab', 'rules');
-})->name('organization.admin.permissions.rules');
+Route::get('/organizations/{id}/admin/permissions/rules', [\App\Http\Controllers\Organization\Admin\Permissions\Rules\Controller::class, '__invoke'])->name('organization.admin.permissions.rules');
 
 Route::get('/organizations/{organization}/admin/billing', [\App\Http\Billing\PaymentHistory\Controller::class, 'billing'])->name('organization.admin.billing');
 
@@ -755,22 +706,10 @@ Route::get('/organizations/{organization}/admin/billing/export', [\App\Http\Bill
 // AJAX 엔드포인트 (동일한 컨트롤러, AJAX 요청 처리)
 Route::post('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history.ajax');
 
-Route::get('/organizations/{id}/admin/projects', function ($id) {
-    $projects = \App\Models\Project::where('organization_id', $id)
-        ->with(['user', 'organization'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+Route::get('/organizations/{id}/admin/projects', [\App\Http\Controllers\Organization\Admin\Projects\Controller::class, '__invoke'])->name('organization.admin.projects');
 
-    // 조직 선택 드롭다운을 위한 모든 조직 목록
-    $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
-        ->join('organization_members', 'organizations.id', '=', 'organization_members.organization_id')
-        ->where('organization_members.user_id', Auth::id())
-        ->where('organization_members.invitation_status', 'accepted')
-        ->orderBy('organizations.created_at', 'desc')
-        ->get();
-
-    return view('800-page-organization-admin.804-page-projects.000-index', compact('projects', 'id', 'organizations'));
-})->name('organization.admin.projects');
+// 조직 설정 - 사용자 관리
+Route::get('/organizations/{id}/settings/users', [\App\Http\Controllers\Organization\Settings\Users\Controller::class, '__invoke'])->name('organization.settings.users');
 
 // 플랫폼 관리자 라우트들 (platform_admin 권한 필요) - 개발용으로 일시적으로 인증 제거
 // 추후 배포시 ->middleware(['auth', 'role:platform_admin']) 적용 예정
@@ -860,21 +799,12 @@ Route::get('/sandbox/git-version-control', function () {
     return view('700-page-sandbox.706-page-git-version-control.000-index');
 })->name('sandbox.git-version-control');
 
-
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
 Route::get('/sandbox/storage-manager', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'index'])->name('sandbox.storage-manager');
 Route::post('/sandbox/storage-manager/create', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'create'])->name('sandbox.storage.create');
 Route::post('/sandbox/storage-manager/select', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
 Route::delete('/sandbox/storage-manager/delete', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
 
-// Query Log API
-Route::get('/api/query-logs/test', function() {
-    return response()->json(['message' => 'Query log API test working']);
-})->name('api.query-logs.test');
-
-Route::get('/api/query-logs', [App\Http\Controllers\QueryLog\GetLogs\Controller::class, '__invoke'])->name('api.query-logs.get');
-Route::get('/api/query-logs/stats', [App\Http\Controllers\QueryLog\GetStats\Controller::class, '__invoke'])->name('api.query-logs.stats');
-Route::delete('/api/query-logs/cleanup', [App\Http\Controllers\QueryLog\Cleanup\Controller::class, '__invoke'])->name('api.query-logs.cleanup');
 
 // Form Creator
 Route::get('/sandbox/form-creator', function () {
