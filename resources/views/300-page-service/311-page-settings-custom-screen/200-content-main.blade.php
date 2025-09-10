@@ -5,8 +5,8 @@ window.customScreensData = @json($customScreens ?? []);
 window.currentSandboxType = @json($currentSandboxType ?? '');
 </script>
 
+<!-- 페이지 설정 탭 네비게이션 -->
 <div class="px-6 py-6" x-data="customScreenSettingsPage()"
-    <!-- 페이지 설정 탭 네비게이션 -->
     @include('300-page-service.309-page-settings-name.100-tab-navigation')
 
     <!-- 알림 메시지 -->
@@ -65,9 +65,27 @@ window.currentSandboxType = @json($currentSandboxType ?? '');
 
                     <!-- 커스텀 화면 사용 안함 옵션 -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">
-                            커스텀 화면 설정
-                        </label>
+                        <!-- 새로고침 버튼 -->
+                        <div class="flex items-center p-3 border border-blue-200 rounded-lg bg-blue-25">
+                            <div class="flex-1">
+                                <div class="font-medium text-blue-700 text-sm">화면을 새로 만들거나 배포했나요?</div>
+                                <div class="text-xs text-blue-600">새로고침하여 최신 화면 목록을 확인하세요.</div>
+                            </div>
+                            <button type="button"
+                                    @click="location.reload()"
+                                    class="ml-3 inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                새로고침
+                            </button>&nbsp;
+                            <button
+                                type="submit"
+                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                저장
+                            </button>
+                        </div>
 
                         <div class="space-y-3">
                             <div class="flex items-center p-4 border border-gray-200 rounded-lg">
@@ -207,39 +225,6 @@ window.currentSandboxType = @json($currentSandboxType ?? '');
                                         생성하기
                                     </a>
                                 </div>
-
-                                <!-- 템플릿에서 선택하기 -->
-                                <div class="flex items-center p-4 border border-dashed border-purple-300 rounded-lg bg-purple-25">
-                                    <div class="flex-1">
-                                        <div class="font-medium text-purple-700 flex items-center">
-                                            🎨 템플릿에서 화면 가져오기
-                                        </div>
-                                        <div class="text-sm text-purple-600">미리 만들어진 템플릿 화면을 선택하여 빠르게 설정할 수 있습니다.</div>
-                                    </div>
-                                    <a href="/sandbox/custom-screens" target="_blank"
-                                       class="ml-3 inline-flex items-center px-3 py-2 border border-purple-300 shadow-sm text-sm leading-4 font-medium rounded-md text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                                        </svg>
-                                        템플릿 선택
-                                    </a>
-                                </div>
-
-                                <!-- 새로고침 버튼 -->
-                                <div class="flex items-center p-3 border border-blue-200 rounded-lg bg-blue-25">
-                                    <div class="flex-1">
-                                        <div class="font-medium text-blue-700 text-sm">화면을 새로 만들거나 배포했나요?</div>
-                                        <div class="text-xs text-blue-600">새로고침하여 최신 화면 목록을 확인하세요.</div>
-                                    </div>
-                                    <button type="button"
-                                            @click="location.reload()"
-                                            class="ml-3 inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                        </svg>
-                                        새로고침
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -262,21 +247,6 @@ window.currentSandboxType = @json($currentSandboxType ?? '');
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button
-                            type="button"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            취소
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            저장
-                        </button>
                     </div>
                 </form>
             </div>

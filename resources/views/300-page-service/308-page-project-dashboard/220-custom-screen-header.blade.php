@@ -271,9 +271,11 @@ async function changeCustomScreenDynamic(screenId, screenTitle, event) {
 
         showNotification('커스텀 화면이 변경되었습니다.', 'success');
 
-        // 드롭다운 닫기
-        const dropdown = button.closest('[x-data]').__x.$data;
-        dropdown.screenOpen = false;
+        // 드롭다운 닫기 (안전한 Alpine.js 접근)
+        const dropdownElement = button.closest('[x-data]');
+        if (dropdownElement && dropdownElement.__x && dropdownElement.__x.$data) {
+            dropdownElement.__x.$data.screenOpen = false;
+        }
 
         // 현재 선택된 화면 제목 업데이트
         const currentScreenButton = button.closest('[x-data]').querySelector('button');
@@ -341,9 +343,11 @@ async function changeCustomScreen(screenType, screenTitle, event) {
         // 성공 메시지 표시
         showNotification('커스텀 화면이 변경되었습니다.', 'success');
 
-        // 드롭다운 닫기
-        const dropdown = button.closest('[x-data]').__x.$data;
-        dropdown.screenOpen = false;
+        // 드롭다운 닫기 (안전한 Alpine.js 접근)
+        const dropdownElement = button.closest('[x-data]');
+        if (dropdownElement && dropdownElement.__x && dropdownElement.__x.$data) {
+            dropdownElement.__x.$data.screenOpen = false;
+        }
 
         // 현재 선택된 화면 제목 업데이트
         const currentScreenButton = button.closest('[x-data]').querySelector('button[\\@click="screenOpen = !screenOpen"]');
