@@ -218,7 +218,50 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         }
 
 
+        // 커스텀 화면 목록 데이터 로드 (헤더 드롭다운용)
+        $customScreens = [];
+        if (!empty($sandboxName)) {
+            try {
+                $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+
+                if (\File::exists($templatePath)) {
+                    $folders = \File::directories($templatePath);
+
+                    foreach ($folders as $folder) {
+                        $folderName = basename($folder);
+                        $contentFile = $folder . '/000-content.blade.php';
+
+                        if (\File::exists($contentFile)) {
+                            // 폴더명에서 화면 정보 추출
+                            $parts = explode('-', $folderName, 3);
+                            $screenId = $parts[0] ?? '000';
+                            $screenType = $parts[1] ?? 'screen';
+                            $screenName = $parts[2] ?? 'unnamed';
+
+                            $customScreens[] = [
+                                'id' => 'template_' . $folderName,
+                                'title' => str_replace('-', ' ', $screenName),
+                                'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                                'folder_name' => $folderName,
+                                'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
+                            ];
+                        }
+                    }
+                }
+
+                // 생성 날짜 기준 내림차순 정렬
+                usort($customScreens, function($a, $b) {
+                    return strcmp($a['folder_name'], $b['folder_name']);
+                });
+
+            } catch (\Exception $e) {
+                \Log::error('커스텀 화면 목록 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $sandboxName]);
+                $customScreens = [];
+            }
+        }
+
         // 기존 프로젝트 대시보드 뷰를 사용하되, 커스텀 화면 데이터도 함께 전달
+        $hasSandbox = !empty($sandboxName);
         return view('300-page-service.308-page-project-dashboard.000-index', [
             'currentPageId' => $pageId,
             'activeTab' => 'overview',
@@ -226,7 +269,9 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             'project' => $project,
             'page' => $page,
             'customScreen' => $customScreen,
-            'sandboxName' => $sandboxName
+            'sandboxName' => $sandboxName,
+            'hasSandbox' => $hasSandbox,
+            'customScreens' => $customScreens
         ]);
     })->name('project.dashboard.page');
 

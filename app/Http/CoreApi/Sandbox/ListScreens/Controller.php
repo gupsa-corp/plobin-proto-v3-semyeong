@@ -5,7 +5,7 @@ namespace App\Http\CoreApi\Sandbox\ListScreens;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
-class Controller extends \App\Http\CoreApi\ApiController
+class Controller extends \App\Http\CoreApi\Controller
 {
     /**
      * 선택된 샌드박스의 화면(스크린) 목록을 반환
@@ -13,13 +13,13 @@ class Controller extends \App\Http\CoreApi\ApiController
     public function listScreens(Request $request)
     {
         $sandboxName = $request->get('sandbox_name');
-        
+
         if (!$sandboxName) {
             return response()->json(['error' => '샌드박스 이름이 필요합니다.'], 400);
         }
 
-        $sandboxPath = storage_path('storage-sandbox-' . $sandboxName);
-        
+        $sandboxPath = storage_path('sandbox/' . $sandboxName);
+
         // 샌드박스 디렉토리가 존재하는지 확인
         if (!File::exists($sandboxPath)) {
             return response()->json(['error' => '샌드박스가 존재하지 않습니다.'], 404);
@@ -27,26 +27,82 @@ class Controller extends \App\Http\CoreApi\ApiController
 
         try {
             $screens = $this->findScreenFiles($sandboxPath);
-            
+
             return response()->json([
                 'sandbox_name' => $sandboxName,
                 'screens' => $screens,
                 'total_count' => count($screens)
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json(['error' => '스크린 목록을 가져오는 중 오류가 발생했습니다.'], 500);
         }
     }
 
     /**
-     * 샌드박스에서 화면 파일들을 찾아서 반환
+     * 특정 샌드박스의 화면(스크린) 목록을 반환 (URL 파라미터로)
+     */
+    public function listScreensBySandbox(Request $request, $sandboxName)
+    {
+        // storage/sandbox 경로 사용하고 frontend 하위만 검색
+        $sandboxFrontendPath = storage_path('sandbox/' . $sandboxName . '/frontend');
+
+        // 샌드박스 frontend 디렉토리가 존재하는지 확인
+        if (!File::exists($sandboxFrontendPath)) {
+            return response()->json(['error' => '샌드박스 frontend 폴더가 존재하지 않습니다.'], 404);
+        }
+
+        try {
+            $screens = $this->findScreenFolders($sandboxFrontendPath);
+
+            return response()->json([
+                'sandbox_name' => $sandboxName,
+                'screens' => $screens,
+                'total_count' => count($screens)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => '스크린 목록을 가져오는 중 오류가 발생했습니다.'], 500);
+        }
+    }
+
+    /**
+     * frontend 폴더에서 스크린 폴더들을 찾아서 반환
+     */
+    private function findScreenFolders($frontendPath)
+    {
+        $screens = [];
+        
+        // frontend 폴더의 모든 디렉토리 스캔
+        $directories = File::directories($frontendPath);
+        
+        foreach ($directories as $directory) {
+            $folderName = basename($directory);
+            
+            // 001-screen-xxx 형식의 폴더인지 확인
+            if (preg_match('/^\d{3}-screen-.+$/', $folderName)) {
+                $screens[] = [
+                    'folder_name' => $folderName
+                ];
+            }
+        }
+        
+        // 폴더명으로 정렬
+        usort($screens, function($a, $b) {
+            return strcmp($a['folder_name'], $b['folder_name']);
+        });
+        
+        return $screens;
+    }
+
+    /**
+     * 샌드박스에서 화면 파일들을 찾아서 반환 (기존 방식 유지)
      */
     private function findScreenFiles($sandboxPath)
     {
         $screens = [];
         $extensions = ['html', 'php']; // 화면으로 간주할 파일 확장자
-        
+
         // 재귀적으로 모든 화면 파일 찾기
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sandboxPath),
@@ -57,18 +113,18 @@ class Controller extends \App\Http\CoreApi\ApiController
             if ($file->isFile()) {
                 $extension = strtolower($file->getExtension());
                 $filename = $file->getBasename();
-                
+
                 // 화면 파일인지 확인
                 if (in_array($extension, $extensions)) {
                     $relativePath = str_replace($sandboxPath . '/', '', $file->getPathname());
                     $directory = dirname($relativePath);
-                    
+
                     // 파일 내용에서 제목 추출 시도
                     $title = $this->extractTitle($file->getPathname());
                     if (!$title) {
                         $title = $this->generateTitleFromFilename($filename, $directory);
                     }
-                    
+
                     $screens[] = [
                         'id' => md5($relativePath), // 파일 경로 기반 고유 ID
                         'filename' => $filename,
@@ -103,26 +159,26 @@ class Controller extends \App\Http\CoreApi\ApiController
     {
         try {
             $content = File::get($filePath);
-            
+
             // HTML title 태그에서 제목 추출
             if (preg_match('/<title[^>]*>(.*?)<\/title>/i', $content, $matches)) {
                 return trim(strip_tags($matches[1]));
             }
-            
+
             // HTML h1 태그에서 제목 추출
             if (preg_match('/<h1[^>]*>(.*?)<\/h1>/i', $content, $matches)) {
                 return trim(strip_tags($matches[1]));
             }
-            
+
             // PHP 주석에서 제목 추출
             if (preg_match('/\/\*\*?\s*\*?\s*(.+?)\s*\*?\s*\*?\//s', $content, $matches)) {
                 return trim($matches[1]);
             }
-            
+
         } catch (\Exception $e) {
             // 파일을 읽을 수 없는 경우 무시
         }
-        
+
         return null;
     }
 
@@ -139,16 +195,16 @@ class Controller extends \App\Http\CoreApi\ApiController
                 $screenName = str_replace('-', ' ', $matches[1]);
                 return $screenName;
             }
-            
+
             // backend 폴더의 경우
             if (strpos($directory, 'backend') !== false) {
                 $folderName = basename($directory);
                 return str_replace('-', ' ', $folderName);
             }
         }
-        
+
         $name = pathinfo($filename, PATHINFO_FILENAME);
-        
+
         // 특별한 파일명들 처리
         $specialNames = [
             'index' => '메인 페이지',
@@ -161,11 +217,11 @@ class Controller extends \App\Http\CoreApi\ApiController
             'form-publisher-editor' => '폼 발행 편집기',
             'gantt' => '간트 차트'
         ];
-        
+
         if (isset($specialNames[$name])) {
             return $specialNames[$name];
         }
-        
+
         // 하이픈과 언더스코어를 공백으로 변경하고 첫 글자 대문자화
         $title = str_replace(['-', '_'], ' ', $name);
         return ucwords($title);
@@ -182,21 +238,22 @@ class Controller extends \App\Http\CoreApi\ApiController
             'gantt' => '간트 차트 화면입니다',
             'dashboard' => '대시보드 화면입니다'
         ];
-        
+
         // 파일명 패턴으로 설명 생성
         foreach ($descriptions as $pattern => $desc) {
             if (strpos($filename, $pattern) !== false) {
                 return $desc;
             }
         }
-        
+
         // 디렉토리 기반 설명
         if ($directory !== '/' && $directory !== '.') {
             return "/{$directory} 디렉토리의 화면입니다";
         }
-        
+
         return "사용자 화면 파일입니다";
     }
+
 
     /**
      * 파일 크기 포맷팅

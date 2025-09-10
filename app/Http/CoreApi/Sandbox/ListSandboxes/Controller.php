@@ -29,12 +29,7 @@ class Controller extends \App\Http\CoreApi\ApiController
             foreach ($directories as $directory) {
                 $basename = basename($directory);
                 $sandboxes[] = [
-                    'name' => $basename,
-                    'path' => $basename,
-                    'full_path' => $directory,
-                    'created_at' => date('Y-m-d H:i:s', File::lastModified($directory)),
-                    'file_count' => $this->countFiles($directory),
-                    'directory_count' => $this->countDirectories($directory)
+                    'name' => $basename
                 ];
             }
 
@@ -54,29 +49,4 @@ class Controller extends \App\Http\CoreApi\ApiController
         }
     }
 
-    /**
-     * 디렉토리 내 파일 개수 계산
-     */
-    private function countFiles($directory)
-    {
-        try {
-            $files = File::allFiles($directory);
-            return count($files);
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * 디렉토리 내 하위 디렉토리 개수 계산
-     */
-    private function countDirectories($directory)
-    {
-        try {
-            $directories = File::directories($directory);
-            return count($directories);
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
 }

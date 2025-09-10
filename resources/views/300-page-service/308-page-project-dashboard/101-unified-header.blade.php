@@ -5,24 +5,20 @@
     $pageId = request()->route('pageId');
     $organization = \App\Models\Organization::find($orgId);
     $project = \App\Models\Project::find($projectId);
-    $page = \App\Models\Page::find($pageId);
+    $page = \App\Models\ProjectPage::find($pageId);
 
     // 페이지 상태 및 설정 확인
-    $hasSandbox = false;
+    // $hasSandbox는 메인 라우트에서 전달받음
     $hasCustomScreen = false;
-    $sandboxName = null;
+    // $sandboxName은 메인 라우트에서 전달받음
     $sandboxLevel = null;
     $customScreen = $customScreen ?? null;
-    
+
     if ($page && !empty($page->sandbox_name)) {
-        $sandboxName = $page->sandbox_name;
         $sandboxLevel = 'page';
-        $hasSandbox = true;
         $hasCustomScreen = !empty($page->custom_screen_settings);
     } elseif ($project && !empty($project->sandbox_name)) {
-        $sandboxName = $project->sandbox_name;
         $sandboxLevel = 'project';
-        $hasSandbox = true;
     }
 @endphp
 
@@ -73,17 +69,17 @@
                         pages: [],
                         loading: false,
                         error: null,
-                        
+
                         async loadPages() {
                             if (this.pages.length > 0) return;
-                            
+
                             this.loading = true;
                             this.error = null;
-                            
+
                             try {
                                 const response = await fetch(`/api/projects/{{ $projectId }}/pages`);
                                 if (!response.ok) throw new Error('Failed to fetch pages');
-                                
+
                                 const data = await response.json();
                                 this.pages = data.pages || [];
                             } catch (error) {
@@ -94,7 +90,7 @@
                                 this.loading = false;
                             }
                         },
-                        
+
                         async openPageDropdown() {
                             this.pageDropdownOpen = true;
                             await this.loadPages();
@@ -125,18 +121,6 @@
                                     프로젝트 페이지 목록
                                 </div>
 
-                                <!-- 새 페이지 생성 -->
-                                <a href="/organizations/{{ $orgId }}/projects/{{ $projectId }}/pages/create"
-                                   class="w-full text-left flex items-center px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 border-b">
-                                    <svg class="w-4 h-4 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                    </svg>
-                                    <div>
-                                        <div class="font-medium">새 페이지 생성</div>
-                                        <div class="text-xs text-gray-500">새로운 페이지 추가</div>
-                                    </div>
-                                </a>
-
                                 <!-- 로딩 상태 -->
                                 <div x-show="loading" class="flex items-center px-4 py-3 text-sm text-gray-500">
                                     <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
@@ -164,7 +148,7 @@
                                     <a :href="`/organizations/{{ $orgId }}/projects/{{ $projectId }}/pages/${pageItem.id}/dashboard`"
                                        class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                                        :class="{ 'bg-blue-50 text-blue-700': pageItem.id == '{{ $pageId }}' }">
-                                        
+
                                         <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
@@ -271,86 +255,4 @@
         </div>
     </div>
 
-    {{-- 상태 표시 바 (통일된 스타일) --}}
-    @if($hasSandbox || $hasCustomScreen || isset($customScreen))
-        <div class="px-6 py-3 
-            @if(isset($customScreen) && !empty($customScreen))
-                bg-blue-50 border-t border-blue-200
-            @elseif($hasSandbox && $sandboxLevel === 'page')
-                bg-green-50 border-t border-green-200
-            @elseif($hasSandbox && $sandboxLevel === 'project')
-                bg-yellow-50 border-t border-yellow-200
-            @else
-                bg-gray-50 border-t border-gray-200
-            @endif
-        ">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2">
-                        @if(isset($customScreen) && !empty($customScreen))
-                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <span class="text-sm font-medium text-blue-800">커스텀 화면</span>
-                        @elseif($hasSandbox)
-                            <svg class="w-4 h-4 
-                                @if($sandboxLevel === 'page') text-green-600 @else text-yellow-600 @endif
-                            " fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                            </svg>
-                            <span class="text-sm font-medium 
-                                @if($sandboxLevel === 'page') text-green-800 @else text-yellow-800 @endif
-                            ">{{ ucfirst($sandboxName) }} 샌드박스</span>
-                        @else
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span class="text-sm font-medium text-gray-800">기본 페이지</span>
-                        @endif
-                    </div>
-                    
-                    <div class="text-sm 
-                        @if(isset($customScreen) && !empty($customScreen))
-                            text-blue-600
-                        @elseif($hasSandbox && $sandboxLevel === 'page')
-                            text-green-600
-                        @elseif($hasSandbox && $sandboxLevel === 'project')
-                            text-yellow-600
-                        @else
-                            text-gray-600
-                        @endif
-                    ">
-                        @if(isset($customScreen) && !empty($customScreen))
-                            {{ $customScreen['title'] ?? '커스텀 화면 적용됨' }}
-                        @elseif($hasSandbox && $sandboxLevel === 'project')
-                            프로젝트 전체에 적용됨
-                        @elseif($hasSandbox)
-                            페이지별 설정
-                        @else
-                            설정 필요
-                        @endif
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-2">
-                    @if($page)
-                        <a href="/organizations/{{ $orgId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200
-                                @if(isset($customScreen) && !empty($customScreen))
-                                    bg-blue-100 hover:bg-blue-200 text-blue-800
-                                @elseif($hasSandbox && $sandboxLevel === 'page')
-                                    bg-green-100 hover:bg-green-200 text-green-800
-                                @elseif($hasSandbox && $sandboxLevel === 'project')
-                                    bg-yellow-100 hover:bg-yellow-200 text-yellow-800
-                                @else
-                                    bg-gray-100 hover:bg-gray-200 text-gray-800
-                                @endif
-                           ">
-                            설정
-                        </a>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endif
 </div>

@@ -8,7 +8,7 @@ use App\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class Controller extends \App\Http\Controller
+class Controller extends \App\Http\CoreApi\Controller
 {
     public function __invoke($id, $projectId, $pageId, Request $request)
     {

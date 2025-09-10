@@ -5,7 +5,7 @@ namespace App\Http\CoreApi\Project\SetSandbox;
 use App\Models\Project;
 use Illuminate\Support\Facades\Log;
 
-class Controller extends \App\Http\Controller
+class Controller extends \App\Http\CoreApi\Controller
 {
     public function __invoke($id, $projectId, Request $request)
     {

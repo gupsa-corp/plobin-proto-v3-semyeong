@@ -114,23 +114,23 @@ Route::prefix('organizations')->group(function () {
         Route::post('/business-info', CreateBusinessInfoController::class);
         Route::post('/business-lookup', BusinessLookupController::class);
         Route::post('/receipt/download', DownloadReceiptController::class);
-        
+
         // 결제 수단 관리 API
         Route::get('/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'index']);
         Route::post('/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'store']);
         Route::put('/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'update']);
         Route::delete('/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'destroy']);
         Route::post('/payment-methods/{paymentMethodId}/set-default', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'setDefault']);
-        
+
         // 결제 내역 API
         Route::get('/payment-history', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'index']);
         Route::get('/payment-history/{paymentId}', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'show']);
-        
+
         // 라이센스 구매 API
         Route::get('/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
         Route::post('/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
         Route::get('/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
-        
+
         // 토스페이먼츠 결제 검증 API
         Route::post('/verify-payment', [\App\Http\CoreApi\OrganizationBilling\VerifyPayment\VerifyPaymentController::class, 'verify']);
         Route::post('/download-receipt', [\App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller::class, 'download']);
@@ -144,7 +144,7 @@ Route::prefix('projects')->group(function () {
     Route::get('/{project}/pages/{page}', ProjectPageShowController::class);
     Route::put('/{project}/pages/{page}', ProjectPageUpdateController::class);
     Route::delete('/{project}/pages/{page}', ProjectPageDestroyController::class);
-    
+
     // 프로젝트 샌드박스 관리 API
     Route::get('/{project}/sandboxes', [ProjectSandboxController::class, 'index']);
     Route::post('/{project}/sandboxes', [ProjectSandboxController::class, 'store']);
@@ -152,6 +152,11 @@ Route::prefix('projects')->group(function () {
     Route::put('/{project}/sandboxes/{sandbox}', [ProjectSandboxController::class, 'update']);
     Route::delete('/{project}/sandboxes/{sandbox}', [ProjectSandboxController::class, 'destroy']);
     Route::post('/{project}/sandboxes/{sandbox}/copy', [ProjectSandboxController::class, 'copy']);
+});
+
+// 페이지 커스텀 화면 API (개발용 - 인증 없음)
+Route::prefix('pages')->group(function () {
+    Route::post('/{pageId}/custom-screen', [\App\Http\CoreApi\Page\SetCustomScreen\Controller::class, 'setCustomScreen']);
 });
 
 
@@ -163,26 +168,26 @@ Route::prefix('test/organizations')->group(function () {
     Route::post('{organization}/billing/business-info', CreateBusinessInfoController::class);
     Route::post('{organization}/billing/business-lookup', BusinessLookupController::class);
     Route::post('{organization}/billing/receipt/download', DownloadReceiptController::class);
-    
+
     // 테스트용 결제 수단 관리 API
     Route::get('{organization}/billing/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'index']);
     Route::post('{organization}/billing/payment-methods', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'store']);
     Route::put('{organization}/billing/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'update']);
     Route::delete('{organization}/billing/payment-methods/{paymentMethodId}', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'destroy']);
     Route::post('{organization}/billing/payment-methods/{paymentMethodId}/set-default', [\App\Http\CoreApi\OrganizationBilling\PaymentMethods\Controller::class, 'setDefault']);
-    
+
     // 테스트용 결제 내역 API
     Route::get('{organization}/billing/payment-history', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'index']);
     Route::get('{organization}/billing/payment-history/{paymentId}', [\App\Http\CoreApi\OrganizationBilling\PaymentHistory\Controller::class, 'show']);
-    
+
     // 테스트용 라이센스 구매 API
     Route::get('{organization}/billing/licenses', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'index']);
     Route::post('{organization}/billing/licenses/purchase', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'purchase']);
     Route::get('{organization}/billing/licenses/usage', [\App\Http\CoreApi\OrganizationBilling\Licenses\Controller::class, 'usage']);
-    
+
     // 플랜 변경 API
     Route::post('{organization}/billing/change-plan', [\App\Http\CoreApi\OrganizationBilling\ChangePlan\Controller::class, 'changePlan']);
-    
+
     // 토스페이먼츠 결제 검증 API (테스트용이므로 주석 처리 - 메인 인증 API 사용)
     // Route::post('{organization}/billing/verify-payment', [\App\Http\CoreApi\OrganizationBilling\VerifyPayment\Controller::class, 'verify']);
     // Route::post('{organization}/billing/download-receipt', [\App\Http\CoreApi\OrganizationBilling\DownloadReceipt\Controller::class, 'download']);
@@ -193,7 +198,8 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/list', [ListSandboxesController::class, 'listSandboxes']);
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     Route::get('/screens', [ListScreensController::class, 'listScreens']);
-    
+    Route::get('/screens/{sandboxName}', [ListScreensController::class, 'listScreensBySandbox']);
+
     // 샌드박스 템플릿 관리 API
     Route::get('/templates', [SandboxTemplateController::class, 'index']);
     Route::post('/templates', [SandboxTemplateController::class, 'store']);
@@ -201,12 +207,12 @@ Route::prefix('sandbox')->group(function () {
     Route::put('/templates/{template}', [SandboxTemplateController::class, 'update']);
     Route::delete('/templates/{template}', [SandboxTemplateController::class, 'destroy']);
     Route::get('/templates/usage/stats', [SandboxTemplateController::class, 'usage']);
-    
+
     // AI Server Callback API
     Route::prefix('storage-sandbox-1/callbacks')->group(function () {
         Route::post('/ai-server', \App\Http\Sandbox\AIServer\Callback\Controller::class);
     });
-    
+
     // Form Creator API
     Route::prefix('form-creator')->group(function () {
         Route::post('/save', \App\Http\Sandbox\FormCreator\Save\Controller::class);
@@ -214,7 +220,7 @@ Route::prefix('sandbox')->group(function () {
         Route::get('/load/{filename}', \App\Http\Sandbox\FormCreator\Load\Controller::class);
         Route::delete('/delete/{filename}', \App\Http\Sandbox\FormCreator\Delete\Controller::class);
     });
-    
+
     // Form Publisher API
     Route::prefix('form-publisher')->group(function () {
         Route::post('/save', \App\Http\Sandbox\FormPublisher\Save\Controller::class);
@@ -248,19 +254,19 @@ Route::get('/core/permissions', [\App\Http\CoreApi\Core\Permissions\Controller::
 Route::prefix('test/e2e')->group(function () {
     // 시스템 상태 조회
     Route::get('/status', [\App\Http\CoreApi\API\TestController::class, 'status']);
-    
+
     // 함수 실행 테스트
     Route::post('/execute-function', [\App\Http\CoreApi\API\TestController::class, 'executeFunction']);
-    
+
     // 파일 조회/쿼리 테스트
     Route::get('/query-files', [\App\Http\CoreApi\API\TestController::class, 'queryFiles']);
-    
+
     // 파일 수정 테스트
     Route::post('/modify-files', [\App\Http\CoreApi\API\TestController::class, 'modifyFiles']);
-    
+
     // 함수 정보 조회
     Route::get('/function-info/{functionName}', [\App\Http\CoreApi\API\TestController::class, 'getFunctionInfo']);
-    
+
     // 테스트 함수 생성
     Route::post('/create-test-function', [\App\Http\CoreApi\API\TestController::class, 'createTestFunction']);
 });
