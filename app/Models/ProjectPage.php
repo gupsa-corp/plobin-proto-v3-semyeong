@@ -20,9 +20,12 @@ class ProjectPage extends Model
         'user_id',
         'sandbox_folder',
         'sandbox_custom_screen_folder',
+        'access_level',
+        'allowed_roles',
     ];
 
     protected $casts = [
+        'allowed_roles' => 'array',
     ];
 
     /**
@@ -119,5 +122,92 @@ class ProjectPage extends Model
             'folder' => $this->getSandboxFolder(),
             'custom_screen_folder' => $this->getSandboxCustomScreenFolder(),
         ];
+    }
+
+    /**
+     * Access Control 관련 메소드들
+     */
+
+    /**
+     * 페이지의 실효적인 접근 레벨을 반환
+     */
+    public function getEffectiveAccessLevel(): PageAccessLevel
+    {
+        // 페이지에 명시적으로 설정된 접근 레벨이 있으면 사용
+        if ($this->access_level) {
+            try {
+                return PageAccessLevel::from($this->access_level);
+            } catch (\ValueError $e) {
+                // 잘못된 값인 경우 기본값 사용
+            }
+        }
+
+        // 페이지 레벨 설정이 없으면 프로젝트의 기본 접근 레벨 사용
+        $project = $this->project;
+        if ($project && $project->default_access_level) {
+            try {
+                return PageAccessLevel::from($project->default_access_level);
+            } catch (\ValueError $e) {
+                // 잘못된 값인 경우 기본값 사용
+            }
+        }
+
+        // 모든 설정이 없으면 기본값 반환
+        return PageAccessLevel::MEMBER;
+    }
+
+    /**
+     * 페이지의 접근 레벨을 설정
+     */
+    public function setAccessLevel(PageAccessLevel $accessLevel): void
+    {
+        $this->access_level = $accessLevel->value;
+    }
+
+    /**
+     * 커스텀 접근 역할 설정
+     */
+    public function setAllowedRoles(array $roles): void
+    {
+        $this->allowed_roles = $roles;
+    }
+
+    /**
+     * 커스텀 접근 역할 추가
+     */
+    public function addAllowedRole(string $role): void
+    {
+        $allowedRoles = $this->allowed_roles ?? [];
+        if (!in_array($role, $allowedRoles)) {
+            $allowedRoles[] = $role;
+            $this->allowed_roles = $allowedRoles;
+        }
+    }
+
+    /**
+     * 커스텀 접근 역할 제거
+     */
+    public function removeAllowedRole(string $role): void
+    {
+        $allowedRoles = $this->allowed_roles ?? [];
+        $this->allowed_roles = array_values(array_filter($allowedRoles, function($r) use ($role) {
+            return $r !== $role;
+        }));
+    }
+
+    /**
+     * 페이지가 공개 접근인지 확인
+     */
+    public function isPublic(): bool
+    {
+        return $this->getEffectiveAccessLevel() === PageAccessLevel::PUBLIC;
+    }
+
+    /**
+     * 페이지가 커스텀 접근 제어를 사용하는지 확인
+     */
+    public function hasCustomAccess(): bool
+    {
+        return $this->getEffectiveAccessLevel() === PageAccessLevel::CUSTOM;
     }
 }
