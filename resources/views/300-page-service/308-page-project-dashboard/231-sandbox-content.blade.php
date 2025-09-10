@@ -12,7 +12,7 @@
         </h2>
 
         <p class="text-green-600 mb-2">
-            현재 <strong>{{ ucfirst($sandboxType) }}</strong> 샌드박스가
+            현재 <strong>{{ ucfirst($sandboxName) }}</strong> 샌드박스가
             @if($sandboxLevel === 'project')
                 <span class="font-semibold">프로젝트 레벨</span>에서 설정되어 있습니다.
             @else

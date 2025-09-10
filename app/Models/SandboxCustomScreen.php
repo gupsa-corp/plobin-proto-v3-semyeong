@@ -9,13 +9,13 @@ class SandboxCustomScreen extends Model
 {
     protected $fillable = [
         'title',
-        'description', 
+        'description',
         'type',
         'folder_name',
         'file_path',
-        'sandbox_type'
+        'sandbox_name'
     ];
-    
+
     /**
      * 폴더가 존재하는지 확인
      */
@@ -24,23 +24,23 @@ class SandboxCustomScreen extends Model
         $folderPath = $this->getFolderPath();
         return File::isDirectory($folderPath);
     }
-    
+
     /**
      * 폴더 경로를 반환
      */
     public function getFolderPath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->sandbox_type}");
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_name}");
     }
-    
+
     /**
      * 전체 파일 경로를 반환
      */
     public function getFullFilePath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->sandbox_type}/{$this->file_path}");
+        return storage_path("sandbox/storage-sandbox-{$this->sandbox_name}/{$this->file_path}");
     }
-    
+
     /**
      * 파일 크기를 반환 (바이트)
      */
@@ -49,7 +49,7 @@ class SandboxCustomScreen extends Model
         $fullPath = $this->getFullFilePath();
         return File::exists($fullPath) ? File::size($fullPath) : 0;
     }
-    
+
     /**
      * 파일 수정일시를 반환
      */

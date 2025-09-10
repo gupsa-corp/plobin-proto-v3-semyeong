@@ -24,7 +24,7 @@ class ProjectPage extends Model
         'sort_order',
         'access_level',
         'allowed_roles',
-        'sandbox_type',
+        'sandbox_name',
         'custom_screen_settings'
     ];
 
@@ -47,7 +47,7 @@ class ProjectPage extends Model
                 $changes = $page->getChanges();
                 // timestamps와 soft delete는 제외
                 unset($changes['updated_at'], $changes['created_at'], $changes['deleted_at']);
-                
+
                 if (!empty($changes)) {
                     ProjectLogService::logPageUpdated($page->project_id, $page->id, $page->title, $changes);
                 }
@@ -130,15 +130,15 @@ class ProjectPage extends Model
 
         // 사용자의 프로젝트 내 역할 확인
         $userRole = $this->project->getUserRole($user);
-        
+
         // 페이지의 접근 레벨 확인
         $pageAccessLevel = $this->getEffectiveAccessLevel();
-        
+
         // 커스텀 역할인 경우
         if ($pageAccessLevel === PageAccessLevel::CUSTOM) {
             return $this->checkCustomRoleAccess($user);
         }
-        
+
         // 표준 역할 기반 접근 확인
         return $pageAccessLevel->canRoleAccess($userRole);
     }
@@ -149,7 +149,7 @@ class ProjectPage extends Model
     private function checkCustomRoleAccess(User $user): bool
     {
         $allowedRoles = $this->getAllowedRoles();
-        
+
         if (empty($allowedRoles)) {
             return false;
         }

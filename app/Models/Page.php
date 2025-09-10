@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Page extends Model
 {
     protected $table = 'project_pages';
-    
+
     protected $fillable = [
         'title',
         'slug',
@@ -19,7 +19,7 @@ class Page extends Model
         'parent_id',
         'user_id',
         'sort_order',
-        'sandbox_type',
+        'sandbox_name',
         'custom_screen_settings'
     ];
 
@@ -52,12 +52,12 @@ class Page extends Model
     {
         $path = [];
         $page = $this;
-        
+
         while ($page) {
             $path[] = $page->slug;
             $page = $page->parent;
         }
-        
+
         return implode('/', array_reverse($path));
     }
 

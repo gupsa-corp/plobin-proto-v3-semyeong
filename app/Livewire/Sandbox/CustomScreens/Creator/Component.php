@@ -113,12 +113,12 @@ class Component extends LivewireComponent
     private function loadScreenForEdit($id)
     {
         try {
-            $screen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)->find($id);
+            $screen = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)->find($id);
             if ($screen) {
                 $this->title = $screen->title;
                 $this->description = $screen->description;
                 $this->type = $screen->type;
-                
+
                 // 파일에서 실제 내용을 읽어옴
                 $filePath = $screen->getFullFilePath();
                 if (File::exists($filePath)) {
@@ -126,10 +126,10 @@ class Component extends LivewireComponent
                 } else {
                     $this->bladeTemplate = $this->getDefaultBladeTemplate();
                 }
-                
+
                 // Livewire 컴포넌트는 기본 템플릿으로 설정 (기존 '#' 대신)
                 $this->livewireComponent = $this->getDefaultLivewireComponent();
-                
+
                 $this->connectedFunctions = [];
                 $this->dbQueries = [];
                 $this->previewData = [];
@@ -207,20 +207,20 @@ class Component extends LivewireComponent
         try {
             if ($this->editMode) {
                 // 기존 화면 수정
-                $screen = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)->find($this->editId);
+                $screen = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)->find($this->editId);
                 if ($screen) {
                     $screen->update([
                         'title' => $this->title,
                         'description' => $this->description,
                         'type' => $this->type
                     ]);
-                    
+
                     // 파일 내용 업데이트
                     $filePath = $screen->getFullFilePath();
                     if (File::exists(dirname($filePath))) {
                         File::put($filePath, $this->bladeTemplate);
                     }
-                    
+
                     session()->flash('message', '화면이 수정되었습니다.');
                 } else {
                     session()->flash('error', '수정할 화면을 찾을 수 없습니다.');
@@ -230,16 +230,16 @@ class Component extends LivewireComponent
                 // 새 화면 생성
                 $folderName = $this->generateFolderName($this->title);
                 $filePath = "custom-screens/{$folderName}/000-content.blade.php";
-                
+
                 $screen = SandboxCustomScreen::create([
                     'title' => $this->title,
                     'description' => $this->description,
                     'type' => $this->type,
                     'folder_name' => $folderName,
                     'file_path' => $filePath,
-                    'sandbox_type' => $this->currentStorage
+                    'sandbox_name' => $this->currentStorage
                 ]);
-                
+
                 // 실제 파일 생성
                 $fullFilePath = $screen->getFullFilePath();
                 $directory = dirname($fullFilePath);
@@ -247,7 +247,7 @@ class Component extends LivewireComponent
                     File::makeDirectory($directory, 0755, true);
                 }
                 File::put($fullFilePath, $this->bladeTemplate);
-                
+
                 session()->flash('message', '화면이 생성되었습니다.');
             }
 
@@ -268,17 +268,17 @@ class Component extends LivewireComponent
         $folderName = preg_replace('/[^a-zA-Z0-9가-힣\s\-_]/', '', $title);
         $folderName = preg_replace('/\s+/', '-', trim($folderName));
         $folderName = strtolower($folderName);
-        
+
         // 중복 방지를 위해 타임스탬프 추가
         return sprintf('%03d-screen-%s', $this->getNextScreenNumber(), $folderName);
     }
 
     private function getNextScreenNumber()
     {
-        $maxNumber = SandboxCustomScreen::where('sandbox_type', $this->currentStorage)
+        $maxNumber = SandboxCustomScreen::where('sandbox_name', $this->currentStorage)
             ->whereRaw("folder_name REGEXP '^[0-9]{3}-screen-'")
             ->max('id');
-        
+
         return $maxNumber ? $maxNumber + 1 : 1;
     }
 

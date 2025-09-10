@@ -31,7 +31,7 @@ class SandboxProjectPagesSeeder extends Seeder
         if (!$organization) {
             $organization = Organization::create([
                 'name' => '테스트 조직',
-                'created_by' => $user->id,
+                'user_id' => $user->id,
             ]);
         }
 
@@ -52,7 +52,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📊 대시보드',
                 'slug' => 'dashboard',
                 'content' => '실시간 프로젝트 통계와 최근 활동을 확인할 수 있는 대시보드입니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'dashboard',
                     'template_path' => 'frontend/001-screen-dashboard/000-content.blade.php',
@@ -71,7 +71,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📝 프로젝트 목록',
                 'slug' => 'project-list',
                 'content' => '프로젝트 목록을 확인하고 관리할 수 있습니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'project list',
                     'template_path' => 'frontend/002-screen-project-list/000-content.blade.php',
@@ -84,7 +84,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '🗂️ 테이블 뷰',
                 'slug' => 'table-view',
                 'content' => '프로젝트 데이터를 테이블 형태로 보고 관리할 수 있습니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'table view',
                     'template_path' => 'frontend/003-screen-table-view/000-content.blade.php',
@@ -97,7 +97,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📋 칸반 보드',
                 'slug' => 'kanban-board',
                 'content' => '프로젝트를 칸반 보드 형태로 관리할 수 있습니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'kanban board',
                     'template_path' => 'frontend/004-screen-kanban-board/000-content.blade.php',
@@ -110,7 +110,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📈 간트 차트',
                 'slug' => 'gantt-chart',
                 'content' => '프로젝트 일정을 간트 차트로 시각화하여 관리할 수 있습니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'gantt chart',
                     'template_path' => 'frontend/005-screen-gantt-chart/000-content.blade.php',
@@ -123,7 +123,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📅 달력 뷰',
                 'slug' => 'calendar-view',
                 'content' => '프로젝트 일정을 달력 형태로 확인할 수 있습니다.',
-                'sandbox_type' => 'storage-sandbox-template',
+                'sandbox_name' => 'storage-sandbox-template',
                 'custom_screen_settings' => json_encode([
                     'screen_type' => 'calendar view',
                     'template_path' => 'frontend/006-screen-calendar-view/000-content.blade.php',
@@ -136,7 +136,7 @@ class SandboxProjectPagesSeeder extends Seeder
 
         // 부모 페이지 생성 및 ID 저장
         $parentPages = [];
-        
+
         foreach ($pages as $pageData) {
             if (!isset($pageData['parent_title'])) {
                 // 최상위 페이지 생성
@@ -145,14 +145,14 @@ class SandboxProjectPagesSeeder extends Seeder
                     'title' => $pageData['title'],
                     'slug' => $pageData['slug'],
                     'content' => $pageData['content'],
-                    'sandbox_type' => $pageData['sandbox_type'] ?? null,
+                    'sandbox_name' => $pageData['sandbox_name'] ?? null,
                     'custom_screen_settings' => $pageData['custom_screen_settings'] ?? null,
                     'parent_id' => null,
                     'user_id' => $user->id,
                 ]);
-                
+
                 $parentPages[$pageData['title']] = $page->id;
-                
+
                 $this->command->info("생성됨: {$pageData['title']}");
             }
         }
@@ -161,19 +161,19 @@ class SandboxProjectPagesSeeder extends Seeder
         foreach ($pages as $pageData) {
             if (isset($pageData['parent_title'])) {
                 $parentId = $parentPages[$pageData['parent_title']] ?? null;
-                
+
                 if ($parentId) {
                     $page = ProjectPage::create([
                         'project_id' => $project->id,
                         'title' => $pageData['title'],
                         'slug' => $pageData['slug'],
                         'content' => $pageData['content'],
-                        'sandbox_type' => $pageData['sandbox_type'] ?? null,
+                        'sandbox_name' => $pageData['sandbox_name'] ?? null,
                         'custom_screen_settings' => $pageData['custom_screen_settings'] ?? null,
                         'parent_id' => $parentId,
                         'user_id' => $user->id,
                     ]);
-                    
+
                     $this->command->info("생성됨: {$pageData['parent_title']} > {$pageData['title']}");
                 }
             }

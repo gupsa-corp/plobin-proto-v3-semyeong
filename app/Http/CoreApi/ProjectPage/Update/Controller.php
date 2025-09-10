@@ -23,14 +23,21 @@ class Controller extends BaseController
 
         $validated = $request->validated();
 
-        // 이름이 변경되면 슬러그도 업데이트
-        $updateData = [
-            'title' => $validated['name'],
-            'content' => $validated['description'] ?? $page->content
-        ];
+        $updateData = [];
 
-        if ($page->title !== $validated['name']) {
-            $updateData['slug'] = Str::slug($validated['name']);
+        // 이름이 변경되면 슬러그도 업데이트  
+        if (isset($validated['name'])) {
+            $updateData['title'] = $validated['name'];
+            $updateData['content'] = $validated['description'] ?? $page->content;
+            
+            if ($page->title !== $validated['name']) {
+                $updateData['slug'] = Str::slug($validated['name']);
+            }
+        }
+
+        // 커스텀 화면 설정 업데이트
+        if (isset($validated['custom_screen_settings'])) {
+            $updateData['custom_screen_settings'] = $validated['custom_screen_settings'];
         }
 
         $page->update($updateData);

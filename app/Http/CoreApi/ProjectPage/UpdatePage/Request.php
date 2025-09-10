@@ -17,7 +17,10 @@ class Request extends FormRequest
             'title' => 'string|max:255',
             'content' => 'nullable|string',
             'status' => 'in:draft,published,archived',
-            'parent_id' => 'nullable|exists:project_pages,id'
+            'parent_id' => 'nullable|exists:project_pages,id',
+            'custom_screen_settings' => 'nullable|array',
+            'custom_screen_settings.screen_id' => 'nullable|integer',
+            'custom_screen_settings.screen_name' => 'nullable|string|max:255'
         ];
     }
 

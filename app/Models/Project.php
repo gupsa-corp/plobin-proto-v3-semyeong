@@ -20,7 +20,7 @@ class Project extends Model
         'user_id',
         'default_access_level',
         'project_roles',
-        'sandbox_type'
+        'sandbox_name'
     ];
 
     protected $casts = [
@@ -41,7 +41,7 @@ class Project extends Model
                 $changes = $project->getChanges();
                 // timestamps는 제외
                 unset($changes['updated_at'], $changes['created_at']);
-                
+
                 if (!empty($changes)) {
                     ProjectLogService::logProjectUpdated($project->id, $changes);
                 }

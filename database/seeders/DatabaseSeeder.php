@@ -26,9 +26,9 @@ class DatabaseSeeder extends Seeder
 
         // 테스트용 관리자 계정 생성
         $admin = User::updateOrCreate(
-            ['email' => 'admin@gupsa.com'],
+            ['email' => 'admin@example.com'],
             [
-                'email' => 'admin@gupsa.com',
+                'email' => 'admin@example.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'country_code' => '+82',
@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // admin@gupsa.com에 platform_admin 권한 부여
+        // admin@example.com에 platform_admin 권한 부여
         $admin->assignRole('platform_admin');
 
         // 테스트용 조직 생성
@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('🎉 데이터베이스 시딩 완료!');
         $this->command->info('로그인 테스트용 계정:');
-        $this->command->info('👤 admin@gupsa.com / password (platform_admin 권한)');
+        $this->command->info('👤 admin@example.com / password (platform_admin 권한)');
         $this->command->info('🏢 테스트 조직 생성됨');
         $this->command->info('📁 테스트 프로젝트 생성됨');
         $this->command->info('💳 결제 및 구독 데이터 생성됨');

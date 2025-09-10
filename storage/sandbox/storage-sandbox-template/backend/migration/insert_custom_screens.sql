@@ -1,5 +1,5 @@
 -- 샌드박스 커스텀 화면 메타데이터 추가
-INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_path, sandbox_type, created_at, updated_at) VALUES
+INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_path, sandbox_name, created_at, updated_at) VALUES
 (
     '프로젝트 테이블 뷰',
     '프로젝트 데이터를 테이블 형식으로 관리하고 필터링, 정렬, 검색 기능을 제공합니다.',
@@ -42,21 +42,21 @@ INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_
 );
 
 -- 기존 샘플 화면 업데이트 (있는 경우)
-UPDATE sandbox_custom_screens 
+UPDATE sandbox_custom_screens
 SET description = '기본적인 대시보드 레이아웃과 통계 카드, 차트를 제공하는 샘플 화면입니다.'
 WHERE folder_name = '000-screen-dashboard';
 
-UPDATE sandbox_custom_screens 
+UPDATE sandbox_custom_screens
 SET description = '프로젝트 목록을 테이블 형태로 표시하고 관리할 수 있는 화면입니다.'
 WHERE folder_name = '001-screen-project-list';
 
 -- 확인용 쿼리
-SELECT 
+SELECT
     id,
     title,
     type,
     folder_name,
-    sandbox_type,
+    sandbox_name,
     created_at
-FROM sandbox_custom_screens 
+FROM sandbox_custom_screens
 ORDER BY folder_name;

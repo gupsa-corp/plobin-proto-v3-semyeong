@@ -20,9 +20,12 @@ class Request extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'custom_screen_settings' => 'nullable|array',
+            'custom_screen_settings.screen_name' => 'nullable|string|max:255',
+            'custom_screen_settings.screen_title' => 'nullable|string|max:255'
         ];
     }
 }

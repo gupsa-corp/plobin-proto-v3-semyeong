@@ -2,7 +2,7 @@
 
 namespace App\Http\Sandbox\Downloads;
 
-use App\Http\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -82,12 +82,12 @@ class Controller extends BaseController
         'database-backup.sql' => [
             'name' => '데이터베이스 백업',
             'category' => 'backups',
-            'content' => '-- 데이터베이스 백업 파일\n-- 생성일: ' . date('Y-m-d H:i:s') . '\n\n-- 테이블 구조 및 데이터 백업 내용이 여기에 위치합니다.'
+            'content' => 'database-backup-content'
         ],
         'config-backup.json' => [
             'name' => '설정 파일 백업',
             'category' => 'backups',
-            'content' => '{"app":{"name":"Plobin","env":"local"},"database":{"default":"mysql"},"backup_date":"' . date('Y-m-d H:i:s') . '"}'
+            'content' => 'config-backup-content'
         ],
         'storage-backup.tar.gz' => [
             'name' => '스토리지 백업',
@@ -128,6 +128,13 @@ class Controller extends BaseController
         // 바이너리 파일의 경우 더미 데이터 생성
         if (str_starts_with($content, 'binary_')) {
             $content = $this->generateDummyBinary($content, $filename);
+        }
+        
+        // 동적 콘텐츠 처리
+        if ($content === 'database-backup-content') {
+            $content = '-- 데이터베이스 백업 파일\n-- 생성일: ' . date('Y-m-d H:i:s') . '\n\n-- 테이블 구조 및 데이터 백업 내용이 여기에 위치합니다.';
+        } elseif ($content === 'config-backup-content') {
+            $content = '{"app":{"name":"Plobin","env":"local"},"database":{"default":"mysql"},"backup_date":"' . date('Y-m-d H:i:s') . '"}';
         }
 
         $headers = [

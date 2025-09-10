@@ -227,21 +227,21 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $page = \App\Models\ProjectPage::find($pageId);
 
         // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
-        $sandboxType = null;
+        $sandboxName = null;
         $customScreenSettings = null;
 
         // 우선순위: 페이지 레벨 > 프로젝트 레벨
-        if ($page && !empty($page->sandbox_type)) {
-            $sandboxType = $page->sandbox_type;
+        if ($page && !empty($page->sandbox_name)) {
+            $sandboxName = $page->sandbox_name;
             $customScreenSettings = $page->custom_screen_settings;
-        } elseif ($project && !empty($project->sandbox_type)) {
-            $sandboxType = $project->sandbox_type;
+        } elseif ($project && !empty($project->sandbox_name)) {
+            $sandboxName = $project->sandbox_name;
             $customScreenSettings = null; // 프로젝트 레벨에서는 커스텀 화면 설정이 없음
         }
 
         // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
         $customScreen = null;
-        if (!empty($sandboxType) && !empty($customScreenSettings)) {
+        if (!empty($sandboxName) && !empty($customScreenSettings)) {
             try {
                 // 커스텀 화면 설정에서 screen_id 또는 template_path 가져오기
                 $customScreenSettings = is_string($customScreenSettings)
@@ -251,7 +251,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 $screenId = $customScreenSettings['screen_id'] ?? null;
                 $templatePath = $customScreenSettings['template_path'] ?? null;
                 $enabled = $customScreenSettings['enabled'] ?? true; // template_path 방식은 기본적으로 enabled
-                
+
 
                 // screen_type에서 screenId 생성 (예: "table view" -> "screen-table-view")
                 if (!$screenId && isset($customScreenSettings['screen_type'])) {
@@ -269,11 +269,11 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                         foreach ($folders as $folder) {
                             $folderName = basename($folder);
                             $contentFile = $folder . '/000-content.blade.php';
-                            
+
                             // screen_id 매칭 로직 수정: template_005-screen-calendar-view => 005-screen-calendar-view
                             $templateId = 'template_' . $folderName;
-                            
-                            
+
+
                             if ($templateId === $screenId && \File::exists($contentFile)) {
                                 // 폴더명에서 화면 정보 추출
                                 $parts = explode('-', $folderName, 3);
@@ -362,7 +362,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
                 \Log::info('커스텀 화면 로드 실패', [
                     'pageId' => $pageId,
-                    'sandbox_type' => $sandboxType,
+                    'sandbox_name' => $sandboxName,
                     'custom_screen_settings' => $customScreenSettings,
                     'error' => $e->getMessage()
                 ]);
@@ -378,7 +378,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             'project' => $project,
             'page' => $page,
             'customScreen' => $customScreen,
-            'sandboxType' => $sandboxType
+            'sandboxName' => $sandboxName
         ]);
     })->name('project.dashboard.page');
 
@@ -422,7 +422,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 $query->where('id', $id);
             })->first();
 
-        $currentSandboxType = $project ? $project->sandbox_type : null;
+        $currentSandboxType = $project ? $project->sandbox_name : null;
 
         return view('300-page-service.315-page-project-settings-sandbox.000-index', [
             'currentProjectId' => $projectId,
@@ -446,13 +446,13 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             }
 
             // 샌드박스 설정 저장
-            $sandboxType = $request->input('sandbox', '');
-            if (empty($sandboxType)) {
-                $sandboxType = null; // 빈 값을 null로 변환
+            $sandboxName = $request->input('sandbox', '');
+            if (empty($sandboxName)) {
+                $sandboxName = null; // 빈 값을 null로 변환
             }
 
             $project->update([
-                'sandbox_type' => $sandboxType
+                'sandbox_name' => $sandboxName
             ]);
 
             return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
@@ -744,7 +744,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/san
                   });
         })->first();
 
-    $currentSandboxType = $page ? $page->sandbox_type : null;
+    $currentSandboxType = $page ? $page->sandbox_name : null;
 
     return view('300-page-service.310-page-settings-sandbox.000-index', [
         'currentPageId' => $pageId,
@@ -769,13 +769,13 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sa
         }
 
         // 샌드박스 설정 저장
-        $sandboxType = $request->input('sandbox', '');
-        if (empty($sandboxType)) {
-            $sandboxType = null; // 빈 값을 null로 변환
+        $sandboxName = $request->input('sandbox', '');
+        if (empty($sandboxName)) {
+            $sandboxName = null; // 빈 값을 null로 변환
         }
 
         $page->update([
-            'sandbox_type' => $sandboxType
+            'sandbox_name' => $sandboxName
         ]);
 
         return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');
@@ -792,7 +792,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         });
     })->first();
 
-    $currentSandboxType = $page ? $page->sandbox_type : null;
+    $currentSandboxType = $page ? $page->sandbox_name : null;
     $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
 
     // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
@@ -843,7 +843,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
             });
 
         } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_type' => $currentSandboxType]);
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $currentSandboxType]);
             $customScreens = [];
         }
     }
@@ -871,7 +871,7 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cu
         }
 
         // 샌드박스가 설정되어 있는지 확인
-        if (empty($page->sandbox_type)) {
+        if (empty($page->sandbox_name)) {
             return redirect()->back()->with('error', '커스텀 화면을 사용하려면 먼저 샌드박스를 선택해야 합니다.');
         }
 
