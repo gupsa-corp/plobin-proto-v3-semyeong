@@ -42,8 +42,6 @@ return [
     '/sandbox' => ['view' => '700-page-sandbox.000-index', 'name' => 'sandbox.index'],
     '/sandbox/dashboard' => ['view' => '700-page-sandbox.701-page-dashboard.000-index', 'name' => 'sandbox.dashboard'],
     '/sandbox/sql-executor' => ['view' => '700-page-sandbox.702-page-sql-executor.000-index', 'name' => 'sandbox.sql-executor'],
-    '/sandbox/file-list' => ['redirect' => '/sandbox/file-manager'],
-    '/sandbox/file-manager' => ['view' => '700-page-sandbox.703-page-file-list.000-index', 'name' => 'sandbox.file-manager'],
     '/sandbox/file-editor' => ['view' => '700-page-sandbox.704-page-file-editor.000-index', 'name' => 'sandbox.file-editor'],
     '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
     '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-page-git-version-control.000-index', 'name' => 'sandbox.git-version-control'],

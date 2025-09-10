@@ -78,9 +78,6 @@
             <div class="mb-3">
                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">파일 관리</div>
                 <div class="flex flex-wrap gap-2">
-                    <a href="/sandbox/file-manager" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        파일 매니저
-                    </a>
                     <a href="/sandbox/file-editor" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
                         파일 에디터
                     </a>

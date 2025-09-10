@@ -1136,10 +1136,6 @@ Route::get('/sandbox/git-version-control', function () {
     return view('700-page-sandbox.706-page-git-version-control.000-index');
 })->name('sandbox.git-version-control');
 
-// 파일 매니저 추가
-Route::get('/sandbox/file-manager', function () {
-    return view('700-page-sandbox.707-page-file-manager.000-index');
-})->name('sandbox.file-manager');
 
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
 Route::get('/sandbox/storage-manager', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'index'])->name('sandbox.storage-manager');
@@ -1217,6 +1213,15 @@ Route::get('/sandbox/projects-list', function () {
 
 // 샌드박스 사용 프로젝트 목록
 Route::get('/sandbox/using-projects', [\App\Http\CoreApi\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
+
+// 자료 다운로드 페이지
+Route::get('/sandbox/downloads', function () {
+    return view('700-page-sandbox.718-page-downloads.000-index');
+})->name('sandbox.downloads');
+
+// 자료 다운로드 API
+Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
+Route::get('/sandbox/downloads/stats', [\App\Http\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
 
 // Global Functions 파일 다운로드
 Route::get('/sandbox/download/{filename}', function ($filename) {
