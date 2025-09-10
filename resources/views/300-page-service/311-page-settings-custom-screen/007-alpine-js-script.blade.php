@@ -2,7 +2,7 @@
 function customScreenSettingsPage() {
     return {
         sandboxSelected: window.currentSandboxName !== '',
-        selectedCustomScreen: '{{ $currentCustomScreenSettings['screen_id'] ?? '' }}',
+        selectedCustomScreen: '{{ $currentCustomScreenId ?? '' }}',
         customScreens: window.customScreensData || [],
         loading: false,
         error: null,

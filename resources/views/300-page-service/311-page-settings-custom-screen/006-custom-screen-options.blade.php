@@ -7,7 +7,7 @@
             value=""
             class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
             x-model="selectedCustomScreen"
-            {{ empty($currentCustomScreenSettings['screen_id']) ? 'checked' : '' }}
+            {{ empty($currentCustomScreenId) ? 'checked' : '' }}
         >
         <label for="custom_screen_none" class="ml-3 flex-1">
             <div class="font-medium text-gray-900">커스텀 화면 사용 안함</div>

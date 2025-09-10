@@ -228,36 +228,21 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
 
         // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
         $sandboxName = null;
-        $customScreenSettings = null;
 
         // 우선순위: 페이지 레벨 > 프로젝트 레벨
         if ($page && !empty($page->sandbox_name)) {
             $sandboxName = $page->sandbox_name;
-            $customScreenSettings = $page->custom_screen_settings;
         } elseif ($project && !empty($project->sandbox_name)) {
             $sandboxName = $project->sandbox_name;
-            $customScreenSettings = null; // 프로젝트 레벨에서는 커스텀 화면 설정이 없음
         }
 
         // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
         $customScreen = null;
-        if (!empty($sandboxName) && !empty($customScreenSettings)) {
+        if (!empty($sandboxName) && $page && $page->custom_screen_enabled) {
             try {
-                // 커스텀 화면 설정에서 screen_id 또는 template_path 가져오기
-                $customScreenSettings = is_string($customScreenSettings)
-                    ? json_decode($customScreenSettings, true)
-                    : $customScreenSettings;
-
-                $screenId = $customScreenSettings['screen_id'] ?? null;
-                $templatePath = $customScreenSettings['template_path'] ?? null;
-                $enabled = $customScreenSettings['enabled'] ?? true; // template_path 방식은 기본적으로 enabled
-
-
-                // screen_type에서 screenId 생성 (예: "table view" -> "screen-table-view")
-                if (!$screenId && isset($customScreenSettings['screen_type'])) {
-                    $screenId = 'screen-' . str_replace(' ', '-', $customScreenSettings['screen_type']);
-                }
-
+                $screenId = $page->custom_screen_id;
+                $templatePath = $page->template_path;
+                $enabled = $page->custom_screen_enabled;
 
                 // screen_id 방식 처리 (새로운 방식)
                 if ($screenId && $enabled) {
@@ -363,7 +348,8 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 \Log::info('커스텀 화면 로드 실패', [
                     'pageId' => $pageId,
                     'sandbox_name' => $sandboxName,
-                    'custom_screen_settings' => $customScreenSettings,
+                    'custom_screen_id' => $page ? $page->custom_screen_id : null,
+                    'custom_screen_enabled' => $page ? $page->custom_screen_enabled : false,
                     'error' => $e->getMessage()
                 ]);
             }
@@ -793,7 +779,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     })->first();
 
     $currentSandboxName = $page ? $page->sandbox_name : null;
-    $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
+    $currentCustomScreenId = $page ? $page->custom_screen_id : null;
 
     // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
     $customScreens = [];
@@ -853,7 +839,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         'activeTab' => 'custom-screen',
         'page' => $page,
         'currentSandboxName' => $currentSandboxName,
-        'currentCustomScreenSettings' => $currentCustomScreenSettings,
+        'currentCustomScreenId' => $currentCustomScreenId,
         'customScreens' => $customScreens
     ]);
 })->name('project.dashboard.page.settings.custom-screen');
@@ -876,19 +862,25 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cu
         }
 
         $customScreenId = $request->input('custom_screen', '');
-        $customScreenSettings = [];
-
+        
         if (!empty($customScreenId)) {
-            $customScreenSettings = [
-                'screen_id' => $customScreenId,
-                'enabled' => true,
-                'applied_at' => now()->format('Y-m-d H:i:s')
-            ];
+            $page->update([
+                'custom_screen_id' => $customScreenId,
+                'custom_screen_type' => 'template',
+                'custom_screen_enabled' => true,
+                'custom_screen_applied_at' => now(),
+                'template_path' => null, // 필요시 추가 설정
+            ]);
+        } else {
+            // 커스텀 화면 비활성화
+            $page->update([
+                'custom_screen_id' => null,
+                'custom_screen_type' => null,
+                'custom_screen_enabled' => false,
+                'custom_screen_applied_at' => null,
+                'template_path' => null,
+            ]);
         }
-
-        $page->update([
-            'custom_screen_settings' => !empty($customScreenSettings) ? $customScreenSettings : null
-        ]);
 
         return redirect()->back()->with('success', '커스텀 화면 설정이 저장되었습니다.');
     } catch (\Exception $e) {

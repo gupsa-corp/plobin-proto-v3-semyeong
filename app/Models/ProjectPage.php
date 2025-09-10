@@ -25,12 +25,19 @@ class ProjectPage extends Model
         'access_level',
         'allowed_roles',
         'sandbox_name',
-        'custom_screen_settings'
+        'custom_screen_id',
+        'custom_screen_type',
+        'custom_screen_enabled',
+        'custom_screen_applied_at',
+        'custom_screen_config',
+        'template_path'
     ];
 
     protected $casts = [
         'allowed_roles' => 'json',
-        'custom_screen_settings' => 'json',
+        'custom_screen_config' => 'json',
+        'custom_screen_enabled' => 'boolean',
+        'custom_screen_applied_at' => 'datetime',
     ];
 
     /**

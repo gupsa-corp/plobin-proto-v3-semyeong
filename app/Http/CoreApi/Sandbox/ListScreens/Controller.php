@@ -66,7 +66,7 @@ class Controller extends \App\Http\CoreApi\ApiController
                     // 파일 내용에서 제목 추출 시도
                     $title = $this->extractTitle($file->getPathname());
                     if (!$title) {
-                        $title = $this->generateTitleFromFilename($filename);
+                        $title = $this->generateTitleFromFilename($filename, $directory);
                     }
                     
                     $screens[] = [
@@ -127,10 +127,26 @@ class Controller extends \App\Http\CoreApi\ApiController
     }
 
     /**
-     * 파일명에서 제목 생성
+     * 파일명과 디렉토리에서 제목 생성 (설정 페이지와 동일한 로직 사용)
      */
-    private function generateTitleFromFilename($filename)
+    private function generateTitleFromFilename($filename, $directory = null)
     {
+        // 디렉토리 기반 제목 생성 (우선순위)
+        if ($directory && $directory !== '.' && $directory !== '/') {
+            // frontend 폴더 하위의 패턴: 001-screen-dashboard 형식
+            $folderName = basename($directory);
+            if (preg_match('/^\d+-screen-(.+)$/', $folderName, $matches)) {
+                $screenName = str_replace('-', ' ', $matches[1]);
+                return $screenName;
+            }
+            
+            // backend 폴더의 경우
+            if (strpos($directory, 'backend') !== false) {
+                $folderName = basename($directory);
+                return str_replace('-', ' ', $folderName);
+            }
+        }
+        
         $name = pathinfo($filename, PATHINFO_FILENAME);
         
         // 특별한 파일명들 처리
