@@ -14,8 +14,8 @@
                 @foreach($availableTabs as $key => $tab)
                     <button wire:click="switchTab('{{ $key }}')"
                             class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
-                                   {{ $activeTab === $key 
-                                      ? 'border-blue-500 text-blue-600' 
+                                   {{ $activeTab === $key
+                                      ? 'border-blue-500 text-blue-600'
                                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                         {{ $tab['icon'] }} {{ $tab['name'] }}
                     </button>
@@ -98,23 +98,23 @@
             <div class="space-y-4">
                 <div class="bg-white p-4 rounded-lg border border-gray-200">
                     <h3 class="font-semibold text-gray-900 mb-4">미리보기</h3>
-                    
+
                     @if($previewScreen)
                         <div class="mb-4">
                             <h4 class="font-medium text-gray-900">{{ $previewScreen['title'] }}</h4>
                             <p class="text-sm text-gray-600">{{ $previewScreen['description'] }}</p>
                         </div>
-                        
+
                         <div class="preview-area">
                             {!! $previewContent !!}
                         </div>
-                        
+
                         @if($previewScreen['status'] === 'published')
                             <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
                                 <p class="text-sm text-green-800">
-                                    <strong>발행 URL:</strong> 
+                                    <strong>발행 URL:</strong>
                                     <code class="bg-green-100 px-2 py-1 rounded text-xs">
-                                        http://localhost:8100/organizations/5/projects/3/pages/{{ $previewScreen['id'] }}
+                                        http://localhost:9100/organizations/5/projects/3/pages/{{ $previewScreen['id'] }}
                                     </code>
                                 </p>
                             </div>
@@ -139,7 +139,7 @@
         <!-- 발행 관리 탭 -->
         <div class="bg-white p-6 rounded-lg border border-gray-200">
             <h3 class="font-semibold text-gray-900 mb-4">발행 관리</h3>
-            
+
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-4 rounded-lg">
@@ -155,11 +155,11 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="border-t border-gray-200 pt-4">
                     <h5 class="font-medium text-gray-900 mb-3">발행된 화면 목록</h5>
                     @php $publishedScreens = collect($screens)->where('status', 'published'); @endphp
-                    
+
                     @if($publishedScreens->count() > 0)
                         <div class="space-y-2">
                             @foreach($publishedScreens as $screen)
