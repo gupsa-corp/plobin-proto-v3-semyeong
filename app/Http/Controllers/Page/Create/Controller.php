@@ -40,7 +40,7 @@ class Controller extends \App\Http\Controllers\Controller
             $title = $request->input('title', '새 페이지');
 
             // 페이지 순서 계산 (같은 parent_id를 가진 페이지들 기준)
-            $sortOrder = ProjectPage::where('project_id', $projectId)
+            $maxSortOrder = ProjectPage::where('project_id', $projectId)
                 ->where(function($query) use ($parentId) {
                     if ($parentId) {
                         $query->where('parent_id', $parentId);
@@ -48,7 +48,9 @@ class Controller extends \App\Http\Controllers\Controller
                         $query->whereNull('parent_id');
                     }
                 })
-                ->max('sort_order') + 1;
+                ->max('sort_order');
+            
+            $sortOrder = ($maxSortOrder ?? 0) + 1;
 
             // 새 페이지 생성
             $page = ProjectPage::create([

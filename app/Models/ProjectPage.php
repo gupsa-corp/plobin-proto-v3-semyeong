@@ -22,6 +22,7 @@ class ProjectPage extends Model
         'sandbox_custom_screen_folder',
         'access_level',
         'allowed_roles',
+        'sort_order',
     ];
 
     protected $casts = [
@@ -131,7 +132,7 @@ class ProjectPage extends Model
     /**
      * 페이지의 실효적인 접근 레벨을 반환
      */
-    public function getEffectiveAccessLevel(): PageAccessLevel
+    public function getEffectivePageAccessLevel(): PageAccessLevel
     {
         // 페이지에 명시적으로 설정된 접근 레벨이 있으면 사용
         if ($this->access_level) {
@@ -200,7 +201,7 @@ class ProjectPage extends Model
      */
     public function isPublic(): bool
     {
-        return $this->getEffectiveAccessLevel() === PageAccessLevel::PUBLIC;
+        return $this->getEffectivePageAccessLevel() === PageAccessLevel::PUBLIC;
     }
 
     /**
@@ -208,6 +209,6 @@ class ProjectPage extends Model
      */
     public function hasCustomAccess(): bool
     {
-        return $this->getEffectiveAccessLevel() === PageAccessLevel::CUSTOM;
+        return $this->getEffectivePageAccessLevel() === PageAccessLevel::CUSTOM;
     }
 }
