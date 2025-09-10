@@ -296,14 +296,15 @@ async function changeCustomScreenDynamic(screenId, screenTitle, event) {
 
 // 미리보기 함수
 function previewScreen(screenId) {
-    let previewUrl;
-    if (screenId.startsWith('template_')) {
-        const templateId = screenId.replace('template_', '');
-        previewUrl = `/sandbox/storage-sandbox-template/${templateId}`;
-    } else {
-        previewUrl = `/sandbox/custom-screen/preview/${screenId}`;
+    if (window.customScreensData && window.currentSandboxName) {
+        const screen = window.customScreensData.find(s => s.id == screenId);
+        if (screen) {
+            // 모든 스크린은 폴더명으로 접근
+            const folderName = screen.name;
+            const previewUrl = `/sandbox/${window.currentSandboxName}/${folderName}`;
+            window.open(previewUrl, 'screen-preview', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+        }
     }
-    window.open(previewUrl, 'screen-preview', 'width=1200,height=800,scrollbars=yes,resizable=yes');
 }
 
 // 기존 커스텀 화면 변경 함수 (하위호환성)

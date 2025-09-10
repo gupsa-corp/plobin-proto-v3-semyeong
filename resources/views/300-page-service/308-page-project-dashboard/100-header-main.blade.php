@@ -13,9 +13,9 @@
             <div>
                 {{-- 페이지 타이틀 --}}
                 @if($project)
-                    <h1 class="text-xl font-semibold text-gray-900" x-text="currentPage.title">{{ $project->name }} 대시보드</h1>
+                    <h1 class="text-xl font-semibold text-gray-900">{{ $project->name }} 대시보드</h1>
                 @else
-                    <h1 class="text-xl font-semibold text-gray-900" x-text="currentPage.title">프로젝트 대시보드</h1>
+                    <h1 class="text-xl font-semibold text-gray-900">프로젝트 대시보드</h1>
                 @endif
 
                 {{-- 브레드크럼 --}}

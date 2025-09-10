@@ -422,14 +422,14 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
                 $query->where('id', $id);
             })->first();
 
-        $currentSandboxType = $project ? $project->sandbox_name : null;
+        $currentSandboxName = $project ? $project->sandbox_name : null;
 
         return view('300-page-service.315-page-project-settings-sandbox.000-index', [
             'currentProjectId' => $projectId,
             'activeTab' => 'sandbox',
             'organizationId' => $id,
             'projectId' => $projectId,
-            'currentSandboxType' => $currentSandboxType
+            'currentSandboxName' => $currentSandboxName
         ]);
     })->name('project.dashboard.project.settings.sandbox');
 
@@ -744,12 +744,12 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/san
                   });
         })->first();
 
-    $currentSandboxType = $page ? $page->sandbox_name : null;
+    $currentSandboxName = $page ? $page->sandbox_name : null;
 
     return view('300-page-service.310-page-settings-sandbox.000-index', [
         'currentPageId' => $pageId,
         'activeTab' => 'sandbox',
-        'currentSandboxType' => $currentSandboxType
+        'currentSandboxName' => $currentSandboxName
     ]);
 })->name('project.dashboard.page.settings.sandbox');
 
@@ -792,12 +792,12 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         });
     })->first();
 
-    $currentSandboxType = $page ? $page->sandbox_name : null;
+    $currentSandboxName = $page ? $page->sandbox_name : null;
     $currentCustomScreenSettings = $page ? $page->custom_screen_settings : null;
 
     // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
     $customScreens = [];
-    if (!empty($currentSandboxType)) {
+    if (!empty($currentSandboxName)) {
         try {
             $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
 
@@ -843,7 +843,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
             });
 
         } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $currentSandboxType]);
+            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $currentSandboxName]);
             $customScreens = [];
         }
     }
@@ -852,7 +852,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         'currentPageId' => $pageId,
         'activeTab' => 'custom-screen',
         'page' => $page,
-        'currentSandboxType' => $currentSandboxType,
+        'currentSandboxName' => $currentSandboxName,
         'currentCustomScreenSettings' => $currentCustomScreenSettings,
         'customScreens' => $customScreens
     ]);

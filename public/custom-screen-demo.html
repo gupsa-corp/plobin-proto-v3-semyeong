@@ -154,7 +154,9 @@
                 },
                 
                 previewScreen(screen) {
-                    const previewUrl = `/sandbox/screen/preview/${this.selectedSandbox}/${encodeURIComponent(screen.path)}`;
+                    // 모든 스크린은 폴더명으로 접근
+                    const folderName = screen.name;
+                    const previewUrl = `/sandbox/${this.selectedSandbox}/${folderName}`;
                     window.open(previewUrl, 'screen-preview', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                     console.log('Opening preview for:', screen.title, 'at', previewUrl);
                 }
