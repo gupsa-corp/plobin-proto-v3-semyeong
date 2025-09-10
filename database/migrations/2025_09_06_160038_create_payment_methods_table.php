@@ -23,10 +23,12 @@ return new class extends Migration
             $table->string('expiry_year', 4)->nullable(); // 만료 년
             $table->boolean('is_default')->default(false); // 기본 결제 수단 여부
             $table->boolean('is_active')->default(true); // 활성 상태
+            $table->integer('priority')->default(1); // 결제 우선순위
             $table->json('toss_response')->nullable(); // Toss Payments 응답
             $table->timestamps();
             
             $table->index(['organization_id', 'is_default']);
+            $table->index(['organization_id', 'priority']);
             $table->index('billing_key');
         });
     }

@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
             SandboxProjectPagesSeeder::class,
         ]);
 
-        // 테스트용 관리자 계정 생성
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
+        // 테스트용 관리자 계정 생성 - using direct DB operations
+        $admin = \DB::table('users')->where('email', 'admin@example.com')->first();
+        if (!$admin) {
+            \DB::table('users')->insert([
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
@@ -36,48 +36,69 @@ class DatabaseSeeder extends Seeder
                 'nickname' => 'admin',
                 'first_name' => '관리자',
                 'last_name' => '테스트',
-            ]
-        );
+                'name' => '관리자 테스트', // Add name field
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $admin = \DB::table('users')->where('email', 'admin@example.com')->first();
+        }
 
-        // admin@example.com에 platform_admin 권한 부여
-        $admin->assignRole('platform_admin');
+        // admin@example.com에 platform_admin 권한 부여 - using direct DB operations
+        $platformAdminRole = \DB::table('roles')->where('name', 'platform_admin')->first();
+        if ($platformAdminRole && $admin) {
+            \DB::table('model_has_roles')->insert([
+                'role_id' => $platformAdminRole->id,
+                'model_type' => 'App\Models\User',
+                'model_id' => $admin->id,
+            ]);
+        }
 
-        // 테스트용 조직 생성
-        $organization = Organization::updateOrCreate(
-            ['name' => '테스트 조직'],
-            [
+        // 테스트용 조직 생성 - using direct DB operations
+        $organization = \DB::table('organizations')->where('name', '테스트 조직')->first();
+        if (!$organization) {
+            \DB::table('organizations')->insert([
                 'name' => '테스트 조직',
                 'description' => '개발 및 테스트용 조직입니다.',
                 'user_id' => $admin->id,
                 'status' => 'active',
-                'members_count' => 1
-            ]
-        );
+                'members_count' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $organization = \DB::table('organizations')->where('name', '테스트 조직')->first();
+        }
 
-        // 조직 멤버 추가
-        OrganizationMember::updateOrCreate(
-            [
+        // 조직 멤버 추가 - using direct DB operations
+        $existingMember = \DB::table('organization_members')
+            ->where('organization_id', $organization->id)
+            ->where('user_id', $admin->id)
+            ->first();
+            
+        if (!$existingMember) {
+            \DB::table('organization_members')->insert([
                 'organization_id' => $organization->id,
                 'user_id' => $admin->id,
-            ],
-            [
                 'role_name' => 'owner',
                 'invitation_status' => 'accepted',
                 'joined_at' => now(),
                 'invited_at' => now(),
-            ]
-        );
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        // 테스트용 프로젝트 생성
-        Project::updateOrCreate(
-            ['name' => '테스트 프로젝트'],
-            [
+        // 테스트용 프로젝트 생성 - using direct DB operations
+        $existingProject = \DB::table('projects')->where('name', '테스트 프로젝트')->first();
+        if (!$existingProject) {
+            \DB::table('projects')->insert([
                 'name' => '테스트 프로젝트',
                 'description' => '개발 및 테스트용 프로젝트입니다.',
                 'organization_id' => $organization->id,
                 'user_id' => $admin->id,
-            ]
-        );
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         // 구독 및 결제 관련 시딩
         $this->call([

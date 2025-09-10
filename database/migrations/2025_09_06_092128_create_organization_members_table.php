@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('role_name')->default('member'); // 조직 내 역할
             $table->timestamp('joined_at')->nullable();
             $table->timestamp('invited_at')->nullable();
             $table->string('invitation_status')->default('pending'); // pending, accepted, declined

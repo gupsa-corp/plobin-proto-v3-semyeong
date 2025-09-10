@@ -25,17 +25,21 @@ class ProjectPage extends Model
         'access_level',
         'allowed_roles',
         'sandbox_name',
+        'sandbox_folder',
+        'sandbox_custom_screen_folder',
         'custom_screen_id',
         'custom_screen_type',
         'custom_screen_enabled',
         'custom_screen_applied_at',
-        'custom_screen_config',
-        'template_path'
+        'template_path',
+        // 화면 설정 컬럼들
+        'screen_title',
+        'screen_description',
+        'screen_layout',
     ];
 
     protected $casts = [
         'allowed_roles' => 'json',
-        'custom_screen_config' => 'json',
         'custom_screen_enabled' => 'boolean',
         'custom_screen_applied_at' => 'datetime',
     ];
@@ -186,5 +190,77 @@ class ProjectPage extends Model
     {
         $accessLevel = $this->getEffectiveAccessLevel();
         return $accessLevel !== PageAccessLevel::PUBLIC;
+    }
+
+    /**
+     * 화면 설정 관련 헬퍼 메서드들
+     */
+
+    /**
+     * 화면 제목 반환 (페이지 제목을 기본값으로 사용)
+     */
+    public function getScreenTitle(): string
+    {
+        return $this->screen_title ?? $this->title;
+    }
+
+    /**
+     * 화면 레이아웃 반환
+     */
+    public function getScreenLayout(): string
+    {
+        return $this->screen_layout ?? 'default';
+    }
+
+    /**
+     * 모든 화면 설정을 배열로 반환
+     */
+    public function getScreenSettings(): array
+    {
+        return [
+            'title' => $this->getScreenTitle(),
+            'description' => $this->screen_description,
+            'layout' => $this->getScreenLayout(),
+        ];
+    }
+
+    /**
+     * Sandbox 폴더 관련 헬퍼 메서드들
+     */
+
+    /**
+     * Sandbox 폴더 경로 반환
+     */
+    public function getSandboxFolder(): ?string
+    {
+        return $this->sandbox_folder;
+    }
+
+    /**
+     * Sandbox 커스텀 스크린 폴더 경로 반환
+     */
+    public function getSandboxCustomScreenFolder(): ?string
+    {
+        return $this->sandbox_custom_screen_folder;
+    }
+
+    /**
+     * Sandbox 설정이 있는지 확인
+     */
+    public function hasSandboxSettings(): bool
+    {
+        return !empty($this->sandbox_name) || !empty($this->sandbox_folder) || !empty($this->sandbox_custom_screen_folder);
+    }
+
+    /**
+     * 모든 sandbox 설정을 배열로 반환
+     */
+    public function getSandboxSettings(): array
+    {
+        return [
+            'name' => $this->sandbox_name,
+            'folder' => $this->getSandboxFolder(),
+            'custom_screen_folder' => $this->getSandboxCustomScreenFolder(),
+        ];
     }
 }

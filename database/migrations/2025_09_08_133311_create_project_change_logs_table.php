@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('project_change_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('action');
+            $table->string('entity_type')->nullable(); // polymorphic 관계용
+            $table->unsignedBigInteger('entity_id')->nullable(); // polymorphic 관계용
             $table->text('description')->nullable();
             $table->json('metadata')->nullable();
             $table->string('ip_address')->nullable();
@@ -23,7 +25,9 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index(['project_id', 'created_at']);
+            $table->index(['user_id', 'created_at']);
             $table->index(['action', 'created_at']);
+            $table->index(['entity_type', 'entity_id']);
         });
     }
 

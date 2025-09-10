@@ -12,11 +12,17 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('parent_id')->nullable()->constrained('folders')->cascadeOnDelete();
+            $table->foreignIdFor(config('auth.providers.users.model'), 'user_id')->nullable()->nullOnDelete();
 
             $table->string('name')->nullable();
             $table->string('slug')->nullable();
 
             $table->timestamps();
         });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('folders');
     }
 };

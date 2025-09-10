@@ -43,7 +43,6 @@
     @elseif(isset($customScreen) && !empty($customScreen))
         <!-- 커스텀 화면이 있는 경우 렌더링 -->
         <div class="bg-white rounded-lg shadow-sm p-6">
-            @include('300-page-service.308-page-project-dashboard.220-custom-screen-header')
             @include('300-page-service.308-page-project-dashboard.221-custom-screen-content')
         </div>
     @elseif($page && $hasSandbox)
@@ -80,15 +79,13 @@
             </div>
         @else
             <!-- 샌드박스만 설정되고 커스텀 화면이 없는 경우 -->
-            <div class="bg-white rounded-lg border border-green-200 shadow-sm">
-                @include('300-page-service.308-page-project-dashboard.230-sandbox-header')
+            <div class="bg-white rounded-lg shadow-sm p-6">
                 @include('300-page-service.308-page-project-dashboard.231-sandbox-content')
             </div>
         @endif
     @else
         <!-- 빈 페이지 안내 -->
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-            @include('300-page-service.308-page-project-dashboard.240-empty-page-header')
+        <div class="bg-white rounded-lg shadow-sm p-6">
             @include('300-page-service.308-page-project-dashboard.241-empty-page-content')
         </div>
     @endif

@@ -11,14 +11,15 @@ class Role extends SpatieRole
     protected $fillable = [
         'name',
         'guard_name',
-        'scope_level',
-        'organization_id',
-        'project_id',
-        'page_id',
-        'parent_role_id',
-        'created_by',
         'description',
-        'is_active',
+        // TODO: Add other fields when corresponding migration is created
+        // 'scope_level',
+        // 'organization_id', 
+        // 'project_id',
+        // 'page_id',
+        // 'parent_role_id',
+        // 'created_by',
+        // 'is_active',
     ];
 
     protected $casts = [

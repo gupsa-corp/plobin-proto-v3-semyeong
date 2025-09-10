@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('log_name')->nullable();
             $table->text('description');
             $table->nullableUuidMorphs('subject', 'subject');
+            $table->string('event')->nullable(); // 이벤트 타입
             $table->nullableUuidMorphs('causer', 'causer');
             $table->json('properties')->nullable();
             $table->uuid('batch_uuid')->nullable();
