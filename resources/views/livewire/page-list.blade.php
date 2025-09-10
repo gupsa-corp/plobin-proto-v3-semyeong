@@ -1,7 +1,7 @@
 {{-- 페이지 목록 Livewire 컴포넌트 --}}
 <div x-on:page-order-changed.window="
         const detail = $event.detail;
-        $wire.call('updatePageOrder', detail.pageId, detail.newIndex, detail.beforePageId, detail.afterPageId);
+        @this.updatePageOrder(detail.pageId, detail.newIndex, detail.beforePageId, detail.afterPageId);
      ">
     {{-- 동적 페이지 목록 --}}
     <div id="sortable-pages" style="display: flex; flex-direction: column; gap: 4px;">
