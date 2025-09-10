@@ -5,7 +5,7 @@ namespace App\Http\Billing\PaymentHistory;
 use Illuminate\Http\Request;
 use App\Models\Organization;
 use Carbon\Carbon;
-use App\Http\CoreApi\Controller as BaseController;
+use App\Http\Controllers\Controller as BaseController;
 
 class Controller extends BaseController
 {

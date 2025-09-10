@@ -103,10 +103,10 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     })->name('project.dashboard.full');
 
     // 페이지 생성 라우트
-    Route::post('/organizations/{id}/projects/{projectId}/pages/create', [\App\Http\CoreApi\Page\Create\Controller::class, '__invoke']);
+    Route::post('/organizations/{id}/projects/{projectId}/pages/create', [\App\Http\Controllers\Page\Create\Controller::class, '__invoke']);
 
     // 페이지 제목 업데이트 라우트
-    Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', [\App\Http\CoreApi\Page\UpdateTitle\Controller::class, '__invoke']);
+    Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', [\App\Http\Controllers\Page\UpdateTitle\Controller::class, '__invoke']);
 
     // 프로젝트 페이지 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
@@ -114,6 +114,14 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $organization = \App\Models\Organization::find($id);
         $project = \App\Models\Project::find($projectId);
         $page = \App\Models\ProjectPage::find($pageId);
+
+        // 페이지 접근 권한 확인
+        if ($page && Auth::check()) {
+            $accessControlService = new \App\Services\AccessControlService();
+            if (!$accessControlService->canUserAccessPage(Auth::user(), $page)) {
+                abort(403, '이 페이지에 접근할 권한이 없습니다.');
+            }
+        }
 
         // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
         $sandboxName = null;
@@ -326,7 +334,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         ]);
     })->name('project.dashboard.project.settings.sandbox');
 
-    Route::post('/organizations/{id}/projects/{projectId}/settings/sandbox', [\App\Http\CoreApi\Project\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.project.settings.sandbox.post');
+    Route::post('/organizations/{id}/projects/{projectId}/settings/sandbox', [\App\Http\Controllers\Project\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.project.settings.sandbox.post');
 
     Route::get('/organizations/{id}/projects/{projectId}/settings/users', function ($id, $projectId) {
         // 프로젝트 정보 가져오기
@@ -393,7 +401,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     })->name('project.dashboard.project.settings.page-delete');
 
     // 페이지 삭제 API
-    Route::delete('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\CoreApi\Page\Delete\Controller::class, '__invoke'])->name('pages.delete');
+    Route::delete('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\Controllers\Page\Delete\Controller::class, '__invoke'])->name('pages.delete');
 });
 
 // 웹 라우트 일괄 등록 (대시보드 제외)
@@ -536,7 +544,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/san
     ]);
 })->name('project.dashboard.page.settings.sandbox');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', [\App\Http\CoreApi\Page\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.page.settings.sandbox.post');
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', [\App\Http\Controllers\Page\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
     $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
@@ -611,7 +619,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     ]);
 })->name('project.dashboard.page.settings.custom-screen');
 
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', [\App\Http\CoreApi\Page\SetCustomScreen\Controller::class, '__invoke'])->name('project.dashboard.page.settings.custom-screen.post');
+Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', [\App\Http\Controllers\Page\SetCustomScreen\Controller::class, '__invoke'])->name('project.dashboard.page.settings.custom-screen.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
     return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
@@ -854,19 +862,19 @@ Route::get('/sandbox/git-version-control', function () {
 
 
 // 스토리지 관리자 - config에서 정의한 라우트를 오버라이드
-Route::get('/sandbox/storage-manager', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'index'])->name('sandbox.storage-manager');
-Route::post('/sandbox/storage-manager/create', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'create'])->name('sandbox.storage.create');
-Route::post('/sandbox/storage-manager/select', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
-Route::delete('/sandbox/storage-manager/delete', [App\Http\CoreApi\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
+Route::get('/sandbox/storage-manager', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'index'])->name('sandbox.storage-manager');
+Route::post('/sandbox/storage-manager/create', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'create'])->name('sandbox.storage.create');
+Route::post('/sandbox/storage-manager/select', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'select'])->name('sandbox.storage.select');
+Route::delete('/sandbox/storage-manager/delete', [App\Http\Controllers\Sandbox\StorageManager\Controller::class, 'delete'])->name('sandbox.storage.delete');
 
 // Query Log API
 Route::get('/api/query-logs/test', function() {
     return response()->json(['message' => 'Query log API test working']);
 })->name('api.query-logs.test');
 
-Route::get('/api/query-logs', [App\Http\CoreApi\QueryLog\GetLogs\Controller::class, '__invoke'])->name('api.query-logs.get');
-Route::get('/api/query-logs/stats', [App\Http\CoreApi\QueryLog\GetStats\Controller::class, '__invoke'])->name('api.query-logs.stats');
-Route::delete('/api/query-logs/cleanup', [App\Http\CoreApi\QueryLog\Cleanup\Controller::class, '__invoke'])->name('api.query-logs.cleanup');
+Route::get('/api/query-logs', [App\Http\Controllers\QueryLog\GetLogs\Controller::class, '__invoke'])->name('api.query-logs.get');
+Route::get('/api/query-logs/stats', [App\Http\Controllers\QueryLog\GetStats\Controller::class, '__invoke'])->name('api.query-logs.stats');
+Route::delete('/api/query-logs/cleanup', [App\Http\Controllers\QueryLog\Cleanup\Controller::class, '__invoke'])->name('api.query-logs.cleanup');
 
 // Form Creator
 Route::get('/sandbox/form-creator', function () {
@@ -937,7 +945,7 @@ Route::get('/sandbox/projects-list', function () {
 })->name('sandbox.projects-list');
 
 // 샌드박스 사용 프로젝트 목록
-Route::get('/sandbox/using-projects', [\App\Http\CoreApi\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
+Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
 
 // 자료 다운로드 페이지
 Route::get('/sandbox/downloads', function () {
