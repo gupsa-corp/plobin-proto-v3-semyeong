@@ -13,13 +13,11 @@
     // $sandboxName은 메인 라우트에서 전달받음
     $sandboxLevel = null;
     $customScreen = $customScreen ?? null;
+    $customScreenFolder = $customScreenFolder ?? ($page->custom_screen_folder ?? null);
 
-    if ($page && !empty($page->sandbox_folder)) {
-        $sandboxLevel = 'page';
-        $hasCustomScreen = !empty($page->custom_screen_settings);
-    } elseif ($project && !empty($project->sandbox_folder)) {
-        $sandboxLevel = 'project';
-    }
+    // 컨트롤러에서 전달받은 샌드박스 정보 사용
+    $sandboxInfo = $sandboxInfo ?? null;
+    $sandboxLevel = $sandboxInfo['sandbox_level'] ?? null;
 @endphp
 
 <div class="bg-white border-b border-gray-200">
@@ -62,6 +60,37 @@
 
             {{-- 헤더 우측 메뉴 --}}
             <div class="flex items-center gap-4">
+
+                {{-- Custom Screen Folder 선택 드롭다운 --}}
+                @if($page && $hasSandbox)
+                    <div class="bg-gray-50 rounded-lg shadow-sm p-3">
+                        <form action="/organizations/{{ $orgId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen" method="POST" class="flex items-center gap-3">
+                            @csrf
+                            <label for="custom_screen" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                Custom Screen:
+                            </label>
+                            <select name="custom_screen" id="custom_screen"
+                                    class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    onchange="this.form.submit()">
+                                <option value="">-- Select Custom Screen --</option>
+                                @php
+                                    // 컨트롤러에서 전달받은 커스텀 스크린 목록 사용
+                                    $availableScreens = $customScreens ?? [];
+                                @endphp
+                                @foreach($availableScreens as $screen)
+                                    <option value="{{ $screen['folder_name'] }}" {{ $customScreenFolder === $screen['folder_name'] ? 'selected' : '' }}>
+                                        {{ $screen['title'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if($customScreenFolder)
+                                <span class="text-xs text-green-600 whitespace-nowrap">
+                                    Current: {{ $customScreenFolder }}
+                                </span>
+                            @endif
+                        </form>
+                    </div>
+                @endif
 
                 {{-- 페이지 설정 드롭다운 (기존 로직 유지) --}}
                 @if($page)

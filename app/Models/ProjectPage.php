@@ -20,6 +20,9 @@ class ProjectPage extends Model
         'user_id',
         'sandbox_folder',
         'sandbox_custom_screen_folder',
+        'custom_screen_enabled',
+        'custom_screen_applied_at',
+        'template_path',
         'access_level',
         'allowed_roles',
         'sort_order',
@@ -27,6 +30,8 @@ class ProjectPage extends Model
 
     protected $casts = [
         'allowed_roles' => 'array',
+        'custom_screen_enabled' => 'boolean',
+        'custom_screen_applied_at' => 'datetime',
     ];
 
     /**

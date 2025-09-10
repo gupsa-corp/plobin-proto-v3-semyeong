@@ -8,17 +8,11 @@
                 </svg>
                 <span class="text-sm font-medium text-green-800">
                     {{ ucfirst($sandboxName) }} Sandbox
-                    @if($sandboxLevel === 'project')
-                        <span class="text-xs font-normal text-green-700">(프로젝트 레벨)</span>
-                    @endif
+                    <span class="text-xs font-normal text-green-700">(프로젝트 레벨)</span>
                 </span>
             </div>
             <div class="text-sm text-green-600">
-                @if($sandboxLevel === 'project')
-                    프로젝트 전체에 적용됨
-                @else
-                    커스텀 화면 미설정
-                @endif
+                프로젝트 전체에 적용됨
             </div>
         </div>
         <div class="flex items-center space-x-2">

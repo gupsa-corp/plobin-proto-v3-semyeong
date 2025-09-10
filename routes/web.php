@@ -109,179 +109,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', [\App\Http\Controllers\Page\UpdateTitle\Controller::class, '__invoke']);
 
     // 프로젝트 페이지 라우트들
-    Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', function ($id, $projectId, $pageId) {
-        // Fetch the organization, project, and page objects
-        $organization = \App\Models\Organization::find($id);
-        $project = \App\Models\Project::find($projectId);
-        $page = \App\Models\ProjectPage::find($pageId);
-
-        // 페이지 접근 권한 확인
-        if ($page && Auth::check()) {
-            $accessControlService = new \App\Services\AccessControlService();
-            if (!$accessControlService->canUserAccessPage(Auth::user(), $page)) {
-                abort(403, '이 페이지에 접근할 권한이 없습니다.');
-            }
-        }
-
-        // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 타입 확인
-        $sandboxName = null;
-
-        // 우선순위: 페이지 레벨 > 프로젝트 레벨
-        if ($page && !empty($page->sandbox_folder)) {
-            $sandboxName = $page->sandbox_folder;
-        } elseif ($project && !empty($project->sandbox_folder)) {
-            $sandboxName = $project->sandbox_folder;
-        }
-
-        // 커스텀 화면이 있는지 확인 (메인 데이터베이스에서)
-        $customScreen = null;
-        if (!empty($sandboxName) && $page && $page->custom_screen_enabled) {
-            try {
-                $screenId = $page->sandbox_custom_screen_folder;
-                $templatePath = $page->template_path;
-                $enabled = $page->custom_screen_enabled;
-
-                // screen_id 방식 처리 (새로운 방식)
-                if ($screenId && $enabled) {
-                    $storagePath = storage_path('sandbox/storage-sandbox-template/frontend');
-
-                    if (\File::exists($storagePath)) {
-                        $folders = \File::directories($storagePath);
-
-                        foreach ($folders as $folder) {
-                            $folderName = basename($folder);
-                            $contentFile = $folder . '/000-content.blade.php';
-
-                            // screen_id 매칭 로직 수정: template_005-screen-calendar-view => 005-screen-calendar-view
-                            $templateId = $folderName;
-
-
-                            if ($templateId === $screenId && \File::exists($contentFile)) {
-                                // 폴더명에서 화면 정보 추출
-                                $parts = explode('-', $folderName, 3);
-                                $screenName = $parts[2] ?? 'unnamed';
-
-                                // Blade 템플릿을 실제 데이터로 렌더링
-                                try {
-                                    // 임시 블레이드 파일 생성 및 렌더링
-                                    $tempViewPath = 'project-renderer-temp-' . time() . '-' . rand(1000, 9999);
-                                    $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
-
-                                    $templateContent = File::get($contentFile);
-                                    File::put($tempViewFile, $templateContent);
-
-                                    try {
-                                        // 실제 프로젝트 데이터 사용
-                                        $renderedContent = view($tempViewPath, [
-                                            'title' => $page->title ?? str_replace('-', ' ', $screenName),
-                                            'description' => $page->content ?? '프로젝트 페이지',
-                                            'organization' => $organization,
-                                            'project' => $project,
-                                            'page' => $page,
-                                            'organizations' => collect([$organization]),
-                                            'projects' => collect([$project]),
-                                            'users' => collect([]),
-                                            'activities' => collect([])
-                                        ])->render();
-                                    } catch (\Exception $e) {
-                                        $renderedContent = '<div class="p-4 bg-red-50 border border-red-200 rounded">
-                                            <h3 class="text-red-800 font-bold">템플릿 렌더링 오류</h3>
-                                            <p class="text-red-700 mt-2">' . $e->getMessage() . '</p>
-                                        </div>';
-                                    } finally {
-                                        // 임시 파일 삭제
-                                        if (File::exists($tempViewFile)) {
-                                            File::delete($tempViewFile);
-                                        }
-                                    }
-                                } catch (Exception $e) {
-                                    $renderedContent = '<div class="p-4 bg-red-50 border border-red-200 rounded">
-                                        <h3 class="text-red-800 font-bold">파일 처리 오류</h3>
-                                        <p class="text-red-700 mt-2">' . $e->getMessage() . '</p>
-                                    </div>';
-                                }
-
-                                $customScreen = [
-                                    'id' => $templateId,
-                                    'title' => $page->title ?? str_replace('-', ' ', $screenName),
-                                    'description' => $page->content ?? '프로젝트 페이지',
-                                    'type' => 'template',
-                                    'content' => $renderedContent
-                                ];
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (\Exception $e) {
-                // 커스텀 화면을 찾지 못한 경우 기본 대시보드로
-                \Log::info('커스텀 화면 로드 실패', [
-                    'pageId' => $pageId,
-                    'sandbox_folder' => $sandboxName,
-                    'sandbox_custom_screen_folder' => $page ? $page->sandbox_custom_screen_folder : null,
-                    'custom_screen_enabled' => $page ? $page->custom_screen_enabled : false,
-                    'error' => $e->getMessage()
-                ]);
-            }
-        }
-
-
-        // 커스텀 화면 목록 데이터 로드 (헤더 드롭다운용)
-        $customScreens = [];
-        if (!empty($sandboxName)) {
-            try {
-                $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
-
-                if (\File::exists($templatePath)) {
-                    $folders = \File::directories($templatePath);
-
-                    foreach ($folders as $folder) {
-                        $folderName = basename($folder);
-                        $contentFile = $folder . '/000-content.blade.php';
-
-                        if (\File::exists($contentFile)) {
-                            // 폴더명에서 화면 정보 추출
-                            $parts = explode('-', $folderName, 3);
-                            $screenId = $parts[0] ?? '000';
-                            $screenType = $parts[1] ?? 'screen';
-                            $screenName = $parts[2] ?? 'unnamed';
-
-                            $customScreens[] = [
-                                'id' => $folderName,
-                                'title' => str_replace('-', ' ', $screenName),
-                                'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
-                                'folder_name' => $folderName,
-                                'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
-                            ];
-                        }
-                    }
-                }
-
-                // 생성 날짜 기준 내림차순 정렬
-                usort($customScreens, function($a, $b) {
-                    return strcmp($a['folder_name'], $b['folder_name']);
-                });
-
-            } catch (\Exception $e) {
-                \Log::error('커스텀 화면 목록 로드 오류', ['error' => $e->getMessage(), 'sandbox_folder' => $sandboxName]);
-                $customScreens = [];
-            }
-        }
-
-        // 기존 프로젝트 대시보드 뷰를 사용하되, 커스텀 화면 데이터도 함께 전달
-        $hasSandbox = !empty($sandboxName);
-        return view('300-page-service.308-page-project-dashboard.000-index', [
-            'currentPageId' => $pageId,
-            'activeTab' => 'overview',
-            'organization' => $organization,
-            'project' => $project,
-            'page' => $page,
-            'customScreen' => $customScreen,
-            'sandboxName' => $sandboxName,
-            'hasSandbox' => $hasSandbox,
-            'customScreens' => $customScreens
-        ]);
-    })->name('project.dashboard.page');
+    Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\Controllers\ProjectPage\ShowController::class, '__invoke'])->name('project.dashboard.page');
 
     // 페이지 설정 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', function ($id, $projectId, $pageId) {
@@ -525,26 +353,6 @@ Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/na
     return view('300-page-service.309-page-settings-name.000-index', ['currentPageId' => $pageId, 'activeTab' => 'name']);
 })->name('project.dashboard.page.settings.name.post');
 
-Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', function ($id, $projectId, $pageId) {
-    // 페이지 정보 가져오기
-    $page = \App\Models\Page::where('id', $pageId)
-        ->whereHas('project', function($query) use ($projectId, $id) {
-            $query->where('id', $projectId)
-                  ->whereHas('organization', function($q) use ($id) {
-                      $q->where('id', $id);
-                  });
-        })->first();
-
-    $currentSandboxName = $page ? $page->sandbox_folder : null;
-
-    return view('300-page-service.310-page-settings-sandbox.000-index', [
-        'currentPageId' => $pageId,
-        'activeTab' => 'sandbox',
-        'currentSandboxName' => $currentSandboxName
-    ]);
-})->name('project.dashboard.page.settings.sandbox');
-
-Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/sandbox', [\App\Http\Controllers\Page\SetSandbox\Controller::class, '__invoke'])->name('project.dashboard.page.settings.sandbox.post');
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', function ($id, $projectId, $pageId) {
     $page = \App\Models\ProjectPage::where('id', $pageId)->whereHas('project', function($query) use ($projectId, $id) {
@@ -553,7 +361,7 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         });
     })->first();
 
-    $currentSandboxName = $page ? $page->sandbox_folder : null;
+    $currentSandboxName = ($page && $page->project) ? $page->project->sandbox_folder : null;
     $currentCustomScreenId = $page ? $page->sandbox_custom_screen_folder : null;
 
     // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)

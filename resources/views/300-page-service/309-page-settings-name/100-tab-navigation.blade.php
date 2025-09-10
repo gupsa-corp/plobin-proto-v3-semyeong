@@ -13,10 +13,6 @@
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.name') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 페이지 이름 변경
             </a>
-            <a href="{{ route('project.dashboard.page.settings.sandbox', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" 
-               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.sandbox') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
-                샌드박스 선택
-            </a>
             <a href="{{ route('project.dashboard.page.settings.custom-screen', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" 
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.page.settings.custom-screen') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 커스텀 화면 선택

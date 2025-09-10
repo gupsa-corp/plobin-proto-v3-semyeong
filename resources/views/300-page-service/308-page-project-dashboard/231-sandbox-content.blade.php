@@ -20,15 +20,9 @@
             @endif
         </p>
 
-        @if($sandboxLevel === 'project')
-            <p class="text-gray-500 mb-6">
-                이 설정은 프로젝트의 모든 페이지에 적용됩니다. 개별 페이지에서 다른 샌드박스를 설정할 수도 있습니다.
-            </p>
-        @else
-            <p class="text-gray-500 mb-6">
-                커스텀 화면을 추가로 설정할 수 있습니다.
-            </p>
-        @endif
+        <p class="text-gray-500 mb-6">
+            이 설정은 프로젝트의 모든 페이지에 적용됩니다. 커스텀 화면을 추가로 설정할 수 있습니다.
+        </p>
 
         <div class="space-y-3">
             <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}/pages/{{ $pageId }}/settings/custom-screen"

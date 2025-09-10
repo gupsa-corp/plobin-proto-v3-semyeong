@@ -1,38 +1,21 @@
 @php
-    // 라우트에서 전달받은 변수들 사용
-    // $organization, $project, $page 변수들이 라우트에서 전달됨
-
-    // 안전한 변수 할당 (변수가 정의되지 않은 경우 null로 처리)
+    // 컨트롤러에서 전달받은 변수들 사용
     $organization = $organization ?? null;
     $project = $project ?? null;
     $page = $page ?? null;
     $customScreen = $customScreen ?? null;
-
+    $sandboxInfo = $sandboxInfo ?? null;
+    
     $organizationId = $organization ? $organization->id : null;
     $projectId = $project ? $project->id : null;
     $pageId = $page ? $page->id : null;
 
-    // 프로젝트 레벨 또는 페이지 레벨에서 샌드박스 설정 확인
-    $hasSandbox = false;
-    $hasCustomScreen = false;
-    $sandboxName = null;
-    $sandboxLevel = null; // 'page' 또는 'project' 구분용
-    $customScreenFolder = null;
-
-    // 우선순위: 페이지 레벨 > 프로젝트 레벨
-    if ($page && !empty($page->sandbox_folder)) {
-        $sandboxName = $page->sandbox_folder;
-        $sandboxLevel = 'page';
-        $hasSandbox = true;
-        $hasCustomScreen = !empty($page->sandbox_custom_screen_folder);
-        $customScreenFolder = $page->sandbox_custom_screen_folder;
-    } elseif ($project && !empty($project->sandbox_folder)) {
-        $sandboxName = $project->sandbox_folder;
-        $sandboxLevel = 'project';
-        $hasSandbox = true;
-        $hasCustomScreen = false; // 프로젝트 레벨에서는 커스텀 화면 설정 없음
-        $customScreenFolder = null;
-    }
+    // 샌드박스 정보는 컨트롤러에서 처리된 데이터 사용
+    $hasSandbox = $sandboxInfo['has_sandbox'] ?? false;
+    $hasCustomScreen = $sandboxInfo['has_custom_screen'] ?? false;
+    $sandboxName = $sandboxInfo['sandbox_name'] ?? null;
+    $sandboxLevel = $sandboxInfo['sandbox_level'] ?? null;
+    $customScreenFolder = $sandboxInfo['custom_screen_folder'] ?? null;
 @endphp
 
 <!-- 페이지별 커스텀 콘텐츠 -->
