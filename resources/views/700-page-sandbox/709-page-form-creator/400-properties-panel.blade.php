@@ -105,6 +105,11 @@
                             <input type="checkbox" id="prop-hidden" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
                             <label for="prop-hidden" class="ml-2 text-sm text-gray-700">Hidden</label>
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line)</label>
+                            <textarea id="prop-options" class="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                        </div>
                     </div>
                 </div>
                 

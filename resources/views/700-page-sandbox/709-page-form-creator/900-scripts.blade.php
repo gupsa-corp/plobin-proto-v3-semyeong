@@ -461,7 +461,7 @@ $(document).ready(function() {
                     </div>
                     <fieldset>
                         <legend class="component-label text-sm font-medium text-gray-700 mb-2">Radio Group</legend>
-                        <div class="space-y-2">
+                        <div class="component-radios space-y-2">
                             <div class="flex items-center">
                                 <input type="radio" name="${componentId}_radio" class="h-4 w-4 text-blue-600 border-gray-300" value="option1">
                                 <label class="ml-2 text-sm text-gray-700">Option 1</label>
@@ -556,9 +556,102 @@ $(document).ready(function() {
     }
     
     /**
+     * Convert RGB color to hex format
+     */
+    function rgbToHex(rgb) {
+        if (!rgb) return '';
+        
+        // If already hex format, return as is
+        if (rgb.startsWith('#')) return rgb;
+        
+        // If RGB format, convert to hex
+        if (rgb.startsWith('rgb(')) {
+            const matches = rgb.match(/\d+/g);
+            if (matches && matches.length >= 3) {
+                const r = parseInt(matches[0]);
+                const g = parseInt(matches[1]);
+                const b = parseInt(matches[2]);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            }
+        }
+        
+        return rgb;
+    }
+
+    /**
+     * Component property definitions - which properties each component type should show
+     */
+    const componentPropertyDefinitions = {
+        input: {
+            main: ['label', 'name', 'placeholder', 'description', 'required', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onclick', 'onchange'],
+            rules: ['ruleRequired', 'ruleMinLength', 'ruleMaxLength', 'rulePattern', 'ruleNumeric', 'ruleEmail', 'ruleErrorMessage']
+        },
+        button: {
+            main: ['label', 'text', 'button-type', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onclick'],
+            rules: []
+        },
+        header: {
+            main: ['text', 'level', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: [],
+            rules: []
+        },
+        textarea: {
+            main: ['label', 'name', 'placeholder', 'description', 'rows', 'required', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onclick', 'onchange'],
+            rules: ['ruleRequired', 'ruleMinLength', 'ruleMaxLength', 'rulePattern', 'ruleErrorMessage']
+        },
+        dropdown: {
+            main: ['label', 'name', 'options', 'required', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onchange'],
+            rules: ['ruleRequired', 'ruleErrorMessage']
+        },
+        checkbox: {
+            main: ['label', 'name', 'value', 'required', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onchange'],
+            rules: ['ruleRequired', 'ruleErrorMessage']
+        },
+        radiogroup: {
+            main: ['label', 'name', 'options', 'required', 'disabled', 'hidden'],
+            style: ['width', 'margin-top', 'margin-bottom', 'padding-x', 'padding-y', 'bg-color', 'text-color', 'border-style', 'border-width', 'border-color'],
+            actions: ['onchange'],
+            rules: ['ruleRequired', 'ruleErrorMessage']
+        }
+    };
+
+    /**
+     * Show/hide property fields based on component type
+     */
+    function showRelevantProperties(componentType) {
+        const definitions = componentPropertyDefinitions[componentType] || {};
+        
+        // Hide all property fields first
+        $('[id^="prop-"]').closest('div').hide();
+        
+        // Show only relevant fields for each tab
+        Object.keys(definitions).forEach(tab => {
+            const fields = definitions[tab];
+            fields.forEach(fieldId => {
+                $(`#prop-${fieldId}`).closest('div').show();
+            });
+        });
+        
+        console.log('=== Showing properties for:', componentType, definitions);
+    }
+
+    /**
      * Fill component properties based on type
      */
     function fillComponentProperties($component, componentType) {
+        // Show only relevant properties for this component type
+        showRelevantProperties(componentType);
         const componentId = $component.attr('id');
         
         // Get saved properties from formData
@@ -583,11 +676,11 @@ $(document).ready(function() {
         $('#prop-margin-bottom').val(savedProperties.marginBottom || 0);
         $('#prop-padding-x').val(savedProperties.paddingX || 0);
         $('#prop-padding-y').val(savedProperties.paddingY || 0);
-        $('#prop-bg-color').val(savedProperties.bgColor || '#ffffff');
-        $('#prop-text-color').val(savedProperties.textColor || '#000000');
+        $('#prop-bg-color').val(rgbToHex(savedProperties.bgColor) || '#ffffff');
+        $('#prop-text-color').val(rgbToHex(savedProperties.textColor) || '#000000');
         $('#prop-border-style').val(savedProperties.borderStyle || 'none');
         $('#prop-border-width').val(savedProperties.borderWidth || 0);
-        $('#prop-border-color').val(savedProperties.borderColor || '#000000');
+        $('#prop-border-color').val(rgbToHex(savedProperties.borderColor) || '#000000');
         
         // Component-specific properties
         $('#prop-level').val(savedProperties.level || 'h2');
@@ -603,6 +696,7 @@ $(document).ready(function() {
     function applyComponentProperties() {
         if (!selectedComponent) return;
         
+        const componentId = selectedComponent.attr('id');
         const componentType = selectedComponent.data('type');
         const label = $('#prop-label').val();
         const placeholder = $('#prop-placeholder').val();
@@ -653,6 +747,47 @@ $(document).ready(function() {
                     .prop('disabled', !!disabled)
                     .toggleClass('hidden', !!hidden);
                 break;
+            case 'dropdown':
+                selectedComponent.find('.component-label').text(label);
+                const options = $('#prop-options').val().split('\n').filter(opt => opt.trim());
+                const select = selectedComponent.find('.component-select');
+                select.empty();
+                select.append('<option value="">Select an option...</option>');
+                options.forEach(option => {
+                    select.append(`<option value="${option.trim()}">${option.trim()}</option>`);
+                });
+                select.attr('name', name || '')
+                    .prop('required', !!required)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
+                break;
+            case 'checkbox':
+                selectedComponent.find('.component-label').text(label);
+                selectedComponent.find('.component-checkbox')
+                    .attr('name', name || '')
+                    .attr('value', $('#prop-value').val())
+                    .prop('required', !!required)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
+                break;
+            case 'radiogroup':
+                selectedComponent.find('.component-label').text(label);
+                const radioOptions = $('#prop-options').val().split('\n').filter(opt => opt.trim());
+                const radioContainer = selectedComponent.find('.component-radios');
+                radioContainer.empty();
+                radioOptions.forEach((option, index) => {
+                    const radioId = `${componentId}_radio_${index}`;
+                    radioContainer.append(`
+                        <div class="flex items-center">
+                            <input type="radio" id="${radioId}" name="${name || 'radio_group'}" value="${option.trim()}" class="h-4 w-4 text-blue-600 border-gray-300">
+                            <label for="${radioId}" class="ml-2 text-sm text-gray-700">${option.trim()}</label>
+                        </div>
+                    `);
+                });
+                selectedComponent.prop('required', !!required)
+                    .prop('disabled', !!disabled)
+                    .toggleClass('hidden', !!hidden);
+                break;
         }
         
         // Apply style to only this component's card
@@ -681,19 +816,11 @@ $(document).ready(function() {
         }
         
         // Update form data with current properties
-        const componentId = selectedComponent.attr('id');
         const componentIndex = formData.components.findIndex(comp => comp.id === componentId);
         
         if (componentIndex !== -1) {
-            // Create properties object with all current values
-            const properties = {
-                label: label,
-                name: name,
-                placeholder: placeholder,
-                description: $('#prop-description').val(),
-                required: required,
-                disabled: disabled,
-                hidden: hidden,
+            // Create properties object based on component type
+            let properties = {
                 width: width,
                 marginTop: marginTop,
                 marginBottom: marginBottom,
@@ -704,18 +831,86 @@ $(document).ready(function() {
                 borderStyle: borderStyle,
                 borderWidth: borderWidth,
                 borderColor: borderColor,
-                text: $('#prop-text').val(),
-                level: $('#prop-level').val(),
-                rows: parseInt($('#prop-rows').val() || 4, 10),
-                value: $('#prop-value').val(),
-                options: $('#prop-options').val(),
-                type: $('#prop-button-type').val()
+                hidden: hidden
             };
+            
+            // Add component-specific properties
+            switch(componentType) {
+                case 'input':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        name: name,
+                        placeholder: placeholder,
+                        description: $('#prop-description').val(),
+                        required: required,
+                        disabled: disabled
+                    };
+                    break;
+                case 'button':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        text: $('#prop-text').val(),
+                        type: $('#prop-button-type').val(),
+                        disabled: disabled
+                    };
+                    break;
+                case 'header':
+                    properties = {
+                        ...properties,
+                        text: $('#prop-text').val(),
+                        level: $('#prop-level').val()
+                    };
+                    break;
+                case 'textarea':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        name: name,
+                        placeholder: placeholder,
+                        description: $('#prop-description').val(),
+                        rows: parseInt($('#prop-rows').val() || 4, 10),
+                        required: required,
+                        disabled: disabled
+                    };
+                    break;
+                case 'dropdown':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        name: name,
+                        options: $('#prop-options').val(),
+                        required: required,
+                        disabled: disabled
+                    };
+                    break;
+                case 'checkbox':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        name: name,
+                        value: $('#prop-value').val(),
+                        required: required,
+                        disabled: disabled
+                    };
+                    break;
+                case 'radiogroup':
+                    properties = {
+                        ...properties,
+                        label: label,
+                        name: name,
+                        options: $('#prop-options').val(),
+                        required: required,
+                        disabled: disabled
+                    };
+                    break;
+            }
             
             // Update formData
             formData.components[componentIndex].properties = properties;
             
-            console.log('=== Properties saved to formData for:', componentId, properties);
+            console.log('=== Properties saved to formData for:', componentId, componentType, properties);
         }
         
         // Show success message
