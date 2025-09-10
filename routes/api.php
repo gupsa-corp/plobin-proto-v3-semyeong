@@ -22,7 +22,6 @@ use App\Http\Controllers\Organization\GetOrganization\Controller as GetOrganizat
 use App\Http\Controllers\Organization\UpdateOrganization\Controller as UpdateOrganizationController;
 use App\Http\Controllers\Organization\DeleteOrganization\Controller as DeleteOrganizationController;
 use App\Http\Controllers\Organization\CheckUrlPath\Controller as CheckUrlPathController;
-use App\Http\Controllers\ProjectPage\Index\Controller as ProjectPageIndexController;
 use App\Http\Controllers\ProjectPage\Store\Controller as ProjectPageStoreController;
 use App\Http\Controllers\ProjectPage\Show\Controller as ProjectPageShowController;
 use App\Http\Controllers\ProjectPage\Update\Controller as ProjectPageUpdateController;
@@ -140,7 +139,6 @@ Route::prefix('organizations')->group(function () {
 
 // 프로젝트 페이지 관리 API (개발용 - 인증 제거)
 Route::prefix('projects')->group(function () {
-    Route::get('/{project}/pages', ProjectPageIndexController::class);
     Route::post('/{project}/pages', ProjectPageStoreController::class);
     Route::get('/{project}/pages/{page}', ProjectPageShowController::class);
     Route::put('/{project}/pages/{page}', ProjectPageUpdateController::class);
