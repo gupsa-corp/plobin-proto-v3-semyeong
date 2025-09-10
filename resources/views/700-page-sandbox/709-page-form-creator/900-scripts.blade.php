@@ -559,23 +559,42 @@ $(document).ready(function() {
      * Fill component properties based on type
      */
     function fillComponentProperties($component, componentType) {
-        switch(componentType) {
-            case 'input':
-                $('#prop-label').val($component.find('.component-label').text());
-                $('#prop-placeholder').val($component.find('.component-input').attr('placeholder'));
-                break;
-            case 'button':
-                $('#prop-label').val($component.find('.component-button').text());
-                break;
-            case 'header':
-                $('#prop-label').val($component.find('.component-header').text());
-                break;
-            case 'textarea':
-                $('#prop-label').val($component.find('.component-label').text());
-                $('#prop-placeholder').val($component.find('.component-textarea').attr('placeholder'));
-                break;
-            // Add more cases as needed
-        }
+        const componentId = $component.attr('id');
+        
+        // Get saved properties from formData
+        const componentData = formData.components.find(comp => comp.id === componentId);
+        const savedProperties = componentData ? componentData.properties : {};
+        
+        console.log('=== Loading properties for:', componentId, savedProperties);
+        
+        // Fill all property fields with saved values or defaults
+        $('#prop-label').val(savedProperties.label || '');
+        $('#prop-text').val(savedProperties.text || '');
+        $('#prop-name').val(savedProperties.name || '');
+        $('#prop-placeholder').val(savedProperties.placeholder || '');
+        $('#prop-description').val(savedProperties.description || '');
+        $('#prop-required').prop('checked', !!savedProperties.required);
+        $('#prop-disabled').prop('checked', !!savedProperties.disabled);
+        $('#prop-hidden').prop('checked', !!savedProperties.hidden);
+        
+        // Style properties
+        $('#prop-width').val(savedProperties.width || 'full');
+        $('#prop-margin-top').val(savedProperties.marginTop || 0);
+        $('#prop-margin-bottom').val(savedProperties.marginBottom || 0);
+        $('#prop-padding-x').val(savedProperties.paddingX || 0);
+        $('#prop-padding-y').val(savedProperties.paddingY || 0);
+        $('#prop-bg-color').val(savedProperties.bgColor || '#ffffff');
+        $('#prop-text-color').val(savedProperties.textColor || '#000000');
+        $('#prop-border-style').val(savedProperties.borderStyle || 'none');
+        $('#prop-border-width').val(savedProperties.borderWidth || 0);
+        $('#prop-border-color').val(savedProperties.borderColor || '#000000');
+        
+        // Component-specific properties
+        $('#prop-level').val(savedProperties.level || 'h2');
+        $('#prop-rows').val(savedProperties.rows || 4);
+        $('#prop-value').val(savedProperties.value || '');
+        $('#prop-options').val(savedProperties.options || '');
+        $('#prop-button-type').val(savedProperties.type || 'button');
     }
     
     /**
@@ -661,8 +680,43 @@ $(document).ready(function() {
             });
         }
         
-        // Update form data
-        updateFormData();
+        // Update form data with current properties
+        const componentId = selectedComponent.attr('id');
+        const componentIndex = formData.components.findIndex(comp => comp.id === componentId);
+        
+        if (componentIndex !== -1) {
+            // Create properties object with all current values
+            const properties = {
+                label: label,
+                name: name,
+                placeholder: placeholder,
+                description: $('#prop-description').val(),
+                required: required,
+                disabled: disabled,
+                hidden: hidden,
+                width: width,
+                marginTop: marginTop,
+                marginBottom: marginBottom,
+                paddingX: paddingX,
+                paddingY: paddingY,
+                bgColor: bgColor,
+                textColor: textColor,
+                borderStyle: borderStyle,
+                borderWidth: borderWidth,
+                borderColor: borderColor,
+                text: $('#prop-text').val(),
+                level: $('#prop-level').val(),
+                rows: parseInt($('#prop-rows').val() || 4, 10),
+                value: $('#prop-value').val(),
+                options: $('#prop-options').val(),
+                type: $('#prop-button-type').val()
+            };
+            
+            // Update formData
+            formData.components[componentIndex].properties = properties;
+            
+            console.log('=== Properties saved to formData for:', componentId, properties);
+        }
         
         // Show success message
         showNotification('Properties applied successfully', 'success');

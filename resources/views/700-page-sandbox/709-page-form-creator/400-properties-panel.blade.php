@@ -87,7 +87,7 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <label class="block text-sm fonㄴt-medium text-gray-700 mb-1">Description</label>
                             <textarea id="prop-description" class="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" rows="3" placeholder="Enter description..."></textarea>
                         </div>
                         
@@ -139,12 +139,12 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
-                            <input type="color" id="prop-bg-color" class="w-full h-10 border border-gray-300 rounded-md">
+                            <input type="color" id="prop-bg-color" class="w-full h-10 border border-gray-300 rounded-md" value="#ffffff">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
-                            <input type="color" id="prop-text-color" class="w-full h-10 border border-gray-300 rounded-md">
+                            <input type="color" id="prop-text-color" class="w-full h-10 border border-gray-300 rounded-md" value="#000000">
                         </div>
                         
                         <div>
@@ -157,7 +157,7 @@
                                     <option value="dotted">Dotted</option>
                                 </select>
                                 <input type="number" id="prop-border-width" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Border width" min="0">
-                                <input type="color" id="prop-border-color" class="w-full h-8 border border-gray-300 rounded-md">
+                                <input type="color" id="prop-border-color" class="w-full h-8 border border-gray-300 rounded-md" value="#000000">
                             </div>
                         </div>
                     </div>
