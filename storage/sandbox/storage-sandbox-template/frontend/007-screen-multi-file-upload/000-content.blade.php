@@ -1,5 +1,5 @@
 {{-- 샌드박스 다중 파일 업로드 템플릿 --}}
-<?php 
+<?php
     $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
     require_once $commonPath;
     $screenInfo = getCurrentScreenInfo();

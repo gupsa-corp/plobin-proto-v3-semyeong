@@ -1,5 +1,5 @@
 {{-- 샌드박스 업로드 파일 리스트 템플릿 --}}
-<?php 
+<?php
     $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
     require_once $commonPath;
     $screenInfo = getCurrentScreenInfo();
@@ -175,7 +175,7 @@
                 </svg>
             </button>
         </div>
-        
+
         <!-- 업로드 영역 -->
         <div class="mb-6">
             <!-- 드래그 앤 드롭 영역 -->
@@ -193,11 +193,11 @@
                     <p class="text-sm text-gray-500">최대 10MB, 모든 파일 형식 지원</p>
                 </div>
             </div>
-            
+
             <!-- 파일 입력 -->
             <input type="file" id="file-input" multiple style="display: none;">
         </div>
-        
+
         <!-- 선택된 파일 목록 -->
         <div id="selected-files" class="mb-6" style="display: none;">
             <h4 class="text-md font-medium text-gray-900 mb-3">선택된 파일</h4>
@@ -205,7 +205,7 @@
                 <!-- 선택된 파일들이 여기에 표시됩니다 -->
             </div>
         </div>
-        
+
         <!-- 업로드 진행률 -->
         <div id="upload-progress" class="mb-6" style="display: none;">
             <div class="flex justify-between items-center mb-2">
@@ -216,12 +216,12 @@
                 <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
         </div>
-        
+
         <!-- 업로드 결과 메시지 -->
         <div id="upload-messages" class="mb-6">
             <!-- 성공/실패 메시지가 여기에 표시됩니다 -->
         </div>
-        
+
         <!-- 버튼들 -->
         <div class="flex justify-end space-x-3">
             <button type="button" onclick="closeUploadModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
@@ -561,7 +561,7 @@ function updateStats(allFiles) {
     const totalSizeStat = document.getElementById('total-size-stat');
     const imageFilesStat = document.getElementById('image-files-stat');
     const documentFilesStat = document.getElementById('document-files-stat');
-    
+
     if (totalFilesStat) {
         totalFilesStat.textContent = allFiles.length;
     }
@@ -621,7 +621,7 @@ async function downloadFile(fileId) {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            
+
             showNotification('파일 다운로드가 시작되었습니다.', 'success');
         } else {
             // API를 통한 다운로드 시도
@@ -837,23 +837,23 @@ function resetUploadModal() {
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('file-input');
     const dropZone = document.getElementById('drop-zone');
-    
+
     // 파일 입력 변경 이벤트
     fileInput.addEventListener('change', function(e) {
         handleFileSelection(e.target.files);
     });
-    
+
     // 드래그 앤 드롭 이벤트
     dropZone.addEventListener('dragover', function(e) {
         e.preventDefault();
         dropZone.classList.add('border-blue-400', 'bg-blue-50');
     });
-    
+
     dropZone.addEventListener('dragleave', function(e) {
         e.preventDefault();
         dropZone.classList.remove('border-blue-400', 'bg-blue-50');
     });
-    
+
     dropZone.addEventListener('drop', function(e) {
         e.preventDefault();
         dropZone.classList.remove('border-blue-400', 'bg-blue-50');
@@ -872,14 +872,14 @@ function handleFileSelection(files) {
 function displaySelectedFiles() {
     const selectedFilesDiv = document.getElementById('selected-files');
     const fileListDiv = document.getElementById('file-list');
-    
+
     if (selectedFiles.length === 0) {
         selectedFilesDiv.style.display = 'none';
         return;
     }
-    
+
     selectedFilesDiv.style.display = 'block';
-    
+
     const fileListHtml = selectedFiles.map((file, index) => `
         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
             <div class="flex items-center space-x-3">
@@ -898,7 +898,7 @@ function displaySelectedFiles() {
             </button>
         </div>
     `).join('');
-    
+
     fileListDiv.innerHTML = fileListHtml;
 }
 
@@ -919,9 +919,9 @@ function getFileIconByName(fileName) {
         'mp4': 'text-purple-500', 'mp3': 'text-blue-500',
         'zip': 'text-yellow-500', 'rar': 'text-yellow-500'
     };
-    
+
     const iconClass = iconClasses[extension] || 'text-gray-500';
-    
+
     return `<svg class="h-6 w-6 ${iconClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
     </svg>`;
@@ -931,7 +931,7 @@ function getFileIconByName(fileName) {
 function updateProgressBar(percent) {
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
-    
+
     progressBar.style.width = percent + '%';
     progressText.textContent = Math.round(percent) + '%';
 }
@@ -939,43 +939,43 @@ function updateProgressBar(percent) {
 // 파일 업로드 실행
 async function uploadFiles() {
     if (selectedFiles.length === 0 || isUploading) return;
-    
+
     isUploading = true;
     document.getElementById('upload-btn').disabled = true;
     document.getElementById('upload-progress').style.display = 'block';
     document.getElementById('upload-messages').innerHTML = '';
-    
+
     const totalFiles = selectedFiles.length;
     let completedFiles = 0;
     const results = [];
-    
+
     try {
         // 각 파일을 순차적으로 업로드
         for (let i = 0; i < selectedFiles.length; i++) {
             const file = selectedFiles[i];
-            
+
             try {
                 const result = await uploadSingleFile(file);
                 results.push({ file: file.name, success: true, message: '업로드 완료' });
             } catch (error) {
                 results.push({ file: file.name, success: false, message: error.message });
             }
-            
+
             completedFiles++;
             const progress = (completedFiles / totalFiles) * 100;
             updateProgressBar(progress);
         }
-        
+
         // 결과 표시
         displayUploadResults(results);
-        
+
         // 성공한 파일이 있으면 파일 목록 새로고침
         if (results.some(r => r.success)) {
             setTimeout(() => {
                 loadFiles(); // 파일 목록 새로고침
             }, 1000);
         }
-        
+
     } catch (error) {
         showNotification('업로드 중 오류가 발생했습니다: ' + error.message, 'error');
     } finally {
@@ -989,7 +989,7 @@ async function uploadFiles() {
 async function uploadSingleFile(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     const response = await fetch('/api/sandbox/file-upload', {
         method: 'POST',
         headers: {
@@ -997,17 +997,17 @@ async function uploadSingleFile(file) {
         },
         body: formData
     });
-    
+
     if (!response.ok) {
         // 응답 텍스트를 확인하여 디버깅
         const responseText = await response.text();
         console.error('Upload error response:', responseText);
         throw new Error(`업로드 실패: ${response.status} - ${responseText.substring(0, 100)}`);
     }
-    
+
     const responseText = await response.text();
     console.log('Upload response:', responseText);
-    
+
     let result;
     try {
         result = JSON.parse(responseText);
@@ -1016,11 +1016,11 @@ async function uploadSingleFile(file) {
         console.error('Response was:', responseText);
         throw new Error(`서버 응답 형식 오류: ${responseText.substring(0, 100)}`);
     }
-    
+
     if (!result.success) {
         throw new Error(result.message || '업로드 실패');
     }
-    
+
     return result;
 }
 
@@ -1029,9 +1029,9 @@ function displayUploadResults(results) {
     const messagesDiv = document.getElementById('upload-messages');
     const successCount = results.filter(r => r.success).length;
     const failCount = results.length - successCount;
-    
+
     let html = '';
-    
+
     if (successCount > 0) {
         html += `<div class="p-3 bg-green-100 border border-green-200 rounded-md">
             <div class="flex">
@@ -1046,7 +1046,7 @@ function displayUploadResults(results) {
             </div>
         </div>`;
     }
-    
+
     if (failCount > 0) {
         html += `<div class="p-3 bg-red-100 border border-red-200 rounded-md mt-2">
             <div class="flex">
@@ -1064,7 +1064,7 @@ function displayUploadResults(results) {
             </div>
         </div>`;
     }
-    
+
     messagesDiv.innerHTML = html;
 }
 </script>

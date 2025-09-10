@@ -455,21 +455,21 @@ class Controller extends \App\Http\Controllers\Controller
         try {
             $downloadsDir = storage_path('sandbox/storage-sandbox-template/downloads');
             $files = [];
-            
+
             if (is_dir($downloadsDir)) {
                 $iterator = new \RecursiveIteratorIterator(
                     new \RecursiveDirectoryIterator($downloadsDir, \RecursiveDirectoryIterator::SKIP_DOTS)
                 );
-                
+
                 $id = 1;
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
                         $relativePath = str_replace($downloadsDir . '/', '', $file->getPathname());
                         $mimeType = $this->getMimeTypeFromFile($file->getPathname());
-                        
+
                         // 다운로드 URL 생성
                         $downloadUrl = url('/sandbox/storage-sandbox-template/downloads/' . $relativePath);
-                        
+
                         $files[] = [
                             'id' => $id++,
                             'original_name' => $file->getFilename(),
@@ -484,19 +484,19 @@ class Controller extends \App\Http\Controllers\Controller
                     }
                 }
             }
-            
+
             // 최신순으로 정렬
             usort($files, function($a, $b) {
                 return strtotime($b['uploaded_at']) - strtotime($a['uploaded_at']);
             });
-            
+
             // 검색 필터
             if (!empty($params['search'])) {
                 $files = array_filter($files, function($file) use ($params) {
                     return stripos($file['original_name'], $params['search']) !== false;
                 });
             }
-            
+
             // 타입 필터
             if (!empty($params['type'])) {
                 $files = array_filter($files, function($file) use ($params) {
@@ -504,7 +504,7 @@ class Controller extends \App\Http\Controllers\Controller
                     return $category === $params['type'];
                 });
             }
-            
+
             // 정렬 적용
             $sortBy = $params['sort'] ?? 'uploaded_at_desc';
             switch ($sortBy) {
@@ -524,7 +524,7 @@ class Controller extends \App\Http\Controllers\Controller
                     usort($files, function($a, $b) { return $b['file_size'] - $a['file_size']; });
                     break;
             }
-            
+
             // 페이지네이션
             $perPage = $params['per_page'] ?? 10;
             $page = $params['page'] ?? 1;
@@ -532,7 +532,7 @@ class Controller extends \App\Http\Controllers\Controller
             $totalPages = ceil($total / $perPage);
             $offset = ($page - 1) * $perPage;
             $pagedFiles = array_slice($files, $offset, $perPage);
-            
+
             return [
                 'files' => array_values($pagedFiles), // reindex array
                 'total' => $total,
@@ -540,7 +540,7 @@ class Controller extends \App\Http\Controllers\Controller
                 'current_page' => $page,
                 'per_page' => $perPage
             ];
-            
+
         } catch (\Exception $e) {
             Log::error('getSandboxDownloadFiles error: ' . $e->getMessage());
             return [
@@ -561,7 +561,7 @@ class Controller extends \App\Http\Controllers\Controller
         if (function_exists('mime_content_type')) {
             return mime_content_type($filePath);
         }
-        
+
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         $mimeTypes = [
             'pdf' => 'application/pdf',
@@ -581,7 +581,7 @@ class Controller extends \App\Http\Controllers\Controller
             'mp3' => 'audio/mpeg',
             'wav' => 'audio/wav'
         ];
-        
+
         return $mimeTypes[$extension] ?? 'application/octet-stream';
     }
 
@@ -596,7 +596,7 @@ class Controller extends \App\Http\Controllers\Controller
         if ($mimeType === 'application/pdf') return 'pdf';
         if (strpos($mimeType, 'document') !== false || strpos($mimeType, 'text') !== false) return 'document';
         if (strpos($mimeType, 'zip') !== false || strpos($mimeType, 'rar') !== false) return 'archive';
-        
+
         return 'other';
     }
 
