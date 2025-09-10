@@ -208,24 +208,6 @@ window.currentSandboxType = @json($currentSandboxType ?? '');
                                     </label>
                                 </div>
                             </template>
-
-                            <!-- 샌드박스로 이동해서 새 화면 만들기 및 템플릿 선택 -->
-                            <div class="space-y-3">
-                                <!-- 새 화면 만들기 -->
-                                <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-lg">
-                                    <div class="flex-1">
-                                        <div class="font-medium text-gray-700">새 커스텀 화면 만들기</div>
-                                        <div class="text-sm text-gray-500">샌드박스에서 새로운 커스텀 화면을 생성할 수 있습니다.</div>
-                                    </div>
-                                    <a href="/sandbox/custom-screen-creator" target="_blank"
-                                       class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                        </svg>
-                                        생성하기
-                                    </a>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </form>
