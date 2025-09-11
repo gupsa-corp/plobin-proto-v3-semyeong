@@ -190,6 +190,24 @@ $(document).ready(function() {
         $('#btn-save').click(saveForm);
         $('#btn-export').click(exportForm);
         $('#btn-clear').click(clearForm);
+        $('#btn-preview').click(togglePreview);
+        
+        // Preview panel actions
+        $('#close-preview').click(hidePreview);
+        
+        // Close preview when clicking on background
+        $('#preview-container').click(function(e) {
+            if (e.target === this) {
+                hidePreview();
+            }
+        });
+        
+        // Close preview with ESC key
+        $(document).keyup(function(e) {
+            if (e.keyCode === 27 && !$('#preview-container').hasClass('hidden')) {
+                hidePreview();
+            }
+        });
         
         // Header actions
         $('#btn-form-manager').click(showFormManager);
@@ -515,9 +533,9 @@ $(document).ready(function() {
             button: { label: 'Button', text: 'Button', type: 'button' },
             header: { text: 'Header Text', level: 'h2' },
             textarea: { label: 'Text Area', name: 'text_area', placeholder: 'Enter text...', rows: 4 },
-            dropdown: { label: 'Dropdown', name: 'dropdown', options: ['Option 1', 'Option 2', 'Option 3'] },
+            dropdown: { label: 'Dropdown', name: 'dropdown', options: 'Option 1\nOption 2\nOption 3' },
             checkbox: { label: 'Checkbox Option', name: 'checkbox', value: 'option' },
-            radiogroup: { label: 'Radio Group', name: 'radio_group', options: ['Option 1', 'Option 2', 'Option 3'] }
+            radiogroup: { label: 'Radio Group', name: 'radio_group', options: 'Option 1\nOption 2\nOption 3' }
         };
         
         return defaults[componentType] || { label: componentType, name: componentType };
@@ -642,8 +660,6 @@ $(document).ready(function() {
                 $(`#prop-${fieldId}`).closest('div').show();
             });
         });
-        
-        console.log('=== Showing properties for:', componentType, definitions);
     }
 
     /**
@@ -657,8 +673,6 @@ $(document).ready(function() {
         // Get saved properties from formData
         const componentData = formData.components.find(comp => comp.id === componentId);
         const savedProperties = componentData ? componentData.properties : {};
-        
-        console.log('=== Loading properties for:', componentId, savedProperties);
         
         // Fill all property fields with saved values or defaults
         $('#prop-label').val(savedProperties.label || '');
@@ -909,8 +923,6 @@ $(document).ready(function() {
             
             // Update formData
             formData.components[componentIndex].properties = properties;
-            
-            console.log('=== Properties saved to formData for:', componentId, componentType, properties);
         }
         
         // Show success message
@@ -966,14 +978,14 @@ $(document).ready(function() {
      */
     function hideEmptyState() {
         $('#empty-state').hide();
-        $('#form-components').show();
+        $('#form-components').removeClass('hidden').show();
     }
     
     /**
      * Show empty state
      */
     function showEmptyState() {
-        $('#form-components').hide();
+        $('#form-components').addClass('hidden').hide();
         $('#empty-state').show();
     }
     
@@ -1123,6 +1135,9 @@ $(document).ready(function() {
         
         updateComponentCount();
         $('#form-status').text('Loaded');
+        
+        // Hide preview when loading new form
+        hidePreview();
     }
     
     /**
@@ -1165,6 +1180,9 @@ $(document).ready(function() {
         // Apply saved properties
         const $component = $('#' + componentId);
         applyComponentDataToElement($component, componentData);
+        
+        // Hide empty state when adding components
+        hideEmptyState();
     }
     
     /**
@@ -1198,6 +1216,53 @@ $(document).ready(function() {
                 if (properties.required !== undefined) $component.find('.component-textarea').prop('required', !!properties.required);
                 if (properties.disabled !== undefined) $component.find('.component-textarea').prop('disabled', !!properties.disabled);
                 if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
+                break;
+            case 'dropdown':
+                if (properties.label) $component.find('.component-label').text(properties.label);
+                if (properties.name !== undefined) $component.find('.component-select').attr('name', properties.name);
+                if (properties.required !== undefined) $component.find('.component-select').prop('required', !!properties.required);
+                if (properties.disabled !== undefined) $component.find('.component-select').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
+                if (properties.options) {
+                    const options = properties.options.split('\n').filter(opt => opt.trim());
+                    const select = $component.find('.component-select');
+                    select.empty();
+                    select.append('<option value="">Select an option...</option>');
+                    options.forEach(option => {
+                        select.append(`<option value="${option.trim()}">${option.trim()}</option>`);
+                    });
+                }
+                break;
+            case 'checkbox':
+                if (properties.label) $component.find('.component-label').text(properties.label);
+                if (properties.name !== undefined) $component.find('.component-checkbox').attr('name', properties.name);
+                if (properties.value !== undefined) $component.find('.component-checkbox').attr('value', properties.value);
+                if (properties.required !== undefined) $component.find('.component-checkbox').prop('required', !!properties.required);
+                if (properties.disabled !== undefined) $component.find('.component-checkbox').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
+                break;
+            case 'radiogroup':
+                if (properties.label) $component.find('.component-label').text(properties.label);
+                if (properties.name !== undefined) {
+                    $component.find('input[type="radio"]').attr('name', properties.name);
+                }
+                if (properties.required !== undefined) $component.prop('required', !!properties.required);
+                if (properties.disabled !== undefined) $component.find('input[type="radio"]').prop('disabled', !!properties.disabled);
+                if (properties.hidden !== undefined) $component.toggleClass('hidden', !!properties.hidden);
+                if (properties.options) {
+                    const options = properties.options.split('\n').filter(opt => opt.trim());
+                    const radioContainer = $component.find('.component-radios');
+                    radioContainer.empty();
+                    options.forEach((option, index) => {
+                        const radioId = `${componentData.id}_radio_${index}`;
+                        radioContainer.append(`
+                            <div class="flex items-center">
+                                <input type="radio" id="${radioId}" name="${properties.name || 'radio_group'}" value="${option.trim()}" class="h-4 w-4 text-blue-600 border-gray-300">
+                                <label for="${radioId}" class="ml-2 text-sm text-gray-700">${option.trim()}</label>
+                            </div>
+                        `);
+                    });
+                }
                 break;
         }
 
@@ -1292,6 +1357,48 @@ $(document).ready(function() {
                 properties.disabled = $component.find('.component-textarea').prop('disabled') || false;
                 properties.hidden = $component.hasClass('hidden');
                 break;
+            case 'dropdown':
+                properties.label = $component.find('.component-label').text();
+                properties.name = $component.find('.component-select').attr('name') || '';
+                properties.required = $component.find('.component-select').prop('required') || false;
+                properties.disabled = $component.find('.component-select').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
+                // Extract options from select element
+                const selectOptions = [];
+                $component.find('.component-select option').each(function() {
+                    const value = $(this).val();
+                    const text = $(this).text();
+                    if (value && value !== '') {
+                        selectOptions.push(text);
+                    }
+                });
+                properties.options = selectOptions.join('\n');
+                break;
+            case 'checkbox':
+                properties.label = $component.find('.component-label').text();
+                properties.name = $component.find('.component-checkbox').attr('name') || '';
+                properties.value = $component.find('.component-checkbox').attr('value') || '';
+                properties.required = $component.find('.component-checkbox').prop('required') || false;
+                properties.disabled = $component.find('.component-checkbox').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
+                break;
+            case 'radiogroup':
+                properties.label = $component.find('.component-label').text();
+                properties.name = $component.find('input[type="radio"]').attr('name') || '';
+                properties.required = $component.prop('required') || false;
+                properties.disabled = $component.find('input[type="radio"]').prop('disabled') || false;
+                properties.hidden = $component.hasClass('hidden');
+                // Extract options from radio buttons
+                const radioOptions = [];
+                $component.find('input[type="radio"]').each(function() {
+                    const value = $(this).val();
+                    const text = $(this).next('label').text();
+                    if (value && text) {
+                        radioOptions.push(text);
+                    }
+                });
+                properties.options = radioOptions.join('\n');
+                break;
         }
         // Read style set on component-card
         const $card = $component.find('> .component-card');
@@ -1328,6 +1435,9 @@ $(document).ready(function() {
             $('#no-selection').show();
             showEmptyState();
             updateComponentCount();
+            
+            // Hide preview
+            hidePreview();
             
             showNotification('Form cleared', 'info');
         }
@@ -1867,6 +1977,10 @@ $(document).ready(function() {
     addComponentToCanvas = function(componentType) {
         originalAddComponentToCanvas(componentType);
         updateFormTree();
+        // Auto-update preview if it's currently shown
+        if (!$('#preview-container').hasClass('hidden')) {
+            showPreview();
+        }
     };
     
     // Update tree when component is deleted  
@@ -1874,6 +1988,20 @@ $(document).ready(function() {
     deleteComponent = function(componentId) {
         originalDeleteComponent(componentId);
         updateFormTree();
+        // Auto-update preview if it's currently shown
+        if (!$('#preview-container').hasClass('hidden')) {
+            showPreview();
+        }
+    };
+    
+    // Auto-update preview when components change
+    const originalApplyComponentProperties = applyComponentProperties;
+    applyComponentProperties = function() {
+        originalApplyComponentProperties();
+        // Auto-update preview if it's currently shown
+        if (!$('#preview-container').hasClass('hidden')) {
+            showPreview();
+        }
     };
     
     // Add event handlers for quick forms
@@ -1896,6 +2024,276 @@ $(document).ready(function() {
         }
     });
     
+    /**
+     * Toggle preview panel
+     */
+    function togglePreview() {
+        const $previewContainer = $('#preview-container');
+        
+        if ($previewContainer.hasClass('hidden')) {
+            showPreview();
+        } else {
+            hidePreview();
+        }
+        updatePreviewButton();
+    }
+    
+    /**
+     * Update preview button text and icon
+     */
+    function updatePreviewButton() {
+        const $previewContainer = $('#preview-container');
+        const $icon = $('#preview-icon');
+        const $text = $('#preview-text');
+        
+        if ($previewContainer.hasClass('hidden')) {
+            $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            $text.text('Preview');
+        } else {
+            $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            $text.text('Hide Preview');
+        }
+    }
+    
+    /**
+     * Show form preview
+     */
+    function showPreview() {
+        if (formData.components.length === 0) {
+            showNotification('폼에 컴포넌트를 추가한 후 프리뷰를 확인하세요', 'warning');
+            return;
+        }
+        
+        // Show preview container
+        $('#preview-container').removeClass('hidden');
+        
+        // Show loading state
+        $('#preview-loading').removeClass('hidden');
+        $('#preview-empty').addClass('hidden');
+        $('#preview-content').addClass('hidden');
+        
+        try {
+            // Convert form data to FormIO format
+            const formioSchema = convertToFormIOSchema(formData);
+            
+            // Create FormIO instance
+            Formio.createForm(document.getElementById('preview-content'), formioSchema)
+                .then(function(form) {
+                    // Hide loading, show content
+                    $('#preview-loading').addClass('hidden');
+                    $('#preview-content').removeClass('hidden');
+                    
+                    // Handle form submission
+                    form.on('submit', function(submission) {
+                        displayFormData(submission.data);
+                        showNotification('폼이 성공적으로 제출되었습니다!', 'success');
+                    });
+                    
+                    // Handle form change
+                    form.on('change', function(changed) {
+                        displayFormData(form.submission.data);
+                    });
+                    
+                    // Initial data display
+                    displayFormData(form.submission.data);
+                })
+                .catch(function(error) {
+                    console.error('FormIO Preview Error:', error);
+                    $('#preview-loading').addClass('hidden');
+                    $('#preview-empty').removeClass('hidden');
+                    showNotification('프리뷰 생성 중 오류가 발생했습니다', 'error');
+                });
+        } catch (error) {
+            console.error('Preview Error:', error);
+            $('#preview-loading').addClass('hidden');
+            $('#preview-empty').removeClass('hidden');
+            showNotification('프리뷰 생성 중 오류가 발생했습니다', 'error');
+        }
+    }
+    
+    /**
+     * Convert form data to FormIO schema
+     */
+    function convertToFormIOSchema(formData) {
+        const components = [];
+        
+        formData.components.forEach(component => {
+            const formioComponent = convertComponentToFormIO(component);
+            if (formioComponent) {
+                components.push(formioComponent);
+            }
+        });
+        
+        return {
+            type: 'form',
+            display: 'form',
+            components: components
+        };
+    }
+    
+    /**
+     * Convert individual component to FormIO format
+     */
+    function convertComponentToFormIO(component) {
+        const props = component.properties || {};
+        
+        switch(component.type) {
+            case 'input':
+                return {
+                    type: 'textfield',
+                    key: props.name || component.id,
+                    label: props.label || 'Text Input',
+                    placeholder: props.placeholder || '',
+                    description: props.description || '',
+                    validate: {
+                        required: props.required || false
+                    },
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'textarea':
+                return {
+                    type: 'textarea',
+                    key: props.name || component.id,
+                    label: props.label || 'Text Area',
+                    placeholder: props.placeholder || '',
+                    description: props.description || '',
+                    rows: props.rows || 4,
+                    validate: {
+                        required: props.required || false
+                    },
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'dropdown':
+                let options = [
+                    { label: 'Option 1', value: 'option1' },
+                    { label: 'Option 2', value: 'option2' },
+                    { label: 'Option 3', value: 'option3' }
+                ];
+                
+                if (props.options) {
+                    if (typeof props.options === 'string') {
+                        options = props.options.split('\n').filter(opt => opt.trim()).map(opt => ({
+                            label: opt.trim(),
+                            value: opt.trim()
+                        }));
+                    } else if (Array.isArray(props.options)) {
+                        options = props.options.map(opt => ({
+                            label: typeof opt === 'string' ? opt : opt.label || opt.value || opt,
+                            value: typeof opt === 'string' ? opt : opt.value || opt.label || opt
+                        }));
+                    }
+                }
+                
+                return {
+                    type: 'select',
+                    key: props.name || component.id,
+                    label: props.label || 'Dropdown',
+                    placeholder: 'Select an option...',
+                    data: {
+                        values: options
+                    },
+                    validate: {
+                        required: props.required || false
+                    },
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'checkbox':
+                return {
+                    type: 'checkbox',
+                    key: props.name || component.id,
+                    label: props.label || 'Checkbox Option',
+                    defaultValue: false,
+                    validate: {
+                        required: props.required || false
+                    },
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'radiogroup':
+                let radioOptions = [
+                    { label: 'Option 1', value: 'option1' },
+                    { label: 'Option 2', value: 'option2' },
+                    { label: 'Option 3', value: 'option3' }
+                ];
+                
+                if (props.options) {
+                    if (typeof props.options === 'string') {
+                        radioOptions = props.options.split('\n').filter(opt => opt.trim()).map(opt => ({
+                            label: opt.trim(),
+                            value: opt.trim()
+                        }));
+                    } else if (Array.isArray(props.options)) {
+                        radioOptions = props.options.map(opt => ({
+                            label: typeof opt === 'string' ? opt : opt.label || opt.value || opt,
+                            value: typeof opt === 'string' ? opt : opt.value || opt.label || opt
+                        }));
+                    }
+                }
+                
+                return {
+                    type: 'radio',
+                    key: props.name || component.id,
+                    label: props.label || 'Radio Group',
+                    values: radioOptions,
+                    validate: {
+                        required: props.required || false
+                    },
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'button':
+                return {
+                    type: 'button',
+                    key: component.id,
+                    label: props.text || props.label || 'Button',
+                    action: 'submit',
+                    theme: 'primary',
+                    size: 'md',
+                    disabled: props.disabled || false,
+                    hidden: props.hidden || false
+                };
+                
+            case 'header':
+                return {
+                    type: 'htmlelement',
+                    key: component.id,
+                    tag: props.level || 'h2',
+                    content: props.text || 'Header Text',
+                    hidden: props.hidden || false
+                };
+                
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Display form data
+     */
+    function displayFormData(data) {
+        const formattedData = JSON.stringify(data, null, 2);
+        $('#form-data').text(formattedData);
+    }
+    
+    /**
+     * Hide preview
+     */
+    function hidePreview() {
+        $('#preview-container').addClass('hidden');
+        $('#preview-content').addClass('hidden');
+        $('#preview-empty').removeClass('hidden');
+        $('#form-data').text('{\n    "message": "폼을 제출하면 데이터가 여기에 표시됩니다"\n}');
+        updatePreviewButton();
+    }
+
     // Global functions for onclick handlers
     window.editComponent = function(componentId) {
         const $component = $('#' + componentId);

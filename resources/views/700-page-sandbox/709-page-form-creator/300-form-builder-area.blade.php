@@ -5,9 +5,9 @@
             <div class="flex items-center space-x-4">
             </div>
             <div class="flex items-center space-x-2">
-                <button class="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">
-                    <i class="fas fa-eye mr-1"></i>
-                    Preview
+                <button class="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600" id="btn-preview">
+                    <i class="fas fa-eye mr-1" id="preview-icon"></i>
+                    <span id="preview-text">Preview</span>
                 </button>
             </div>
         </div>
