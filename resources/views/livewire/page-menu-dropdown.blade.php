@@ -1,23 +1,22 @@
 {{-- Livewire 페이지 메뉴 드롭다운 컴포넌트 --}}
-<div class="page-dropdown-container" style="display: flex; position: relative;">
-    <button wire:click="toggleDropdown" 
-            @click.stop
-            style="width: 20px; height: 20px; border: none; border-radius: 3px; background: #F3F4F6; color: #6B7280; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;"
-            onmouseover="this.style.background='#E5E7EB'"
-            onmouseout="this.style.background='#F3F4F6'"
-            title="페이지 옵션">
-        •••
+<div class="page-dropdown-container" 
+     style="display: flex !important; position: relative; opacity: 1 !important; visibility: visible !important;">
+    <button onclick="console.log('Button clicked for page:', {{ $page['id'] }}); toggleDropdown({{ $page['id'] }})"
+            style="width: 24px; height: 24px; border: 1px solid #D1D5DB; border-radius: 4px; background: #F8F9FA !important; color: #495057 !important; font-size: 14px; font-weight: bold; line-height: 1; cursor: pointer; display: flex !important; align-items: center; justify-content: center; opacity: 1 !important; visibility: visible !important; z-index: 999; margin-left: 4px;"
+            onmouseover="this.style.background='#E9ECEF'; this.style.borderColor='#ADB5BD';"
+            onmouseout="this.style.background='#F8F9FA'; this.style.borderColor='#D1D5DB';"
+            title="페이지 옵션 (ID: {{ $page['id'] }})">
+        ⋮
     </button>
     
-    @if($isOpen)
-        <div @click.away="$wire.closeDropdown()"
-             style="position: absolute; right: 0; top: 100%; z-index: 50; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+    <div id="dropdown-{{ $page['id'] }}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; z-index: 9999; margin-top: 4px; width: 160px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
             
             {{-- 이름 변경 --}}
-            <button @click.stop="
+            <button onclick="
                 const newTitle = prompt('새로운 페이지 이름을 입력하세요:', '{{ addslashes($page['title']) }}');
                 if (newTitle && newTitle.trim() !== '') {
-                    $wire.updatePageTitle({{ $page['id'] }}, newTitle.trim());
+                    @this.updatePageTitle({{ $page['id'] }}, newTitle.trim());
+                    closeAllDropdowns();
                 }
             " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#F9FAFB'"
@@ -29,9 +28,10 @@
             </button>
             
             {{-- 하위 페이지 추가 --}}
-            <button wire:click="addChildPage({{ $page['id'] }})"
-                    @click.stop
-                    style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+            <button onclick="
+                @this.addChildPage({{ $page['id'] }});
+                closeAllDropdowns();
+            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#F9FAFB'"
                     onmouseout="this.style.background='white'">
                 <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,13 +40,28 @@
                 하위 페이지 추가
             </button>
             
+            {{-- 페이지 설정 --}}
+            <button onclick="
+                @this.openPageSettings({{ $page['id'] }});
+                closeAllDropdowns();
+            " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                    onmouseover="this.style.background='#F9FAFB'"
+                    onmouseout="this.style.background='white'">
+                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                페이지 설정
+            </button>
+            
             {{-- 구분선 --}}
             <div style="height: 1px; background: #E5E7EB; margin: 4px 0;"></div>
             
             {{-- 삭제 --}}
-            <button @click.stop="
+            <button onclick="
                 if (confirm('{{ addslashes($page['title']) }} 페이지를 정말 삭제하시겠습니까?\\n\\n하위 페이지가 있는 경우 먼저 하위 페이지를 삭제해야 합니다.')) {
-                    $wire.deletePage({{ $page['id'] }});
+                    @this.deletePage({{ $page['id'] }});
+                    closeAllDropdowns();
                 }
             " style="width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; font-size: 13px; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 8px;"
                     onmouseover="this.style.background='#FEF2F2'"
@@ -57,5 +72,4 @@
                 삭제
             </button>
         </div>
-    @endif
 </div>

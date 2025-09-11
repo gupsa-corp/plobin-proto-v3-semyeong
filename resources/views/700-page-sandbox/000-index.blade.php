@@ -41,15 +41,16 @@
                     <p class="text-gray-600">데이터베이스 관리</p>
                 </a>
 
+                <a href="{{ route('sandbox.using-projects') }}" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-yellow-200 bg-yellow-50">
+                    <h3 class="text-lg font-semibold text-yellow-900 mb-2">📦 샌드박스 사용 프로젝트</h3>
+                    <p class="text-yellow-700">현재 샌드박스를 사용하고 있는 프로젝트 목록 확인</p>
+                </a>
+
                 <a href="/sandbox/git-version-control" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Git 버전 관리</h3>
                     <p class="text-gray-600">로컬 Git 저장소 관리</p>
                 </a>
 
-                <a href="/sandbox/api-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">API 생성기</h3>
-                    <p class="text-gray-600">API 엔드포인트 생성 및 테스트</p>
-                </a>
 
                 <a href="/sandbox/api-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">API 목록</h3>
@@ -66,10 +67,6 @@
                     <p class="text-gray-600">생성된 Blade 템플릿 목록 관리</p>
                 </a>
 
-                <a href="/sandbox/file-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">파일 매니저</h3>
-                    <p class="text-gray-600">드래그 앤 드롭 파일 업로드 및 관리</p>
-                </a>
 
                 <a href="/sandbox/file-editor-integrated" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-blue-200 bg-blue-50">
                     <h3 class="text-lg font-semibold text-blue-900 mb-2">통합 파일 에디터</h3>
@@ -94,6 +91,11 @@
                 <a href="/sandbox/scenario-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-blue-200 bg-blue-50">
                     <h3 class="text-lg font-semibold text-blue-900 mb-2">📋 시나리오 관리자</h3>
                     <p class="text-blue-700">개발 시나리오 및 요구사항을 체계적으로 관리하고 추적합니다</p>
+                </a>
+
+                <a href="/sandbox/downloads" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-green-200 bg-green-50">
+                    <h3 class="text-lg font-semibold text-green-900 mb-2">📥 자료 다운로드</h3>
+                    <p class="text-green-700">E2E 테스트용 자료와 샘플 파일을 다운로드할 수 있습니다</p>
                 </a>
             </div>
         </div>

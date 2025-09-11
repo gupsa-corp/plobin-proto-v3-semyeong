@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sandbox_sql_executions', function (Blueprint $table) {
             $table->id();
-            $table->string('sandbox_name')->comment('샌드박스 이름 (storage-sandbox-1)');
+            $table->string('sandbox_folder')->comment('샌드박스 이름 (storage-sandbox-1)');
             $table->longText('sql_query')->comment('실행된 SQL 쿼리');
             $table->enum('query_type', ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'OTHER'])->comment('쿼리 타입');
             $table->enum('status', ['success', 'error'])->comment('실행 상태');
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('execution_time_ms')->nullable()->comment('실행 시간 (밀리초)');
             $table->string('user_session_id')->comment('사용자 세션 ID');
             $table->timestamps();
-            
-            $table->index(['sandbox_name', 'created_at']);
+
+            $table->index(['sandbox_folder', 'created_at']);
             $table->index(['status', 'created_at']);
             $table->index('query_type');
         });

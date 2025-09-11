@@ -16,15 +16,15 @@
                         @php
                             $currentStorage = session('sandbox_storage', '1');
                             $storageOptions = [];
-                            $storagePath = storage_path();
+                            $sandboxPath = storage_path('sandbox');
 
-                            if (file_exists($storagePath)) {
-                                $directories = glob($storagePath . '/storage-sandbox-*', GLOB_ONLYDIR);
+                            if (file_exists($sandboxPath)) {
+                                $directories = glob($sandboxPath . '/*', GLOB_ONLYDIR);
                                 foreach ($directories as $directory) {
                                     $basename = basename($directory);
-                                    if (strpos($basename, 'storage-sandbox-') === 0) {
-                                        $name = substr($basename, strlen('storage-sandbox-'));
-                                        $storageOptions[] = $name;
+                                    // sandbox-template 폴더는 제외
+                                    if ($basename !== 'sandbox-template') {
+                                        $storageOptions[] = $basename;
                                     }
                                 }
                                 sort($storageOptions);
@@ -33,10 +33,10 @@
 
                         @forelse($storageOptions as $storage)
                             <option value="{{ $storage }}" {{ $storage == $currentStorage ? 'selected' : '' }}>
-                                storage-sandbox-{{ $storage }}
+                                {{ $storage }}
                             </option>
                         @empty
-                            <option value="1">storage-sandbox-1 (기본)</option>
+                            <option value="1">1 (기본)</option>
                         @endforelse
                     </select>
                 </div>
@@ -44,6 +44,11 @@
                 <a href="/sandbox/storage-manager"
                    class="text-sm text-blue-600 hover:text-blue-800 underline">
                     관리
+                </a>
+                <span class="text-gray-300">|</span>
+                <a href="{{ route('sandbox.using-projects') }}"
+                   class="text-sm text-yellow-600 hover:text-yellow-800 underline">
+                    사용 프로젝트
                 </a>
             </div>
         </div>
@@ -73,9 +78,6 @@
             <div class="mb-3">
                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">파일 관리</div>
                 <div class="flex flex-wrap gap-2">
-                    <a href="/sandbox/file-manager" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        파일 매니저
-                    </a>
                     <a href="/sandbox/file-editor" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
                         파일 에디터
                     </a>
@@ -86,21 +88,25 @@
             <div class="mb-2">
                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">개발 도구</div>
                 <div class="flex flex-wrap gap-2">
-                    <a href="/sandbox/api-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        API 생성기
-                    </a>
+                    <!-- API 개발 -->
                     <a href="/sandbox/api-list" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        API 목록
+                        📋 API 목록
                     </a>
+                    
+                    <!-- 화면 개발 (커스텀 화면) -->
+                    <a href="/sandbox/custom-screens" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors font-medium border border-indigo-200">
+                        📱 커스텀 화면 관리
+                    </a>
+                    <a href="/sandbox/custom-screen-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors font-medium border border-indigo-200">
+                        ✨ 화면 생성기
+                    </a>
+                    
+                    <!-- 기존 블레이드 도구 -->
                     <a href="/sandbox/blade-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        Blade 생성기
+                        🎨 Blade 생성기
                     </a>
-                    <a href="/sandbox/blade-list" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        Blade 목록
-                    </a>
-                    <a href="/sandbox/git-version-control" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        Git 버전 관리
-                    </a>
+                    
+                    <!-- 함수 개발 -->
                     <a href="/sandbox/function-browser" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors font-medium">
                         📚 함수 브라우저
                     </a>
@@ -116,11 +122,16 @@
                     <a href="/sandbox/function-templates" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-colors">
                         🏪 템플릿
                     </a>
+                    
+                    <!-- 기타 도구 -->
                     <a href="/sandbox/form-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors font-medium">
-                        Form Creator
+                        📝 Form Creator
                     </a>
                     <a href="/sandbox/scenario-manager" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium">
                         📋 시나리오 관리자
+                    </a>
+                    <a href="/sandbox/git-version-control" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                        🔀 Git 버전 관리
                     </a>
                 </div>
             </div>

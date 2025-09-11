@@ -60,6 +60,22 @@ return [
             'report' => false,
         ],
 
+        'sandbox_uploads' => [
+            'driver' => 'local',
+            'root' => storage_path('sandbox/uploads'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'sandbox_downloads' => [
+            'driver' => 'local',
+            'root' => storage_path('sandbox/storage-sandbox-template/downloads'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

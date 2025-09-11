@@ -1,44 +1,78 @@
+@php
+    // 컨트롤러에서 전달받은 변수들 사용
+    $organization = $organization ?? null;
+    $project = $project ?? null;
+    $page = $page ?? null;
+    $customScreen = $customScreen ?? null;
+    $sandboxInfo = $sandboxInfo ?? null;
+    
+    $organizationId = $organization ? $organization->id : null;
+    $projectId = $project ? $project->id : null;
+    $pageId = $page ? $page->id : null;
+
+    // 샌드박스 정보는 컨트롤러에서 처리된 데이터 사용
+    $hasSandbox = $sandboxInfo['has_sandbox'] ?? false;
+    $hasCustomScreen = $sandboxInfo['has_custom_screen'] ?? false;
+    $sandboxName = $sandboxInfo['sandbox_name'] ?? null;
+    $sandboxLevel = $sandboxInfo['sandbox_level'] ?? null;
+    $customScreenFolder = $sandboxInfo['custom_screen_folder'] ?? null;
+@endphp
+
 <!-- 페이지별 커스텀 콘텐츠 -->
 <div class="px-6 py-6" x-data="">
-    <!-- 빈 페이지 안내 -->
-    <div class="flex flex-col items-center justify-center min-h-96 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div class="text-center max-w-md">
-            <div class="mb-6">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-            </div>
-            
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">
-                페이지 콘텐츠가 없습니다
-            </h2>
-            
-            <p class="text-gray-500 mb-6">
-                이 페이지는 아직 설정되지 않았습니다.<br>
-                페이지 설정에서 샌드박스 설정 또는 커스텀 화면을 구성해주세요.
-            </p>
-            
-            <div class="space-y-3">
-                <a href="/organizations/1/projects/1/pages/1/settings/custom-screen" 
-                   class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    커스텀 화면 설정하기
-                </a>
-                
-                <div class="text-sm text-gray-400">
-                    또는 샌드박스 설정에서 바로 시작하세요
-                </div>
-                
-                <a href="/organizations/1/projects/1/pages/1/settings/sandbox" 
-                   class="inline-flex items-center justify-center px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
-                    샌드박스 설정하기
-                </a>
-            </div>
+    @if(!$organization)
+        <!-- 조직이 없는 경우 -->
+        @include('300-page-service.308-page-project-dashboard.210-error-organization-not-found')
+    @elseif(!$project)
+        <!-- 프로젝트가 없는 경우 -->
+        @include('300-page-service.308-page-project-dashboard.211-error-project-not-found')
+    @elseif(isset($customScreen) && !empty($customScreen))
+        <!-- 커스텀 화면이 있는 경우 렌더링 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            @include('300-page-service.308-page-project-dashboard.221-custom-screen-content')
         </div>
-    </div>
+    @elseif($page && $hasCustomScreen && $customScreenFolder)
+        <!-- sandbox_custom_screen_folder 기반 커스텀 화면 렌더링 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            @php
+                // storage/sandbox 경로에서 실제 파일 찾기
+                $customScreenFilePath = storage_path('sandbox/' . $sandboxName . '/frontend/' . trim($customScreenFolder, '/') . '/000-content.blade.php');
+            @endphp
+
+            @if(file_exists($customScreenFilePath))
+                {!! view()->file($customScreenFilePath, get_defined_vars())->render() !!}
+            @else
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-800">
+                                커스텀 화면 파일을 찾을 수 없습니다: <code>{{ $customScreenFilePath }}</code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @elseif($page && $hasSandbox)
+        <!-- 일반 샌드박스만 설정된 경우 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            @include('300-page-service.308-page-project-dashboard.231-sandbox-content')
+        </div>
+    @else
+        <!-- 빈 페이지 안내 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            @include('300-page-service.308-page-project-dashboard.241-empty-page-content', [
+                'organizationId' => $organizationId,
+                'projectId' => $projectId,
+                'pageId' => $pageId,
+                'page' => $page
+            ])
+        </div>
+    @endif
 </div>
+
+<!-- JavaScript 에러 처리 -->
+@include('300-page-service.308-page-project-dashboard.400-javascript-error-handling')

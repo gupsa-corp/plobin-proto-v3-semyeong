@@ -13,7 +13,7 @@ class FunctionMetadataService
     public function __construct()
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
-        $this->basePath = storage_path("sandbox-storage/storage-sandbox-{$this->currentStorage}");
+        $this->basePath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}");
     }
 
     /**
@@ -22,14 +22,14 @@ class FunctionMetadataService
     public function getFunctions(): array
     {
         $functionsFile = $this->basePath . '/metadata/functions.json';
-        
+
         if (!File::exists($functionsFile)) {
             return [];
         }
 
         $content = File::get($functionsFile);
         $data = json_decode($content, true);
-        
+
         return $data['functions'] ?? [];
     }
 
@@ -48,7 +48,7 @@ class FunctionMetadataService
     public function getStatistics(): array
     {
         $functionsFile = $this->basePath . '/metadata/functions.json';
-        
+
         if (!File::exists($functionsFile)) {
             return [
                 'total_functions' => 0,
@@ -59,7 +59,7 @@ class FunctionMetadataService
 
         $content = File::get($functionsFile);
         $data = json_decode($content, true);
-        
+
         return $data['statistics'] ?? [];
     }
 
@@ -70,7 +70,7 @@ class FunctionMetadataService
     {
         try {
             $functionsFile = $this->basePath . '/metadata/functions.json';
-            
+
             // Load existing data
             $data = [];
             if (File::exists($functionsFile)) {
@@ -102,7 +102,7 @@ class FunctionMetadataService
 
             // Save
             File::put($functionsFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -116,7 +116,7 @@ class FunctionMetadataService
     {
         try {
             $functionsFile = $this->basePath . '/metadata/functions.json';
-            
+
             if (!File::exists($functionsFile)) {
                 return false;
             }
@@ -126,16 +126,16 @@ class FunctionMetadataService
 
             if (isset($data['functions'][$functionName])) {
                 unset($data['functions'][$functionName]);
-                
+
                 // Update statistics
                 $this->updateStatistics($data);
-                
+
                 // Save
                 File::put($functionsFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                
+
                 return true;
             }
-            
+
             return false;
         } catch (\Exception $e) {
             return false;
@@ -149,16 +149,16 @@ class FunctionMetadataService
     {
         try {
             $function = $this->getFunction($functionName);
-            
+
             if (!$function) {
                 return false;
             }
 
             $versions = $function['versions'] ?? [];
-            
+
             if (!in_array($version, $versions)) {
                 $versions[] = $version;
-                
+
                 // Sort versions (release first, then by name)
                 usort($versions, function($a, $b) {
                     if ($a === 'release') return -1;
@@ -168,7 +168,7 @@ class FunctionMetadataService
 
                 return $this->updateFunction($functionName, ['versions' => $versions]);
             }
-            
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -181,7 +181,7 @@ class FunctionMetadataService
     public function getFunctionsByCategory(string $category): array
     {
         $functions = $this->getFunctions();
-        
+
         return array_filter($functions, function($function) use ($category) {
             return ($function['category'] ?? '') === $category;
         });
@@ -198,7 +198,7 @@ class FunctionMetadataService
 
         foreach ($functions as $name => $function) {
             $searchable = strtolower($name . ' ' . ($function['description'] ?? '') . ' ' . implode(' ', $function['tags'] ?? []));
-            
+
             if (strpos($searchable, $term) !== false) {
                 $results[$name] = $function;
             }
@@ -279,13 +279,13 @@ class FunctionMetadataService
     {
         try {
             $metadataDir = $this->basePath . '/metadata';
-            
+
             if (!File::exists($metadataDir)) {
                 File::makeDirectory($metadataDir, 0755, true);
             }
 
             $functionsFile = $metadataDir . '/functions.json';
-            
+
             if (!File::exists($functionsFile)) {
                 $initialData = [
                     'functions' => [],
@@ -296,7 +296,7 @@ class FunctionMetadataService
                         'last_updated' => now()->toISOString()
                     ]
                 ];
-                
+
                 File::put($functionsFile, json_encode($initialData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             }
 

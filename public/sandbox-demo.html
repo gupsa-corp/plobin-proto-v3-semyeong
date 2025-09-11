@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>샌드박스 API 데모</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">샌드박스 템플릿 API 데모</h1>
+            <p class="text-gray-600">서버에서 사용할 수 있는 샌드박스 템플릿 목록을 API로 불러와서 표시하는 기능을 테스트합니다.</p>
+        </div>
+
+        <!-- API 테스트 섹션 -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">API 엔드포인트 테스트</h2>
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">API URL</label>
+                    <input type="text" 
+                           id="apiUrl" 
+                           value="/api/sandbox/list" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button onclick="testAPI()" 
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    API 테스트
+                </button>
+            </div>
+            <div id="apiResult" class="bg-gray-100 border rounded-md p-4 min-h-[100px] font-mono text-sm"></div>
+        </div>
+
+        <!-- 샌드박스 템플릿 목록 -->
+        <div class="bg-white shadow rounded-lg" x-data="sandboxTemplates()">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">사용 가능한 샌드박스 템플릿</h2>
+                        <p class="mt-1 text-sm text-gray-500">
+                            서버에서 사용할 수 있는 샌드박스 템플릿 목록입니다. 이 템플릿들을 기반으로 새로운 샌드박스를 생성할 수 있습니다.
+                        </p>
+                    </div>
+                    <button @click="loadTemplates()" 
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            :disabled="loading">
+                        <svg class="h-4 w-4 mr-2" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span x-text="loading ? '로딩중...' : '새로고침'"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <!-- 로딩 상태 -->
+                <div x-show="loading" class="text-center py-4">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-400 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    템플릿 목록을 불러오는 중...
+                </div>
+
+                <!-- 에러 상태 -->
+                <div x-show="error && !loading" class="text-center py-4">
+                    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">템플릿 로딩 오류</h3>
+                                <p class="text-sm text-red-700 mt-1" x-text="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 템플릿 목록 -->
+                <div x-show="!loading && !error && templates.length > 0">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <template x-for="template in templates" :key="template.name">
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all duration-200">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-base font-medium text-gray-900 truncate" x-text="template.name"></h4>
+                                        <p class="text-sm text-gray-500 truncate" x-text="template.path"></p>
+                                    </div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2">
+                                        템플릿
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center text-xs text-gray-600">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span x-text="'생성일: ' + template.created_at"></span>
+                                    </div>
+                                    <div class="flex items-center text-xs text-gray-600">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <span x-text="'파일: ' + template.file_count + '개'"></span>
+                                    </div>
+                                    <div class="flex items-center text-xs text-gray-600">
+                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                        </svg>
+                                        <span x-text="'폴더: ' + template.directory_count + '개'"></span>
+                                    </div>
+                                </div>
+                                
+                                <button @click="useTemplate(template)" 
+                                        class="w-full inline-flex justify-center items-center px-3 py-2 border border-indigo-300 shadow-sm text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    템플릿으로 생성
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 템플릿이 없는 경우 -->
+                <div x-show="!loading && !error && templates.length === 0" class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <h4 class="mt-2 text-lg font-medium text-gray-900">사용 가능한 템플릿이 없습니다</h4>
+                    <p class="mt-1 text-sm text-gray-500">서버에서 템플릿을 찾을 수 없습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사용 안내 -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">사용 방법</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>페이지 로드 시 자동으로 서버에서 샌드박스 템플릿 목록을 가져옵니다</li>
+                            <li>템플릿 카드에서 "템플릿으로 생성" 버튼을 클릭하면 해당 템플릿을 선택할 수 있습니다</li>
+                            <li>새로고침 버튼으로 최신 템플릿 목록을 다시 불러올 수 있습니다</li>
+                            <li>상단의 "API 테스트" 버튼으로 직접 API 응답을 확인할 수 있습니다</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 직접 테스트 함수
+        async function testAPI() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const resultDiv = document.getElementById('apiResult');
+            
+            try {
+                resultDiv.textContent = '로딩 중...';
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `오류: ${error.message}`;
+            }
+        }
+
+        // Alpine.js 컴포넌트
+        function sandboxTemplates() {
+            return {
+                templates: [],
+                loading: false,
+                error: null,
+                
+                init() {
+                    // 페이지 로드 시 템플릿 목록을 자동으로 불러오기
+                    this.loadTemplates();
+                },
+                
+                async loadTemplates() {
+                    this.loading = true;
+                    this.error = null;
+                    
+                    try {
+                        const response = await fetch('/api/sandbox/list', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        this.templates = data.sandboxes || [];
+                        
+                    } catch (error) {
+                        console.error('템플릿 로딩 에러:', error);
+                        this.error = error.message || '템플릿 목록을 불러오는 중 오류가 발생했습니다.';
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                useTemplate(template) {
+                    // 템플릿 선택 시 동작
+                    console.log('선택된 템플릿:', template);
+                    alert(`${template.name} 템플릿이 선택되었습니다!\n\n파일: ${template.file_count}개\n폴더: ${template.directory_count}개\n생성일: ${template.created_at}`);
+                }
+            }
+        }
+        
+        // 페이지 로드 시 API 테스트 실행
+        window.addEventListener('load', function() {
+            setTimeout(testAPI, 1000);
+        });
+    </script>
+</body>
+</html>

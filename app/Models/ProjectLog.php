@@ -10,6 +10,8 @@ class ProjectLog extends Model
 {
     use HasFactory;
 
+    protected $table = 'project_change_logs';
+
     protected $fillable = [
         'project_id',
         'user_id',
@@ -97,13 +99,13 @@ class ProjectLog extends Model
      * 로그 생성 정적 메서드
      */
     public static function createLog(
-        int $projectId, 
-        int $userId, 
-        string $action, 
-        string $description = null, 
-        string $entityType = null, 
-        int $entityId = null, 
-        array $metadata = []
+        int $projectId,
+        int $userId,
+        string $action,
+        ?string $description = null,
+        ?string $entityType = null,
+        ?int $entityId = null,
+        ?array $metadata = []
     ) {
         return self::create([
             'project_id' => $projectId,

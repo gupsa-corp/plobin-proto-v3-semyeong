@@ -11,11 +11,11 @@ return [
                       </svg>'
         ],
         [
-            'title' => '개인정보 수정',
-            'url' => '/mypage/edit',
-            'active' => request()->is('mypage/edit'),
+            'title' => '권한',
+            'url' => '/mypage/permissions',
+            'active' => request()->is('mypage/permissions'),
             'icon' => '<svg width="20" height="20" viewBox="0 0 20 20">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/>
+                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" fill="currentColor"/>
                       </svg>'
         ],
         [

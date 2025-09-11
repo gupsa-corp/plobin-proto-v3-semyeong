@@ -178,11 +178,7 @@
                         <div class="bg-gray-50 rounded-lg p-4">
                             <div class="text-xs text-gray-600 mb-2">Blade 템플릿 코드:</div>
                             <pre class="bg-white p-3 rounded border text-xs overflow-x-auto whitespace-pre-wrap font-mono text-gray-800"
-                                 style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; max-height: 400px; overflow-y: auto;">
-{{ $previewContent ?? '&lt;div class="sample-template"&gt;
-    &lt;h1&gt;{{ $title }}&lt;/h1&gt;
-    &lt;p&gt;{{ $content }}&lt;/p&gt;
-&lt;/div&gt;' }}
+                                 style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; max-height: 400px; overflow-y: auto;">{{ $previewContent ?? '&lt;div class="sample-template"&gt;&lt;h1&gt;&#123;&#123; $title &#125;&#125;&lt;/h1&gt;&lt;p&gt;&#123;&#123; $content &#125;&#125;&lt;/p&gt;&lt;/div&gt;' }}
                             </pre>
                         </div>
                     </div>

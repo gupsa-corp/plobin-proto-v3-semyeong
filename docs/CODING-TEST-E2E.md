@@ -8,7 +8,7 @@
 
 ### 관리자 계정
 ```
-이메일: admin@gupsa.com
+이메일: admin@example.com
 비밀번호: password
 ```
 

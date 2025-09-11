@@ -71,15 +71,7 @@
 
             {{-- JSON 포맷 버튼 --}}
             <button
-                @click="
-                    try {
-                        const parsed = JSON.parse(testParams || '{}');
-                        testParams = JSON.stringify(parsed, null, 2);
-                        validateJson(testParams);
-                    } catch (e) {
-                        console.error('JSON 파싱 오류:', e);
-                    }
-                "
+                @click="formatJson()"
                 class="absolute top-2 right-2 px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border border-gray-300"
                 title="JSON 포맷 정리"
             >
@@ -100,50 +92,97 @@
     {{-- 예시 탭 --}}
     <div x-show="activeTestTab === 'examples'" class="p-3">
         <div class="space-y-3">
-            <template x-for="(example, operation) in parameterExamples" :key="operation">
-                <div class="border border-gray-200 rounded-lg p-3">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-medium text-gray-700" x-text="operation.toUpperCase() + ' 작업'"></span>
-                        <button
-                            @click="testParams = example; activeTestTab = 'params'; validateJson(example);"
-                            class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs rounded transition-colors"
-                        >
-                            📋 사용
-                        </button>
+            @if(!empty($parameterExamples))
+                @foreach($parameterExamples as $index => $example)
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">예시 {{ $index + 1 }} (로그 기반)</span>
+                            <button
+                                onclick="useLogExample('{{ addslashes($example) }}')"
+                                class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs rounded transition-colors"
+                            >
+                                📋 사용
+                            </button>
+                        </div>
+                        <pre class="text-xs bg-gray-50 p-2 rounded border overflow-x-auto" style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;">{{ $example }}</pre>
                     </div>
-                    <pre class="text-xs bg-gray-50 p-2 rounded border overflow-x-auto" style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;" x-text="JSON.stringify(JSON.parse(example), null, 2)"></pre>
-                </div>
-            </template>
+                @endforeach
+            @else
+                {{-- 기본 예시 (로그가 없을 때) --}}
+                <template x-for="(example, operation) in parameterExamples" :key="operation">
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700" x-text="operation.toUpperCase() + ' 작업'"></span>
+                            <button
+                                @click="testParams = example; activeTestTab = 'params'; validateJson(example);"
+                                class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs rounded transition-colors"
+                            >
+                                📋 사용
+                            </button>
+                        </div>
+                        <pre class="text-xs bg-gray-50 p-2 rounded border overflow-x-auto" style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;" x-text="JSON.stringify(JSON.parse(example), null, 2)"></pre>
+                    </div>
+                </template>
+            @endif
         </div>
     </div>
 
     {{-- 히스토리 탭 --}}
     <div x-show="activeTestTab === 'history'" class="p-3">
-        @if(!empty($testResults))
+        {{-- 날짜 선택 드롭다운 --}}
+        @if(!empty($availableLogDates))
+            <div class="mb-4 pb-3 border-b border-gray-200">
+                <label class="block text-sm font-medium text-gray-700 mb-2">로그 날짜 선택</label>
+                <select 
+                    wire:model.live="selectedLogDate"
+                    wire:change="selectLogDate($event.target.value)"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    @foreach($availableLogDates as $date)
+                        <option value="{{ $date }}">{{ $date }} ({{ \Carbon\Carbon::parse($date)->format('m월 d일') }})</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+
+        {{-- 로그 히스토리 표시 --}}
+        @if(!empty($logHistory))
             <div class="space-y-2 max-h-64 overflow-y-auto">
-                @foreach(array_reverse(array_slice($testResults, -10)) as $index => $result)
-                    <div class="border rounded-lg p-2 {{ $result['success'] ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' }}">
+                @foreach(array_slice($logHistory, 0, 20) as $log)
+                    <div class="border rounded-lg p-2 {{ $log['success'] ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' }}">
                         <div class="flex justify-between items-start mb-1">
-                            <div class="text-xs {{ $result['success'] ? 'text-green-700' : 'text-red-700' }} font-medium">
-                                {{ isset($result['timestamp']) ? $result['timestamp'] : now()->format('H:i:s') }}
+                            <div class="text-xs {{ $log['success'] ? 'text-green-700' : 'text-red-700' }} font-medium">
+                                {{ $log['timestamp'] }} ({{ \Carbon\Carbon::parse($log['datetime'])->format('H:i:s') }})
                             </div>
                             <button
-                                data-params="{{ htmlspecialchars(json_encode(isset($result['params']) ? $result['params'] : []), ENT_QUOTES, 'UTF-8') }}"
-                                onclick="rerunWithParams(this)"
-                                class="px-2 py-1 bg-white hover:bg-gray-100 border border-gray-200 text-xs rounded transition-colors"
+                                onclick="useLogExample('{{ addslashes($log['params_raw']) }}')"
+                                class="px-2 py-1 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 text-xs rounded transition-colors"
                                 title="이 파라미터로 다시 실행"
                             >
                                 🔄 재실행
                             </button>
                         </div>
                         <div class="text-xs text-gray-600 mb-1">
-                            파라미터: <code class="bg-white px-1 rounded">{{ Str::limit(json_encode(isset($result['params']) ? $result['params'] : []), 50) }}</code>
+                            파라미터: <code class="bg-white px-1 rounded">{{ Str::limit($log['params_raw'], 50) }}</code>
                         </div>
-                        <div class="text-xs {{ $result['success'] ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $result['success'] ? '✅ 성공' : '❌ 실패: ' . (isset($result['error']) ? $result['error'] : '알 수 없는 오류') }}
+                        <div class="text-xs {{ $log['success'] ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $log['success'] ? '✅ 성공' : '❌ 실패: ' . (isset($log['error']) ? $log['error'] : '알 수 없는 오류') }}
                         </div>
                     </div>
                 @endforeach
+            </div>
+            
+            @if(count($logHistory) > 20)
+                <div class="mt-3 text-center">
+                    <p class="text-xs text-gray-500">{{ count($logHistory) }}개 중 최근 20개를 표시했습니다.</p>
+                </div>
+            @endif
+        @elseif(!empty($availableLogDates))
+            <div class="text-center py-8 text-gray-500">
+                <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm">선택한 날짜에 실행 히스토리가 없습니다</p>
             </div>
         @else
             <div class="text-center py-8 text-gray-500">
@@ -151,6 +190,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <p class="text-sm">실행 히스토리가 없습니다</p>
+                <p class="text-xs text-gray-400 mt-1">함수를 실행하면 로그가 저장됩니다</p>
             </div>
         @endif
     </div>
@@ -284,6 +324,16 @@ function functionTestPanel() {
             }
         },
         
+        formatJson() {
+            try {
+                const parsed = JSON.parse(this.testParams || '{}');
+                this.testParams = JSON.stringify(parsed, null, 2);
+                this.validateJson(this.testParams);
+            } catch (e) {
+                console.error('JSON 파싱 오류:', e);
+            }
+        },
+        
         init() {
             this.validateJson(this.testParams);
             this.$watch('testParams', (value) => this.validateJson(value));
@@ -307,6 +357,33 @@ function rerunWithParams(button) {
         }
     } catch (e) {
         console.error('Failed to load parameters:', e);
+    }
+}
+
+// 로그 예시 사용 함수
+function useLogExample(params) {
+    try {
+        const testParamsEl = document.querySelector('[x-model="testParams"]');
+        if (testParamsEl) {
+            testParamsEl.value = params;
+            testParamsEl.dispatchEvent(new Event('input'));
+            
+            // JSON 검증 함수 호출
+            if (window.Alpine && testParamsEl._x_dataStack) {
+                const data = testParamsEl._x_dataStack[0];
+                if (data && data.validateJson) {
+                    data.validateJson(params);
+                }
+            }
+        }
+        
+        // Switch to params tab
+        const paramsTabButton = document.querySelector('[\\@click*="params"]');
+        if (paramsTabButton) {
+            paramsTabButton.click();
+        }
+    } catch (e) {
+        console.error('Failed to use log example:', e);
     }
 }
 

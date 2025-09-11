@@ -41,7 +41,7 @@ class AccessControlService
         $userRole = $this->getUserProjectRole($user, $project);
         
         // 페이지의 접근 레벨 확인
-        $pageAccessLevel = $page->getEffectiveAccessLevel();
+        $pageAccessLevel = $page->getEffectivePageAccessLevel();
         
         // 커스텀 역할인 경우
         if ($pageAccessLevel === PageAccessLevel::CUSTOM) {
@@ -79,7 +79,7 @@ class AccessControlService
 
         if ($organizationMember) {
             // 조직 역할을 프로젝트 역할로 매핑
-            return $this->mapOrganizationRoleToProjectRole($organizationMember->role);
+            return $this->mapOrganizationRoleToProjectRole($organizationMember->role_name);
         }
 
         // 기본값은 게스트
@@ -116,7 +116,27 @@ class AccessControlService
             return false;
         }
 
-        // 사용자의 커스텀 역할 확인
+        // 프로젝트 매니저(PM)인지 확인
+        if ($page->project->user_id === $user->id) {
+            return true;
+        }
+
+        foreach ($allowedRoles as $allowedItem) {
+            // 이메일 주소로 체크
+            if (filter_var($allowedItem, FILTER_VALIDATE_EMAIL)) {
+                if ($user->email === $allowedItem) {
+                    return true;
+                }
+            }
+            // 사용자 ID로 체크  
+            elseif (is_numeric($allowedItem)) {
+                if ($user->id == $allowedItem) {
+                    return true;
+                }
+            }
+        }
+
+        // 기존 커스텀 역할 확인 (하위 호환성)
         $userCustomRoles = $user->roles()
             ->where('name', 'like', 'project_' . $page->project_id . '_%')
             ->pluck('id')
@@ -190,7 +210,7 @@ class AccessControlService
                 'user' => $orgMember->user,
                 'role' => $projectRole,
                 'is_owner' => $project->user_id === $orgMember->user->id,
-                'organization_role' => $orgMember->role,
+                'organization_role' => $orgMember->role_name,
             ];
         }
 
@@ -202,7 +222,7 @@ class AccessControlService
      */
     public function getPageAccessibleRoles(ProjectPage $page): array
     {
-        $accessLevel = $page->getEffectiveAccessLevel();
+        $accessLevel = $page->getEffectivePageAccessLevel();
         
         if ($accessLevel === PageAccessLevel::CUSTOM) {
             return $page->allowed_roles ?? [];
@@ -227,7 +247,7 @@ class AccessControlService
         $summary = [];
 
         foreach ($pages as $page) {
-            $accessLevel = $page->getEffectiveAccessLevel();
+            $accessLevel = $page->getEffectivePageAccessLevel();
             $accessibleRoles = $this->getPageAccessibleRoles($page);
 
             $summary[] = [

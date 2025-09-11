@@ -25,28 +25,48 @@
 <script>
     // Livewire 이벤트 리스너들
     $wire.on('functionSelected', (functionName) => {
-        if (window.dependencyGraph) {
-            window.dependencyGraph.selectFunction(functionName);
-        }
+        window.dependencyGraph?.selectFunction(functionName);
     });
 
     $wire.on('viewModeChanged', (mode) => {
-        if (window.dependencyGraph) {
-            window.dependencyGraph.setViewMode(mode);
-        }
+        window.dependencyGraph?.setViewMode(mode);
     });
 
     $wire.on('filterChanged', (filters) => {
-        if (window.dependencyGraph) {
-            window.dependencyGraph.applyFilters(filters);
-        }
+        window.dependencyGraph?.applyFilters(filters);
     });
 
-    // 그래프 초기화
+    // 그래프 초기화 - 최적화된 버전
     document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initDependencyGraph === 'function') {
+        const loadGraph = () => {
+            if (typeof initDependencyGraph !== 'function') {
+                console.error('initDependencyGraph function not found');
+                document.getElementById('graph-loading').innerHTML = '<div class="text-center text-red-500">그래프 초기화 함수를 찾을 수 없습니다.</div>';
+                return;
+            }
+            
             const graphData = @json($dependencyGraph);
+            console.log('Graph data received:', graphData);
+            
+            if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
+                console.warn('Empty graph data received');
+            }
+            
             window.dependencyGraph = initDependencyGraph('#dependency-graph', graphData, $wire);
+        };
+
+        // D3.js 로딩 확인
+        if (typeof d3 !== 'undefined') {
+            loadGraph();
+        } else {
+            console.warn('D3.js not loaded, waiting...');
+            setTimeout(() => {
+                if (typeof d3 !== 'undefined') {
+                    loadGraph();
+                } else {
+                    document.getElementById('graph-loading').innerHTML = '<div class="text-center text-red-500">D3.js 라이브러리를 로드할 수 없습니다.</div>';
+                }
+            }, 1000);
         }
     });
 </script>

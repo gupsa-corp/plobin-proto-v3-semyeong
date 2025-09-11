@@ -14,24 +14,19 @@
                         <p class="text-sm text-gray-600 mt-1">파일 매니저와 Monaco 에디터를 함께 사용하는 통합 개발 환경</p>
                     </div>
                     
-                    <div class="flex" style="height: calc(100vh - 200px);">
-                        <!-- 왼쪽: 파일 매니저 -->
-                        <div class="w-1/3 border-r border-gray-200 bg-gray-50">
-                            <div class="h-full overflow-auto">
-                                <div class="p-4 border-b bg-white">
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">파일 매니저</h3>
-                                    <p class="text-sm text-gray-600">파일을 업로드하고 편집할 파일을 선택하세요</p>
-                                </div>
-                                
-                                <div class="p-4">
-                                    <x-livewire-filemanager />
-                                </div>
+                    <div class="p-8 text-center">
+                        <div class="max-w-md mx-auto">
+                            <div class="mb-6">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
                             </div>
-                        </div>
-                        
-                        <!-- 오른쪽: Monaco 에디터 -->
-                        <div class="w-2/3 bg-white">
-                            <livewire:sandbox.file-manager-editor />
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">기능이 제거되었습니다</h3>
+                            <p class="text-gray-600 mb-4">통합 파일 에디터는 더 이상 사용할 수 없습니다.</p>
+                            <p class="text-sm text-gray-500 mb-6">대신 개별 파일 에디터를 이용해주세요.</p>
+                            <a href="/sandbox/file-editor" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                파일 에디터로 이동
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -39,68 +34,5 @@
         </div>
     </div>
 
-    <style>
-        /* 파일매니저 커스터마이징 */
-        .livewire-filemanager {
-            height: 100%;
-        }
-        
-        /* 모나코 에디터 다크 테마 조정 */
-        .monaco-editor {
-            border-radius: 0;
-        }
-        
-        /* 스크롤바 스타일링 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-    </style>
-
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            // 파일매니저의 파일 클릭을 감지하여 에디터로 전달
-            document.addEventListener('click', function(e) {
-                // '.file' 클래스를 가진 요소 클릭 감지 (파일매니저의 파일 아이템)
-                const fileElement = e.target.closest('.file');
-                if (fileElement) {
-                    const mediaId = fileElement.dataset.id;
-                    if (mediaId) {
-                        // 약간의 지연 후 에디터 컴포넌트에 이벤트 전달
-                        setTimeout(() => {
-                            Livewire.dispatch('fileSelected', { mediaId: parseInt(mediaId) });
-                        }, 100);
-                    }
-                }
-            });
-
-            // 파일 저장 성공 알림
-            Livewire.on('fileSaved', (data) => {
-                alert(data[0].message || '파일이 저장되었습니다.');
-            });
-        });
-    </script>
-    
-    <!-- Filament Scripts -->
-    @filamentScripts
-    
-    <!-- Livewire Scripts -->
-    @livewireScripts
-    
-    <!-- Filemanager Scripts -->
-    @filemanagerScripts
 </body>
 </html>

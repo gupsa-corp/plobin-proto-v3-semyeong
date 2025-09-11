@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\ProjectRole;
 use App\Enums\PageAccessLevel;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 
 class Project extends Model
 {
@@ -19,7 +19,8 @@ class Project extends Model
         'organization_id',
         'user_id',
         'default_access_level',
-        'project_roles'
+        'project_roles',
+        'sandbox_folder'
     ];
 
     protected $casts = [
@@ -32,7 +33,7 @@ class Project extends Model
     protected static function booted(): void
     {
         static::created(function ($project) {
-            ProjectLogService::logProjectCreated($project->id, $project->name, $project->user_id);
+            ProjectChangeLogService::logProjectCreated($project->id, $project->name, $project->user_id);
         });
 
         static::updated(function ($project) {
@@ -40,9 +41,9 @@ class Project extends Model
                 $changes = $project->getChanges();
                 // timestamps는 제외
                 unset($changes['updated_at'], $changes['created_at']);
-                
+
                 if (!empty($changes)) {
-                    ProjectLogService::logProjectUpdated($project->id, $changes);
+                    ProjectChangeLogService::logProjectUpdated($project->id, $changes);
                 }
             }
         });
@@ -76,6 +77,11 @@ class Project extends Model
     public function memberRoles()
     {
         return $this->hasMany(ProjectMemberRole::class);
+    }
+
+    public function sandboxes()
+    {
+        return $this->hasMany(ProjectSandbox::class);
     }
 
     /**

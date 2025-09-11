@@ -18,9 +18,6 @@
             <button wire:click="refreshList" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 새로고침
             </button>
-            <a href="/sandbox/api-creator" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                새 API 생성
-            </a>
         </div>
         <div class="text-sm text-gray-600">
             총 {{ count($apis) }}개의 API
@@ -113,12 +110,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             <h3 class="mt-4 text-lg font-medium text-gray-900">생성된 API가 없습니다</h3>
-            <p class="mt-2 text-gray-500">API Creator를 사용하여 첫 번째 API를 생성해보세요.</p>
-            <div class="mt-6">
-                <a href="/sandbox/api-creator" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                    새 API 생성
-                </a>
-            </div>
+            <p class="mt-2 text-gray-500">API 파일을 직접 업로드하거나 생성하여 관리할 수 있습니다.</p>
         </div>
     @endif
 

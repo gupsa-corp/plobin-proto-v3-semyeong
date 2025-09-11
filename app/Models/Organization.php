@@ -44,6 +44,11 @@ class Organization extends Model
         return $this->hasMany(OrganizationMember::class);
     }
 
+    public function organizationMembers(): HasMany
+    {
+        return $this->hasMany(OrganizationMember::class);
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organization_members')
@@ -66,7 +71,7 @@ class Organization extends Model
     {
         return $this->organizationMembers()->create([
             'user_id' => $user->id,
-            'role' => $role->value,
+            'role_name' => $role->value,
             'invited_at' => now(),
             'joined_at' => now(),
             'invitation_status' => 'accepted',

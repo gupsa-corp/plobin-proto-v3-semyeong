@@ -2,7 +2,7 @@
 
 namespace App\Http\UserAccount\Delete;
 
-use App\Http\CoreApi\Controller as BaseController;
+use App\Http\Controllers\Controller as BaseController;
 use App\Models\User;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class Controller extends BaseController
     public function show()
     {
         $user = Auth::user();
-        
+
         // 사용자가 소속된 조직들 조회
         $organizations = Organization::whereHas('members', function ($query) use ($user) {
             $query->where('user_id', $user->id);
@@ -116,7 +116,7 @@ class Controller extends BaseController
     public function checkOrganizationStatus()
     {
         $user = Auth::user();
-        
+
         $organizations = Organization::whereHas('members', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->with(['members' => function ($query) use ($user) {

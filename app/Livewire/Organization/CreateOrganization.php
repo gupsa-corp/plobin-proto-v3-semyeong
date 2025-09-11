@@ -29,6 +29,12 @@ class CreateOrganization extends Component
 
     public function openModal()
     {
+        // 모달 열기 전에 인증 상태 확인
+        if (!Auth::check()) {
+            session()->flash('error', '조직을 생성하려면 로그인이 필요합니다.');
+            return redirect('/login');
+        }
+
         $this->showModal = true;
         $this->reset(['name', 'description']);
         $this->resetErrorBag();
@@ -44,6 +50,12 @@ class CreateOrganization extends Component
     public function createOrganization()
     {
         $this->validate();
+
+        // 인증 상태 체크
+        if (!Auth::check()) {
+            session()->flash('error', '로그인이 필요합니다.');
+            return redirect('/login');
+        }
 
         // 조직 생성
         $organization = Organization::create([

@@ -16,13 +16,16 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug');
             $table->text('content')->nullable();
-            $table->string('status')->default('draft'); // draft, review, published, archived
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('project_pages')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('sort_order')->default(0);
+
+            // Sandbox related columns
+            $table->string('sandbox_folder')->nullable();
+            $table->string('sandbox_custom_screen_folder')->nullable();
+
             $table->timestamps();
-            
+
             $table->unique(['project_id', 'slug']);
         });
     }

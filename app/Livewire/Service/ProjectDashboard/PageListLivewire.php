@@ -5,7 +5,7 @@ namespace App\Livewire\Service\ProjectDashboard;
 use App\Models\Page;
 use App\Models\Project;
 use App\Models\ProjectPage;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -169,7 +169,7 @@ class PageListLivewire extends Component
             'status' => 'draft',
             'project_id' => $this->projectId,
             'parent_id' => null,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id() ?? 1, // 인증되지 않은 경우 기본 사용자 ID 1
             'sort_order' => $parentCount
         ]);
         
@@ -194,7 +194,7 @@ class PageListLivewire extends Component
             'status' => 'draft',
             'project_id' => $this->projectId,
             'parent_id' => $parentId,
-            'user_id' => auth()->id(), // 인증되지 않은 경우 기본 사용자 ID
+            'user_id' => auth()->id() ?? 1, // 인증되지 않은 경우 기본 사용자 ID 1
             'sort_order' => $childrenCount
         ]);
         
@@ -235,7 +235,7 @@ class PageListLivewire extends Component
                 $page->update(['title' => $newTitle]);
                 
                 // 로그 기록
-                ProjectLogService::logPageUpdated(
+                ProjectChangeLogService::logPageUpdated(
                     $page->project_id,
                     $page->id,
                     $newTitle,
@@ -302,7 +302,7 @@ class PageListLivewire extends Component
             $page->update(['title' => $newTitle]);
             
             // 로그 기록
-            ProjectLogService::logPageUpdated(
+            ProjectChangeLogService::logPageUpdated(
                 $page->project_id,
                 $page->id,
                 $newTitle,
@@ -351,7 +351,7 @@ class PageListLivewire extends Component
             $page->delete();
 
             // 로그 기록
-            ProjectLogService::logPageDeleted(
+            ProjectChangeLogService::logPageDeleted(
                 $page->project_id,
                 $pageId,
                 $page->title

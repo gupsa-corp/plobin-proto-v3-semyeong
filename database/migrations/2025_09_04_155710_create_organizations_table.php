@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
             $table->string('name', 25); // 조직명 최대 25자
+            $table->string('url', 50)->nullable(); // 조직 URL
             $table->text('description')->nullable();
             $table->string('status')->default('active');
             $table->integer('members_count')->default(1);

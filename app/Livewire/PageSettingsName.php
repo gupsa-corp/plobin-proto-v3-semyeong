@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\ProjectPage;
-use App\Services\ProjectLogService;
+use App\Services\ProjectChangeLogService;
 
 class PageSettingsName extends Component
 {
@@ -42,7 +42,7 @@ class PageSettingsName extends Component
             $page->update(['title' => $this->title]);
             
             // 로그 기록
-            ProjectLogService::logPageUpdated(
+            ProjectChangeLogService::logPageUpdated(
                 $page->project_id,
                 $page->id,
                 $this->title,

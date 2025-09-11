@@ -11,7 +11,7 @@ class OrganizationMember extends Model
     protected $fillable = [
         'organization_id',
         'user_id',
-        'role',
+        'role_name',
         'joined_at',
         'invited_at',
         'invitation_status'
@@ -37,8 +37,8 @@ class OrganizationMember extends Model
      */
     public function getRoleEnum(): ProjectRole
     {
-        if ($this->role) {
-            return ProjectRole::from($this->role);
+        if ($this->role_name) {
+            return ProjectRole::from($this->role_name);
         }
 
         // 기본값은 게스트
@@ -59,7 +59,7 @@ class OrganizationMember extends Model
      */
     public function setRoleEnum(ProjectRole $role): void
     {
-        $this->role = $role->value;
+        $this->role_name = $role->value;
     }
 
     /**

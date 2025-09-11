@@ -13,6 +13,10 @@
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.name') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 프로젝트 이름 변경
             </a>
+            <a href="{{ route('project.dashboard.project.settings.sandbox', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.sandbox') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
+                샌드박스 설정
+            </a>
             <a href="{{ route('project.dashboard.project.settings.users', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.users') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 사용자 관리
@@ -21,21 +25,13 @@
                class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.permissions') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
                 권한 관리
             </a>
-            <a href="{{ route('project.dashboard.project.settings.delete', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
-               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.delete') ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-red-700 hover:border-red-300' }} font-medium text-sm">
-                프로젝트 삭제
-            </a>
-            <a href="{{ route('project.dashboard.project.settings.sandboxes', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
-               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.sandboxes') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
-                샌드박스 관리
-            </a>
             <a href="{{ route('project.dashboard.project.settings.page-delete', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
-               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.page-delete') ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-orange-700 hover:border-orange-300' }} font-medium text-sm">
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.page-delete') ? 'border-orange-500 text-orange-600' : 'border-transparent text-orange-500 hover:text-orange-700 hover:border-orange-300' }} font-medium text-sm">
                 페이지 삭제
             </a>
-            <a href="{{ route('project.dashboard.project.settings.logs', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
-               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.logs') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
-                변경 로그
+            <a href="{{ route('project.dashboard.project.settings.delete', ['id' => request()->route('id'), 'projectId' => request()->route('projectId')]) }}" 
+               class="py-2 px-1 border-b-2 {{ request()->routeIs('project.dashboard.project.settings.delete') ? 'border-red-500 text-red-600' : 'border-transparent text-red-500 hover:text-red-700 hover:border-red-300' }} font-medium text-sm">
+                프로젝트 삭제
             </a>
         </nav>
     </div>

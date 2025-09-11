@@ -1,5 +1,8 @@
 # Plobin Proto V3 개발 가이드
 
+계정 : admin@example.com
+비번 : password
+
 ## 최우선 준수 규칙
 
 ### 파일 구조 및 URL 설계 규칙
@@ -43,7 +46,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
 - 메인 페이지: `000-index.blade.php`
 - 레이아웃: `301-layout-head.blade.php`
 - 컴포넌트: `200-sidebar-main.blade.php`
-- Livewire 뷰: `700-livewire-api-creator.blade.php`
+- Livewire 뷰: `700-livewire-component-name.blade.php`
 
 ### 숫자 접두사 체계
 - `000-xxx.blade.php`: 인덱스 파일 (메인 레이아웃)
