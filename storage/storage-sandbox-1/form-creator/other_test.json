@@ -1,0 +1,114 @@
+{
+    "name": "other test",
+    "description": "",
+    "components": [
+        {
+            "id": "comp_1",
+            "type": "dropdown",
+            "properties": {
+                "label": "드롭다운",
+                "name": "active_user",
+                "required": false,
+                "disabled": false,
+                "hidden": false,
+                "options": "user 1\nuser 2\nuser 3",
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 10,
+                "paddingX": 10,
+                "paddingY": 10,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_2",
+            "type": "input",
+            "properties": {
+                "label": "인풋",
+                "placeholder": "write user name...",
+                "name": "search_user",
+                "required": false,
+                "disabled": false,
+                "hidden": false,
+                "width": "third",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 10,
+                "paddingY": 10,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "none",
+                "borderWidth": 0,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_3",
+            "type": "radiogroup",
+            "properties": {
+                "label": "동의?",
+                "name": "radio_group",
+                "required": true,
+                "disabled": false,
+                "hidden": false,
+                "options": "say Yes\nsay No",
+                "width": "quarter",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 20,
+                "paddingY": 20,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "dashed",
+                "borderWidth": 1,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_4",
+            "type": "textarea",
+            "properties": {
+                "label": "잡담",
+                "placeholder": "Enter text...",
+                "rows": "4",
+                "name": "blrablra",
+                "required": false,
+                "disabled": false,
+                "hidden": false,
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 10,
+                "paddingY": 10,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_5",
+            "type": "tagpicker",
+            "properties": {
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 16,
+                "paddingY": 16,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgb(229, 231, 235)"
+            }
+        }
+    ],
+    "settings": [],
+    "saved_at": "2025-09-11T00:59:36.491810Z",
+    "created_at": "2025-09-11T00:59:36.491920Z",
+    "modified_at": "2025-09-11T00:59:36.491951Z"
+}

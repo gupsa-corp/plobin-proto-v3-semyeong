@@ -1,0 +1,131 @@
+{
+    "name": "new test",
+    "description": "",
+    "components": [
+        {
+            "id": "comp_1",
+            "type": "dropdown",
+            "properties": {
+                "label": "다운다운",
+                "name": "active_user",
+                "required": false,
+                "disabled": false,
+                "hidden": false,
+                "options": "Option 1\nOption 2\nOption 3",
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 10,
+                "paddingX": 10,
+                "paddingY": 10,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_2",
+            "type": "textarea",
+            "properties": {
+                "label": "Tex",
+                "placeholder": "그만",
+                "rows": "4",
+                "name": "text",
+                "required": false,
+                "disabled": true,
+                "hidden": false,
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 111,
+                "paddingY": 111,
+                "bgColor": "rgb(0, 0, 0)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "none",
+                "borderWidth": 0,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_3",
+            "type": "input",
+            "properties": {
+                "label": "Input",
+                "placeholder": "Enter text...",
+                "name": "ㄴㅊㄹ",
+                "required": false,
+                "disabled": false,
+                "hidden": false,
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 0,
+                "paddingY": 0,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "none",
+                "borderWidth": 0,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_4",
+            "type": "header",
+            "properties": {
+                "text": "",
+                "level": "h2",
+                "hidden": false,
+                "width": "full",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 0,
+                "paddingY": 0,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "none",
+                "borderWidth": 0,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_8",
+            "type": "button",
+            "properties": {
+                "text": "버튼",
+                "type": "button",
+                "disabled": false,
+                "hidden": false,
+                "width": "quarter",
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 0,
+                "paddingY": 0,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "none",
+                "borderWidth": 0,
+                "borderColor": "rgb(0, 0, 0)"
+            }
+        },
+        {
+            "id": "comp_9",
+            "type": "card",
+            "properties": {
+                "marginTop": 0,
+                "marginBottom": 0,
+                "paddingX": 16,
+                "paddingY": 16,
+                "bgColor": "rgb(255, 255, 255)",
+                "textColor": "rgb(0, 0, 0)",
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgb(229, 231, 235)"
+            }
+        }
+    ],
+    "settings": [],
+    "saved_at": "2025-09-10T07:31:50.505097Z",
+    "created_at": "2025-09-10T07:31:50.505252Z",
+    "modified_at": "2025-09-10T07:31:50.505276Z"
+}
