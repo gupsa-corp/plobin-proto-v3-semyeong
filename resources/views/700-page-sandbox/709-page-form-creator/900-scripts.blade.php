@@ -563,8 +563,8 @@ $(document).ready(function() {
         const componentType = $component.data('type');
         const componentId = $component.attr('id');
         
-        $('#no-selection').hide();
-        $('#component-properties').show();
+        $('#no-selection').addClass('hidden');
+        $('#component-properties').removeClass('hidden');
         
         // Fill basic properties
         $('#prop-type').val(componentType);
@@ -651,13 +651,13 @@ $(document).ready(function() {
         const definitions = componentPropertyDefinitions[componentType] || {};
         
         // Hide all property fields first
-        $('[id^="prop-"]').closest('div').hide();
+        $('[id^="prop-"]').closest('div').addClass('hidden');
         
         // Show only relevant fields for each tab
         Object.keys(definitions).forEach(tab => {
             const fields = definitions[tab];
             fields.forEach(fieldId => {
-                $(`#prop-${fieldId}`).closest('div').show();
+                $(`#prop-${fieldId}`).closest('div').removeClass('hidden');
             });
         });
     }
@@ -936,8 +936,8 @@ $(document).ready(function() {
         $('.property-tab').removeClass('active border-blue-500 text-blue-600').addClass('border-transparent text-gray-500');
         $(`.property-tab[data-tab="${tab}"]`).addClass('active border-blue-500 text-blue-600').removeClass('border-transparent text-gray-500');
         
-        $('.tab-content').hide();
-        $(`#tab-${tab}`).show();
+        $('.tab-content').addClass('hidden');
+        $(`#tab-${tab}`).removeClass('hidden');
     }
     
     /**
@@ -954,8 +954,8 @@ $(document).ready(function() {
             
             // Hide properties if this component was selected
             if (selectedComponent && selectedComponent.attr('id') === componentId) {
-                $('#component-properties').hide();
-                $('#no-selection').show();
+                $('#component-properties').addClass('hidden');
+                $('#no-selection').removeClass('hidden');
                 selectedComponent = null;
             }
             
@@ -977,16 +977,16 @@ $(document).ready(function() {
      * Hide empty state
      */
     function hideEmptyState() {
-        $('#empty-state').hide();
-        $('#form-components').removeClass('hidden').show();
+        $('#empty-state').addClass('hidden');
+        $('#form-components').removeClass('hidden');
     }
     
     /**
      * Show empty state
      */
     function showEmptyState() {
-        $('#form-components').addClass('hidden').hide();
-        $('#empty-state').show();
+        $('#form-components').addClass('hidden');
+        $('#empty-state').removeClass('hidden');
     }
     
     /**
@@ -1431,8 +1431,8 @@ $(document).ready(function() {
             componentCounter = 0;
             selectedComponent = null;
             
-            $('#component-properties').hide();
-            $('#no-selection').show();
+            $('#component-properties').addClass('hidden');
+            $('#no-selection').removeClass('hidden');
             showEmptyState();
             updateComponentCount();
             
@@ -1462,8 +1462,8 @@ $(document).ready(function() {
      * Load forms list
      */
     function loadFormsList() {
-        $('#forms-loading').show();
-        $('#forms-empty').hide();
+        $('#forms-loading').removeClass('hidden');
+        $('#forms-empty').addClass('hidden');
         
         $.ajax({
             url: '/api/sandbox/form-creator/list',
@@ -1482,12 +1482,12 @@ $(document).ready(function() {
      * Display forms list
      */
     function displayFormsList(forms) {
-        $('#forms-loading').hide();
+        $('#forms-loading').addClass('hidden');
         
         const $formsList = $('#forms-list');
         
         if (forms.length === 0) {
-            $('#forms-empty').show();
+            $('#forms-empty').removeClass('hidden');
             return;
         }
         
@@ -1599,9 +1599,9 @@ $(document).ready(function() {
             const description = $item.find('.form-description').text().toLowerCase();
             
             if (name.includes(query) || description.includes(query)) {
-                $item.show();
+                $item.removeClass('hidden');
             } else {
-                $item.hide();
+                $item.addClass('hidden');
             }
         });
     }
@@ -1700,8 +1700,8 @@ $(document).ready(function() {
         $('.right-panel-tab').removeClass('active border-blue-500 text-blue-600').addClass('border-transparent text-gray-500');
         $(`.right-panel-tab[data-tab="${tab}"]`).addClass('active border-blue-500 text-blue-600').removeClass('border-transparent text-gray-500');
         
-        $('.right-tab-content').hide();
-        $(`#right-tab-${tab}`).show();
+        $('.right-tab-content').addClass('hidden');
+        $(`#right-tab-${tab}`).removeClass('hidden');
         
         // Load content based on tab
         if (tab === 'tree') {
@@ -1724,12 +1724,12 @@ $(document).ready(function() {
         $treeComponents.empty();
         
         if (formData.components.length === 0) {
-            $treeEmpty.show();
+            $treeEmpty.removeClass('hidden');
             $componentCount.text('0 components');
             return;
         }
         
-        $treeEmpty.hide();
+        $treeEmpty.addClass('hidden');
         $componentCount.text(`${formData.components.length} component${formData.components.length > 1 ? 's' : ''}`);
         
         formData.components.forEach((component, index) => {
@@ -1787,7 +1787,7 @@ $(document).ready(function() {
      * Expand all tree nodes
      */
     function expandAllTreeNodes() {
-        $('.tree-item').show();
+        $('.tree-item').removeClass('hidden');
         $('.tree-node-toggle i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
     }
     
@@ -1909,11 +1909,11 @@ $(document).ready(function() {
         $quickFormsList.empty();
         
         if (forms.length === 0) {
-            $quickFormsEmpty.show();
+            $quickFormsEmpty.removeClass('hidden');
             return;
         }
         
-        $quickFormsEmpty.hide();
+        $quickFormsEmpty.addClass('hidden');
         
         forms.slice(0, 10).forEach(form => { // Show only first 10 forms
             const $formItem = createQuickFormItem(form);
@@ -1965,9 +1965,9 @@ $(document).ready(function() {
             const description = $item.find('p').text().toLowerCase();
             
             if (name.includes(query) || description.includes(query)) {
-                $item.show();
+                $item.removeClass('hidden');
             } else {
-                $item.hide();
+                $item.addClass('hidden');
             }
         });
     }
