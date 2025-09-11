@@ -64,7 +64,12 @@
     @else
         <!-- 빈 페이지 안내 -->
         <div class="bg-white rounded-lg shadow-sm p-6">
-            @include('300-page-service.308-page-project-dashboard.241-empty-page-content')
+            @include('300-page-service.308-page-project-dashboard.241-empty-page-content', [
+                'organizationId' => $organizationId,
+                'projectId' => $projectId,
+                'pageId' => $pageId,
+                'page' => $page
+            ])
         </div>
     @endif
 </div>

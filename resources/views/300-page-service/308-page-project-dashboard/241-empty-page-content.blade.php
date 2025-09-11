@@ -42,14 +42,74 @@
                     프로젝트에 페이지가 없습니다. 먼저 페이지를 생성해주세요.
                 </div>
 
-                <a href="/organizations/{{ $organizationId }}/projects/{{ $projectId }}"
-                   class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                <button id="create-page-btn"
+                        data-organization-id="{{ $organizationId }}"
+                        data-project-id="{{ $projectId }}"
+                        class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    페이지 생성하기
-                </a>
+                    <span id="create-page-text">페이지 생성하기</span>
+                </button>
             @endif
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const createPageBtn = document.getElementById('create-page-btn');
+    const createPageText = document.getElementById('create-page-text');
+    
+    if (createPageBtn) {
+        createPageBtn.addEventListener('click', function() {
+            const organizationId = this.dataset.organizationId;
+            const projectId = this.dataset.projectId;
+            
+            // 버튼 비활성화 및 로딩 상태 표시
+            this.disabled = true;
+            this.classList.add('opacity-50', 'cursor-not-allowed');
+            createPageText.textContent = '페이지 생성 중...';
+            
+            // CSRF 토큰 가져오기
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            // 페이지 생성 요청
+            fetch(`/organizations/${organizationId}/projects/${projectId}/pages/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    title: '새 페이지',
+                    parent_id: null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 성공 시 생성된 페이지로 리다이렉트
+                    window.location.href = data.redirect_url;
+                } else {
+                    // 오류 처리
+                    alert(data.error || '페이지 생성 중 오류가 발생했습니다.');
+                    // 버튼 복원
+                    this.disabled = false;
+                    this.classList.remove('opacity-50', 'cursor-not-allowed');
+                    createPageText.textContent = '페이지 생성하기';
+                }
+            })
+            .catch(error => {
+                console.error('페이지 생성 오류:', error);
+                alert('페이지 생성 중 오류가 발생했습니다.');
+                // 버튼 복원
+                this.disabled = false;
+                this.classList.remove('opacity-50', 'cursor-not-allowed');
+                createPageText.textContent = '페이지 생성하기';
+            });
+        });
+    }
+});
+</script>
